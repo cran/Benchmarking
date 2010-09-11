@@ -1,0 +1,19 @@
+Package: Benchmarking
+Type: Package
+Title: Benchmark and frontier analysis using DEA and SFA
+Version: 0.10
+Date: 2010-09-11 ($Date: 2010-09-11 19:06:14 +0200 (11 sep 2010) $)
+Author: Peter Bogetoft and Lars Otto
+Maintainer: Lars Otto <lo@foi.dk>
+Depends: lpSolveAPI, ucminf
+Description: Estimates and graphs deterministic (DEA) frontier models
+        with different technology assumptions (fdh, vrs, drs, crs, irs,
+        add). Also handles possible slacks, peers and their weights
+        (lambdas), optimal cost, revenue and profit allocation,
+        super--efficiency, and mergers.  A comparative method for
+        estimating SFA efficiencies is included.
+License: GPL (>= 2)
+LazyLoad: yes
+Packaged: 2010-09-11 19:57:47 UTC; Lars
+Repository: CRAN
+Date/Publication: 2010-09-12 08:10:47
