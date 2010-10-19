@@ -1,9 +1,9 @@
-# $Id: sdea.R 72 2010-09-11 17:06:14Z Lars $
+# $Id: sdea.R 75 2010-10-08 20:26:55Z Lars $
 
 
 # Calculates super efficiency
 sdea <- function(X,Y, RTS="vrs", ORIENTATION="in", TRANSPOSE=FALSE,
-                 LP=FALSE,...)
+                 LP=FALSE)
 {
    # Input is as for the method eff
    # Antal firmaer i data er K
@@ -21,6 +21,9 @@ sdea <- function(X,Y, RTS="vrs", ORIENTATION="in", TRANSPOSE=FALSE,
    # Superefficiens skal gemmes i en K-vektor som vi til en start 
    # saetter til NA.
    supereff = rep(NA,K)
+   if ( !is.null(dimnames(X)[[2]]) )  {
+      names(supereff) <- dimnames(X)[[2]]
+   }
    rts <- c("fdh","vrs","drs","crs","irs","irs","add")
    if ( missing(RTS) ) RTS <- "vrs" 
    if ( is.real(RTS) )  {
@@ -53,14 +56,21 @@ sdea <- function(X,Y, RTS="vrs", ORIENTATION="in", TRANSPOSE=FALSE,
       # der skal bruges, de definerer teknologien.
       e <- dea(X[,i,drop=FALSE], Y[,i,drop=FALSE],
          RTS,ORIENTATION, XREF=X[,-i,drop=FALSE], YREF=Y[,-i,drop=FALSE],
-         TRANSPOSE=TRUE,LP=LP, ...)
+         TRANSPOSE=TRUE,LP=LP)
       supereff[i] <- e$eff
       # print(dim(lambda))
       # print(dim(e$lambda))
       lambda[-i,i] <- e$lambda[,1]
    }
+# print("sdea: færdig med gennemløb")
 
-   rownames(lambda) <- 1:K
+# print(colnames(X))
+   if ( is.null(colnames(X)) )  {
+      rownames(lambda) <- paste("L",1:K,sep="")
+   } else {
+       rownames(lambda) <- paste("L",colnames(X),sep="_")
+   }
+   colnames(lambda) <- colnames(X)
    if (!TRANSPOSE)  {
       lambda <- t(lambda)
    }

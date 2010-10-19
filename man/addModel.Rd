@@ -1,89 +1,137 @@
-% $Id: addModel.Rd 72 2010-09-11 17:06:14Z Lars $
-\name{add.dea}
-\alias{add.dea}
+% $Id: addModel.Rd 81 2010-10-20 15:26:25Z Lars $
+\name{dea.add}
+\alias{dea.add}
+
 
 \title{Additive DEA model}
 
-\description{
-Calculates efficiency as sum of input and output slacks
-}
+\description{ Calculates additive efficiency as sum of input and
+output slacks within different DEA models }
 
 
 \usage{
-add.dea(X, Y, RTS = "vrs", TRANSPOSE = FALSE, ...)
+
+dea.add(X, Y, RTS="vrs", TRANSPOSE=FALSE, XREF=NULL, YREF=NULL, 
+        FRONT.IDX=NULL, LP=FALSE)
+
 }
 
 
 \arguments{
 
-  \item{X}{input where efficiency is to be calculated, a K x m matrix
+\item{X}{Inputs of firms to be evaluated, a K x m matrix
   of observations of K firms with m inputs (firm x input).  In case
-  \code{TRABSPOSE=TRUE} the input matrix is transposed as input x
+  \code{TRANSPOSE=TRUE} the input matrix is transposed to input x
   firm. }
 
-  \item{Y}{output where efficiency is to be calculated, a K x n matrix
+\item{Y}{Outputs of firms to be evaluated, a K x n matrix
   of observations of K firms with n outputs (firm x input).  In case
-  \code{TRABSPOSE=TRUE} the output matrix is transposed as output x
+  \code{TRANSPOSE=TRUE} the output matrix is transposed to output x
   firm. }
 
-  \item{RTS}{ A text string or a number to state the returns to scale
-  assumption
+\item{RTS}{ Text string or a number defining the underlying DEA
+technology / returns to scale assumption.
 
 \tabular{rcl}{
 0 \tab "fdh" \tab Free disposability hull, no convexity assumption \cr
-1 \tab "vrs" \tab Variable returns to scale, convex and free disposability \cr
-2 \tab "drs" \tab Decreasing returns to scale, convex, down-scaling and free disposability \cr
-3 \tab "crs" \tab constant returns to scale and free disposability \cr
-4 \tab "irs" \tab increasing returns to scale, up-scaling, but not down-scaling \cr
-5 \tab "add" \tab additivity,  scaling up and down, but only with integers
+1 \tab "vrs" \tab Variable returns to scale, convexity and free disposability \cr
+2 \tab "drs" \tab Decreasing returns to scale, convexity, down-scaling and free disposability \cr
+3 \tab "crs" \tab Constant returns to scale, convexity and free disposability \cr
+4 \tab "irs" \tab Increasing returns to scale, (up-scaling, but not down-scaling), convexity and free disposability \cr
+5 \tab "add" \tab Additivity (scaling up and down, but only with integers), and free disposability
 }
 
 }
 
-   \item{TRANSPOSE}{Input and output matrices are treated as goods times
-      units as defaults.  If \code{TRANSPOSE=FALSE} then marices 
-      are units times goods as in standard in R for statistical models}
+\item{TRANSPOSE}{Input and output matrices are treated as firms
+      times goods matrices for the default value \code{TRANSPOSE=FALSE}
+      corresponding to the standard in R for statistical models.  When
+      \code{TRUE} data matrices are transposed to good times firms
+      matrices as is normally used in LP formulation of the problem.}
 
-   \item{\dots}{Optional parameters for the method \code{slack}.}
+
+\item{XREF}{Inputs of the firms determining the technology, defaults
+to \code{X}}
+
+\item{YREF}{Outputs of the firms determining the technology, defaults
+to \code{Y}}
+
+\item{FRONT.IDX}{Index for firms determining the technology}
+
+
+\item{LP}{Only for debugging. If \code{LP=TRUE} then input and output
+   for the LP program are written to standard output for each unit.}
 
 }
 
 
 \value{
 
-\item{sum}{Sum of all slacks for each unit}
+\item{sum}{Sum of all slacks for each firm,
+     \code{sum=sum(sx)+sum(sy)}.}
 
 \item{slack}{A non-NULL vector of logical variables, \code{TRUE} if
-there is slack for the corresponding firm: also output from method
-\code{slack}.}
+     there is slack for the corresponding firm, and \code{FALSE} if
+     the there is no slack, i.e. the sum of slacks is zero.}
 
-\item{sx}{A matrix for input slacks for each firm, only calculated if
-the option \code{SLACK} is \code{TRUE} or returned from the method
-\code{slack}}
+\item{sx}{A matrix of input slacks for each firm}
 
-\item{sy}{A matrix for output slack, see \code{sx}}
+\item{sy}{A matrix of output slack for each firm}
+
+\item{lambda}{The lambdas, i.e. the weights of the peers for each firm}
 
 }
 
-\details{
- ~~ If necessary, more details than the __description__ above ~~
+
+\details{ The sum of the slacks is maximized in a LP formulation of
+  the DEA technology. The sum of the slacks can be seen as distance to
+  the frontier when you only move parallel to the axes of inputs and
+  outputs, i.e. not a usual Euclidean distance, but what is also known
+  as an L1 norm.
+
+  Since it is the sum of slacks that is calculated, there is no
+  exogenous ORIENTATION in the problem. Rather, there is generally
+  both an input and an output direction in the slacks. The model
+  considers the input excess and output shortfall simultaneously and
+  finds a point on the frontier that is most distant to the point
+  being evaluated.
+
 }
+
+
+\note{ This is neither a Farrell nor a Shephard like efficiency.
+
+The value of the slacks depends on the scaling of the different
+inputs and outputs.  Therefore the values are not independent of how
+the input and output are measured.}
+
+
+\author{ Peter Bogetoft and Lars Otto \email{lo@foi.dk}}
+
 
 \source{
-   corresponds to eqs. 4.34-4.38 in Cooper et al., 2007 
+   Corresponds to Eqs. 4.34-4.38 in Cooper et al. (2007)
 }
+
 
 \references{
-B&O
+
+Bogetoft and Otto; \emph{Benchmarking with DEA, SFA, and R}; Springer
+   2011
+
+Cooper, Seiford, and Tone; \emph{Data Envelopment Analysis: A
+	Comprehensive Text with Models, Applications, References and
+	DEA-Solver Software}; Second edition, Springer 2007
+
 }
 
-\examples{
 
+\examples{
 x <- matrix(c(2,3,2,4,6,5,6,8),ncol=1)
 y <- matrix(c(1,3,2,3,5,2,3,5),ncol=1)
 dea.plot.frontier(x,y,txt=1:dim(x)[1])
 
-sb <- add.dea(x,y,RTS="vrs")
+sb <- dea.add(x,y,RTS="vrs")
 data.frame("sx"=sb$sx,"sy"=sb$sy,"sum"=sb$sum,"slack"=sb$slack)
 }
 

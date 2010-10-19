@@ -1,8 +1,8 @@
-# $Id: dea.plot.R 72 2010-09-11 17:06:14Z Lars $
+# $Id: dea.plot.R 79 2010-10-19 09:02:04Z Lars $
 "dea.plot" <-
 function(x, y, RTS="vrs", ORIENTATION="in-out", txt=NULL, add=FALSE, 
-            wx=NULL, wy=NULL, TRANSPOSE = FALSE, fex=1,
-            ..., RANGE=FALSE, xlim, ylim, xlab, ylab)
+            wx=NULL, wy=NULL, TRANSPOSE = FALSE, fex=1, GRID=FALSE,
+            RANGE=FALSE, ..., xlim, ylim, xlab, ylab)
 # x er input 1 og y er iput 2 eller output.
 # Hvis der flere varer i de to input/output bliver de lagt sammen som
 # vægtet sum med vægte wx og wy; default vægte som være simpel addition.
@@ -58,7 +58,6 @@ function(x, y, RTS="vrs", ORIENTATION="in-out", txt=NULL, add=FALSE,
 
    if ( add == FALSE ) {
       dots = list(...)
-	   if ( missing(RANGE) ) RANGE = F
 	   if (RANGE)  {
 		   xlim <- 1.2*range(c(0,x)) +c(0,.01)
 		   ylim <- 1.2*range(c(0,y)) +c(0,.01)
@@ -71,13 +70,54 @@ function(x, y, RTS="vrs", ORIENTATION="in-out", txt=NULL, add=FALSE,
                         "in"="x2", "out"="y2", "in-out"="Y")}
       # plot points with axes
       plot(x,y,xlim=xlim,ylim=ylim,xaxs="i",yaxs="i",xlab=xlab,ylab=ylab,
-                frame=F,...)
-      grid(col="darkgray")
-      box(col="grey")
+                frame=FALSE,...)
+      if ( GRID )  {
+         grid(col="darkgray")
+         box(col="grey")
+      }
       if ( length(txt) > 0 ) {
         # Evt. tekst på punkter sættes lidt nede til højre
         text(x,y,txt,adj=c(-.75,.75),cex=fex)
       }
+   }  # if ( add == FALSE )
+
+   if ( RTS == "add" )   {
+      # Lav alle mulige additive kombinatinoner af data
+      # Find foerst randen i en fdh
+      idx <- sort(x, index.return=TRUE)
+      effektive <- rep(NA, dim(x)[1])
+      j <- 1
+      prev <- idx$ix[1]
+      effektive[j] <- prev
+      for ( i in idx$ix )  {
+         if ( y[i] > y[prev] )  {
+         	j <- j+1
+            effektive[j] <- i
+            prev <- i
+         }
+      }
+      # Frontier/rand og antal firms i randen
+      rand <- effektive[!is.na(effektive)]
+      nr <- length(rand)
+      # Hvor mange gange en firm optraeder foer vi er uden for plotrammen
+      if ( missing(xlim) )  xlim=c(0,1.2*max(x+.001))
+      nx <- round(xlim[2]/x[rand])
+
+      # lav aggregerings matrix til alle kombinationer af data
+      M <- matrix(NA, nrow=prod(1+nx), ncol=nr)
+      M[,1] <- rep(0:nx[1], prod(1+nx[-1]))
+      for ( j in 2:nr )  {
+         M[,j] <- as.integer(gl(1+nx[j], prod(1+nx[1:(j-1)]))) -1
+      }
+      # Drop foerste række med bar nuller
+      M <- M[-1,]
+      # Lav saa alle kombinationerne
+      x <- M %*% x[rand,,drop=FALSE]
+      y <- M %*% y[rand,,drop=FALSE]
+      # Herefter kan plottet laves som var det fdh, bemaerk at firms
+      # er allerede afsat som punkter saa kombinationerne kommer ikke
+      # til at optraede som punkter
+      RTS <- "fdh"
    }
 
    if ( ORIENTATION == "in" ) {
@@ -157,9 +197,9 @@ function(x, y, RTS="vrs", ORIENTATION="in-out", txt=NULL, add=FALSE,
       # extreme points in the convex hull
       if ( RTS == "vrs" | RTS == "drs" | RTS == "irs" ) 
            lines(x[hpts],y[hpts],...)
-      if ( RTS == "fdh" )  {
+      if ( RTS == "fdh" | RTS == "add" )  {
          # tegn linjer for fdh
-         idx <- sort(x,index.return=T)
+         idx <- sort(x,index.return=TRUE)
          prev <- idx$ix[1];
          for ( i in idx$ix )  {
             if ( y[i] > y[prev] ) {

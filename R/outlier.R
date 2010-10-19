@@ -1,4 +1,4 @@
-# $Id: outlier.R 72 2010-09-11 17:06:14Z Lars $
+# $Id: outlier.R 70 2010-08-31 08:29:20Z lo $
 
 
 outlier.ap <- function(X, Y, NDEL = 3, NLEN = 25, TRANSPOSE = FALSE)  

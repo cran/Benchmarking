@@ -1,4 +1,4 @@
-# $Id: dea.dual.R 72 2010-09-11 17:06:14Z Lars $
+# $Id: dea.dual.R 78 2010-10-18 22:09:28Z Lars $
 
 # In the calculation in the method input/output matrices X and Y are
 # of the order good x firms.  Ie. X, Y etc must be transformed as
@@ -13,8 +13,8 @@
 
 dea.dual <- function(X,Y, RTS="vrs", ORIENTATION="in", 
             XREF=NULL,YREF=NULL,
-            FRONT.IDX=NULL, DUAL=NULL,
-            TRANSPOSE=FALSE, LP=FALSE, CONTROL=NULL, LPK=NULL, ...)  {
+            FRONT.IDX=NULL, DUAL=NULL, DIRECT=NULL,
+            TRANSPOSE=FALSE, LP=FALSE, CONTROL=NULL, LPK=NULL)  {
    # XREF, YREF determines the technology
    # FRONT.IDX index for units that determine the technology
 
@@ -72,8 +72,10 @@ dea.dual <- function(X,Y, RTS="vrs", ORIENTATION="in",
    if ( length(FRONT.IDX) > 0 )  {
       if ( !is.vector(FRONT.IDX) )
          stop("FRONT.IDX is not a vector in 'eff'")
-      XREF <- matrix(XREF[,FRONT.IDX],nrow=dim(XREF)[1])
-      YREF <- matrix(YREF[,FRONT.IDX],nrow=dim(YREF)[1])
+      XREF <- XREF[,FRONT.IDX, drop=FALSE]
+      YREF <- YREF[,FRONT.IDX, drop=FALSE]
+      # XREF <- matrix(XREF[,FRONT.IDX],nrow=dim(XREF)[1])
+      # YREF <- matrix(YREF[,FRONT.IDX],nrow=dim(YREF)[1])
    }
 
    m = dim(X)[1]  # number of inputs

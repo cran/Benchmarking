@@ -1,31 +1,29 @@
-% $Id: dea.merge.Rd 72 2010-09-11 17:06:14Z Lars $
+% $Id: dea.merge.Rd 81 2010-10-20 15:26:25Z Lars $
 \name{dea.merge}
 \alias{dea.merge}
 
-\title{
-Efficiency results after mergers and their decompositions
-}
+\title{ Estimate potential merger gains and their decompositions }
 
-\description{ Calculate and decompose efficiency from mergers of
-similar firms, horisontal integration.  }
+\description{ Calculate and decompose potential gains from mergers of
+similar firms (horizontal integration).  }
 
 \usage{
 
 dea.merge(X, Y, M, RTS = "vrs", ORIENTATION = "in",
-             XREF = NULL, YREF = NULL, FRONT.IDX = NULL, TRANSPOSE = FALSE,
-             LP = FALSE, CONTROL = NULL, LPK = NULL, ...)
+          XREF = NULL, YREF = NULL, FRONT.IDX = NULL, 
+          TRANSPOSE=FALSE, LP=FALSE, CONTROL=NULL, LPK=NULL)
 }
 
-\arguments{ Most of the arguments corresponds to the argument in
-\code{dea}, K firms, m inputs, and n outputs.
+\arguments{\item{}{ Most of the arguments correspond to the arguments in
+\code{\link{dea}}, with K firms, m inputs, and n outputs.}
 
   \item{X}{ K times m matrix as in \code{dea} }
 
   \item{Y}{ K times n matrix as in \code{dea} }
 
   \item{M}{Kg times K matrix where each row defines a merger by the
-  firms ((colloms) included; matrix as returned from method
-  \code{make.marge}}
+  firms ((collums) included; matrix as returned from method
+  \code{\link{make.merge}}}
 
   \item{RTS}{as in \code{dea} }
 
@@ -45,55 +43,77 @@ dea.merge(X, Y, M, RTS = "vrs", ORIENTATION = "in",
 
   \item{LPK}{ as in \code{dea} }
 
-  \item{\dots}{ as in \code{dea} }
+%  \item{\dots}{ as in \code{dea} }
 
 }
 
-\details{
-%%  ~~ If necessary, more details than the description above ~~
-}
+
+\details{ 
+The K firms are merged into Kg new, merged firms.
+
+The decomposition is summarized on page 275 and in table 9.1 page 276
+in Bogetoft and Otto (2011) and is based on Bogetoft and Wang (2005) }
+
 
 \value{
 
-\item{Eff}{overall efficiencies of mergers, Kg vector}
+\item{Eff}{Overall efficiencies of mergers, Kg vector}
 
-\item{Estar}{adjusted overall efficiencies of mergers after the
+\item{Estar}{Adjusted overall efficiencies of mergers after the
 removal of individual learning, Kg vector}
 
-\item{learning}{= individual learning effects me (row) vectors, K*
-(row) vectors}
+\item{learning}{Learning effects, Kg vector}
 
-\item{harmony}{harmony effects, Kg vector}
+\item{harmony}{Harmony (scope) effects, Kg vector}
 
-\item{size}{size effects, K* vector0}
+\item{size}{Size (scale) effects, Kg vector}
 
 }
 
-\references{
-PB & LO, chapter XX
-}
 
-\author{
-Peter Bogetoft and Lars Otto \email{lo@foi.dk}
-}
+\references{ Bogetoft and Otto; \emph{Benchmarking with DEA, SFA, and
+R}; chapter 9; Springer 2011.
 
-\note{
+Bogetoft and Wang; \dQuote{Estimating the Potential Gains from
+Mergers}; \emph{Journal of Productivity Analysis}, 23, pp. 145-171,
+2005. }
+
+
+\author{ Peter Bogetoft and Lars Otto \email{lo@foi.dk}}
+
+
+% \note{
 %%  ~~further notes~~
-}
+% }
 
-%% ~Make other sections like Warning with \section{Warning }{....} ~
 
 \seealso{
-%% ~~objects to See Also as \code{\link{help}}, ~~~
+    \code{\link{dea}} and \code{\link{make.merge}}
 }
 
+
+
 \examples{
-##---- Should be DIRECTLY executable !! ----
-##-- ==>  Define data, use random,
-##--	or do  help(data=index)  for the standard data sets.
+x <- matrix(c(100,200,300,500),ncol=1,dimnames=list(LETTERS[1:4],"x"))
+y <- matrix(c(75,100,300,400),ncol=1,dimnames=list(LETTERS[1:4], "y"))
+
+dea.plot.frontier(x,y,RTS="vrs",txt=LETTERS[1:length(x)],
+	xlim=c(0,1000),ylim=c(0,1000) )
+dea.plot.frontier(x,y,RTS="drs", add=TRUE, lty="dashed", lwd=2)
+dea.plot.frontier(x,y,RTS="crs", add=TRUE, lty="dotted")
+
+dea(x,y,RTS="crs")
+M <- make.merge(list(c(1,2), c(3,4)), X=x)
+xmer <- M \%*\% x
+ymer <- M \%*\% y
+points(xmer,ymer,pch=8)
+text(xmer,ymer,labels=c("A+B","C+D"),pos=4)
+dea.merge(x,y,M, RTS="vrs")
+dea.merge(x,y,M, RTS="crs")
 }
 
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.
-\keyword{ ~kwd1 }
-\keyword{ ~kwd2 }% __ONLY ONE__ keyword per line
+\keyword{ models }
+\keyword{ efficiency }
+\keyword{ merger }

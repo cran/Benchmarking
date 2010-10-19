@@ -1,4 +1,4 @@
-% $Id: sfa.Rd 72 2010-09-11 17:06:14Z Lars $
+% $Id: sfa.Rd 81 2010-10-20 15:26:25Z Lars $
 \name{sfa}
 \alias{sfa}
 \alias{lambda.sfa}
@@ -11,8 +11,8 @@
 \alias{summary.sfa}
 \alias{coef.sfa}
 \alias{te.sfa}
-\alias{te1.sfa}
-\alias{te2.sfa}
+% \alias{te1.sfa}
+% \alias{te2.sfa}
 \alias{teJ.sfa}
 \alias{teBC.sfa}
 \alias{teMode.sfa}
@@ -22,31 +22,46 @@
 \title{Stochastic frontier estimation}
 
 \description{
-Estimate a stochastic frontier production functin using a maximum 
+Estimate a stochastic frontier production function using a maximum 
 likelihood method.
 }
 
 \usage{
 sfa(x, y, beta0 = NULL, lambda0 = 1, resfun = ebeta, 
-    TRANSPOSE = FALSE, DEBUG=FALSE,..., control, hessian=2)
+    TRANSPOSE = FALSE, DEBUG=FALSE,
+    control=list(maxeval=1000, stepmax=.1), hessian=2)
+
+te.sfa(object)
+teBC.sfa(object)
+teMode.sfa(object)
+teJ.sfa(object)
+
+te.add.sfa(object)
+
+sigma2u.sfa(object)
+sigma2v.sfa(object)
+sigma2.sfa(object)
+
+lambda.sfa(object)
+
 }
 
 
 \arguments{
 
-  \item{x}{input as a k x m matrix of observations on m inputs of
-k firms; (unit x input); MUST be a matrix. No constant for the
-intercept should be included in x as it is added by default.}
+  \item{x}{Input as a K x m matrix of observations on m inputs from K
+    firms; (firm x input); MUST be a matrix. No constant for the
+    intercept should be included in x as it is added by default.}
 
-  \item{y}{output; k times 1 matrix (one output)  }
+  \item{y}{Output; K times 1 matrix (one output)  }
 
-  \item{beta0}{optional initial parameter values}
+  \item{beta0}{Optional initial parameter values}
 
-%  \item{sigma0}{optional initial estimate of total variance}
+%  \item{sigma0}{Optional initial estimate of total variance}
 
-  \item{lambda0}{optional initial ratio of variances}
+  \item{lambda0}{Optional initial ratio of variances}
 
-  \item{resfun}{function to calculate the residuals, default is a
+  \item{resfun}{Function to calculate the residuals, default is a
   linear model with an intercept. Must be called as
   \code{resfun(x,y,parm)} where \code{parm=c(beta,lambda)} or
   \code{parm=c(beta)}, and return the residuals as an array of length
@@ -58,33 +73,45 @@ intercept should be included in x as it is added by default.}
 %   \item{std.err}{Calculates the standard errors of the parameter
 %   estimates and write the results along the parameters}
 % 
-%   \item{vcov}{Calculates the varians-covarians matrix of the parameters}
+%   \item{vcov}{Calculates the variance-covarians matrix of the parameters}
 
-  \item{TRANSPOSE}{Data is transposed, ie. input is now m x k matrix}
+  \item{TRANSPOSE}{If TRUE, data is transposed, i.e. input is now m x K matrix}
 
-  \item{DEBUG}{Set to TRUE to get various debuggen informatin written
+  \item{DEBUG}{Set to TRUE to get various debugging information written
   on the console}
 
-  \item{\dots}{optional parameters for the \code{ucminf} method}
+  \item{control}{List of control parameters to \code{ucminf}}
 
-  \item{control}{list of control parameters to \code{ucminf}}
+  \item{hessian}{How the Hessian is delivered, see the ucminf
+      documentation}
 
-  \item{hessian}{how the Hessian is delivered, see the ucminf
-  documentation}
+
+  \item{object}{Object of class \sQuote{sfa} as output from the
+      function \code{sfa}} }
+
+
+\details{ The optimization is done by the R method \code{ucminf} from
+   the package with the same name. The efficiency terms are assumed to
+   be half--normal distributed.
+
+The generic functions \code{print.sfa}, \code{summary.sfa},
+   \code{fitted.sfa}, \code{residuals.sfa}, \code{logLik.sfa}, and
+   \code{coef.sfa} all work as expected.
+
+The methods \code{te.sfa}, \code{teMode.sfa} etc. calculates the
+   efficiency corresponding to different methods
+
 }
 
-
-\details{
-  The optimization is done by the R method \code{ucminf}. The efficiency terms are asumed to be half--normal distributed.
-}
 
 \value{
 
-The values returned is the same as for \code{ucminf}, i.e. a list with components plus some espicifically relevant for sfa: 
+The values returned from \code{sfa} is the same as for \code{ucminf},
+i.e. a list with components plus some especially relevant for sfa:
 
 \item{par}{The best set of parameters found \code{c(beta,lambda)}.}
 
-\item{value}{The value of minus loglikelihood function corresponding to 'par'.}
+\item{value}{The value of minus log-likelihood function corresponding to 'par'.}
 
 \item{beta}{The parameters for the function}
 
@@ -94,14 +121,14 @@ The values returned is the same as for \code{ucminf}, i.e. a list with component
 
 \item{N}{The number of observations}
 
-\item{df}{The  degrees of freedom for the model}
+\item{df}{The degrees of freedom for the model}
 
-\item{residuals}{The residuals as a n times 1 matrix/vector, 
-can also be obtained by \code{residuals(sfa-object)}}
+\item{residuals}{The residuals as a K times 1 matrix/vector, 
+can also be obtained by \cr \code{residuals(sfa-object)}}
 
 \item{fitted.values}{Fitted values}
 
-\item{vcov}{The varians-covarians matrix for all estimaed parameters
+\item{vcov}{The variance-covarians matrix for all estimated parameters
  incl. lambda}
 
 \item{convergence}{An integer code. '0' indicates successful
@@ -128,31 +155,58 @@ on this see \code{ucminf}}
 
 }
 
-\references{See the method \code{ucminf} for the possible optimization
-methods and further options}
 
-\author{Lars Otto \email{lo@foi.dk}}
 
-\note{ Calculation of technical efficiencys for each unit can be done
-by the method te.sfa as shown in the examples.
+\references{
 
-\code{te.sfa(sfaObject), teBC.sfa(sfaObject)}:  Battese and Coelli (1988, 392)
-
-\code{teMode.sfa(sfaObject), te1.sfa(sfaObject)}:  Jondrow et al. (1982, 235), conditional mode
-
-\code{teJ.sfa(sfaObject), te2.sfa(sfaObject)}:  Jondrow et al. (1982, 235), conditional mean
-
-\code{te.add.sfa(sfaObject)} efficiency in the additive model
-
-The variance for the distribution of efficiencies can be calculated by
-\code{sigma2u.sfa(sfaObject)}, the variance for the random errors by
-\code{sigma2v.sfa(sfaObject)}, and the total variance by
-\code{sigma2.sfa}.
+ Bogetoft and Otto; \emph{Benchmarking with DEA, SFA, and
+R}, chapters 7 and 8; Springer 2011
 
 }
 
 
-\seealso{\code{\link{ucminf}}}
+\seealso{ See the method \code{ucminf} for the possible optimization
+   methods and further options to use in the option \code{control}.
+
+The method \code{sfa} in the package \pkg{frontier} gives another way to estimate stochastic production functions.
+
+}
+
+
+\author{ Peter Bogetoft and Lars Otto \email{lo@foi.dk}}
+
+
+\note{ Calculation of technical efficiencies for each unit can be done
+by the method te.sfa as shown in the examples.
+
+\code{te.sfa(sfaObject), teBC.sfa(sfaObject)}: Efficiencies estimated by minimizing the mean square error; Eq. (7.21) in Bogetoft
+     and Otto (2011, 219) and Battese and Coelli (1988, 392)
+
+\code{teMode.sfa(sfaObject), te1.sfa(sfaObject)}: Efficiencies estimates using the conditional mode approach; Bogetoft and Otto
+     (2011, 219), Jondrow et al. (1982, 235).
+
+\code{teJ.sfa(sfaObject), te2.sfa(sfaObject)}: Efficiencies estimates using the conditional mean approach Jondrow et al. (1982,
+     235).
+
+\code{te.add.sfa(sfaObject)} Efficiency in the additive model,
+      Bogetoft and Otto (2011, 219)
+
+The variance pf the distribution of efficiency can be calculated by
+      \code{sigma2u.sfa(sfaObject)}, the variance of the random
+      error by \code{sigma2v.sfa(sfaObject)}, and the total variance
+      (sum of variances of efficiency and random noise) by
+      \code{sigma2.sfa}.
+
+The ratio of variances of the efficiency and the random noise can be found from
+      the method \code{lambda.sfa}
+
+The generic method \code{summary} prints the parameters, standard
+      errors, t-values, and a few more statistics from the
+      optimization.
+
+}
+
+
 
 \examples{
 # Example from the book by Coelli et al.
@@ -172,18 +226,14 @@ summary(sfa(x,y))
 # Estimate efficiency for each unit
 o <- sfa(x,y)
 te <- te.sfa(o)
-te1 <- te1.sfa(o)
-te2 <- te2.sfa(o)
-cbind(te,te1,te2)[1:10,]
+teM <- teMode.sfa(o)
+teJ <- teJ.sfa(o)
+cbind(te,teM,teJ)[1:10,]
 
-# Detailed calculations with out the method te.sfa
-e <- o$residuals    # Residuals
-residuals(o)[1:10]        # or
 
 sigma2.sfa(o)       # Estimated varians
 lambda.sfa(o)       # Estimated lambda
-
-
 }
+
 \keyword{sfa}
 \keyword{efficiency}%

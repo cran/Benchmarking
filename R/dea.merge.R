@@ -1,10 +1,10 @@
-# $Id: dea.merge.R 72 2010-09-11 17:06:14Z Lars $
+# $Id: dea.merge.R 74 2010-10-05 21:41:48Z Lars $
 
 
 dea.merge <- function(X, Y, M, RTS = "vrs", ORIENTATION = "in", 
     XREF = NULL, YREF = NULL,
     FRONT.IDX = NULL, TRANSPOSE = FALSE, LP = FALSE, CONTROL=NULL,
-    LPK=NULL, ...)
+    LPK=NULL)
 {
 
 # Mergers should be measured against the originale technology set,
@@ -28,7 +28,7 @@ Ymerger <- M %*% Y
 E <- dea(Xmerger, Ymerger, RTS=RTS, ORIENTATION=ORIENTATION, 
     XREF = XREF, YREF = YREF,
     FRONT.IDX = FRONT.IDX, TRANSPOSE = TRANSPOSE, FAST = TRUE, 
-    LP = LP, CONTROL=CONTROL, LPK=LPK, ...)
+    LP = LP, CONTROL=CONTROL, LPK=LPK)
 
 
 # Individual efficiencies

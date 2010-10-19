@@ -1,8 +1,8 @@
-% $Id: make.merge.Rd 72 2010-09-11 17:06:14Z Lars $
+% $Id: make.merge.Rd 81 2010-10-20 15:26:25Z Lars $
 \name{make.merge}
 \alias{make.merge}
 
-\title{ Make an aggregation matrix to perform mergers of firms}
+\title{ Make an aggregation matrix to perform mergers }
 
 \description{ Make an aggregation matrix to perform mergers of
  firms. The matrix can be post multiplied (matrix multiplication) to
@@ -16,40 +16,70 @@ make.merge(grp, nFirm = NULL, X = NULL)
 
 \arguments{
 
-  \item{grp}{ list of length Kg for Kg firms after mergers; each
-component of the list is a list with the firm numbers going into this
-merger.  }
+ \item{grp}{ Either a list of length Kg for Kg firms after mergers;
+       each component of the list is a list with the firm numbers
+       going into this merger.
 
-  \item{nFirm}{ Number of firms before the mergers }
+       Or a factor of length K with Kg levels where where each level
+       determines a merger; to exclude firms for mergers set the
+       factor value to NA. }
 
- \item{X}{A matrix for input or output where the rows corresponds to
-the number of firms at the outset }
+ \item{nFirm}{ Number of firms before the mergers }
+
+ \item{X}{A matrix of inputs or outputs where the rows corresponds to
+       the number of original (starting) firms }
 
 }
 
 
-\details{ Either \code{nFirm} or \code{X} must be present; if both are
-present then \code{nFirm} must be equal to the number of rows in
-\code{X}, the number of firms.  }
+\details{ 
+
+Either \code{nFirm} or \code{X} must be present; if both are present
+then \code{nFirm} must be equal to the number of rows in \code{X}, the
+number of firms.
+
+When \code{X} is an input matrix of dimension \code{K x m}, \code{K}
+firms and \code{m} inputs, and \code{M <- make.merge(gr,K)} then
+\code{M \%*\% X} is the input matrix for the merged firms.
+
+}
+
 
 \value{ Returns an aggregation matrix of dimension Kg times K where
-rows corresponds to new merged firms and colloms are 1 for firms to be
-included and 0 for firms excluded in this merged firm.  }
+rows corresponds to new merged firms and collums are 1 for firms to be
+included and 0 for firms to be excluded in the the given merger as
+defined by the row. }
 
 
-\note{ Whe \code{X} is an input matrix of dimension \code{K x m},
-\code{K} firms and \code{m} inputs, such that if \code{M <-
-make.merge(gr,K)} then \code{M \%*\% X} is the input matrix for the
-merged firms. }
+\note{ The argument \code{TRANSPOSE} has not been implemented for this
+function. If you need transposed matrices you must transpose the
+merger matrix yourself. If you define mergers via factors there is no
+need to transpose in the arguments; just do not use \code{X} in the
+arguments.  }
 
-\author{ Peter Bogetoft and Lars Otto \email{lo@foi.dk} }
 
-\seealso{ \code{dea.merge} }
+
+\author{ Peter Bogetoft and Lars Otto \email{lo@foi.dk}}
+
+
+\seealso{ \code{\link{dea.merge}} }
+
 
 \examples{
 # To merge firms 1,3, and 5; and 2 and 4 of 7 firms into 2 new firms
-# the aggregation matrix is M. Not all firms are involved in a merger.
+# the aggregation matrix is M; not all firms are involved in a merger.
 M <- make.merge(list(c(1,3,5), c(2,4)),7)
 print(M)
+
+# Merge 1 and 2, and 4 and 5, and leave 3 alone, total of 5 firms.
+# Using a list
+M1 <- make.merge(list(c(1,2), c(4,5)), nFirm=5)
+print(M1)
+
+# Using a factor
+fgr <- factor(c("en","en",NA,"to","to"))
+M2 <- make.merge(fgr)
+print(M2)
+
 }
 

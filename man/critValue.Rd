@@ -1,8 +1,8 @@
-% $Id: critValue.Rd 72 2010-09-11 17:06:14Z Lars $
+% $Id: critValue.Rd 81 2010-10-20 15:26:25Z Lars $
 \name{critValue}
 \alias{critValue}
 
-\title{Critical values from bootstraped DEA models}
+\title{Critical values from bootstrapped DEA models}
 
 \description{Calculates critical value for test using bootstrap output
 in DEA models; an after method for the method boot.sw98 in the FEAR
@@ -19,18 +19,25 @@ the \code{NREP} bootstraps; NREP is from \code{boot.sw98} }
 
 }
 
-\details{Needs bootstraped values of the test statistic}
+\details{Needs bootstrapped values of the test statistic}
 
 \value{Returns the critical value}
 
 
-\author{Lars Otto \email{lo@foi.dk}}
+\author{ Peter Bogetoft and Lars Otto \email{lo@foi.dk}}
+
+
+\seealso{\code{boot.sw98} in \pkg{FEAR}, Paul W. Wilson (2008),
+\dQuote{FEAR 1.0: A Software Package for Frontier Efficiency Analysis
+with R,} \emph{Socio-Economic Planning Sciences} 42, 247--254 }
 
 
 \examples{
-
-
+# The critical value for two-sided test in normal distribution found
+# by simulation.
+x <- rnorm(1000000)
+critValue(x,.975)
 }
 
-\keyword{ ~kwd1 }
-\keyword{ ~kwd2 }% __ONLY ONE__ keyword per line
+% \keyword{ ~kwd1 }
+% \keyword{ ~kwd2 }% __ONLY ONE__ keyword per line

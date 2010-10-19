@@ -1,4 +1,4 @@
-# $Id: cost.R 72 2010-09-11 17:06:14Z Lars $
+# $Id: cost.R 75 2010-10-08 20:26:55Z Lars $
 
 # Function to calculate minimum cost input.
 
@@ -126,7 +126,8 @@ cost.opt <- function(XREF, YREF, W, YOBS=NULL, RTS="vrs", TRANSPOSE=FALSE,
       lambda <- t(lambda)
    }
 
-   svar <- list("xopt"=xopt, "cost"=cost, "lambda"=lambda, rts=RTS)
+   svar <- list("xopt"=xopt, "cost"=cost, "lambda"=lambda, 
+                rts=RTS, TRANSPOSE=TRANSPOSE)
    class(svar) <- "cost.opt"
    return (svar)
 } # cost.opt

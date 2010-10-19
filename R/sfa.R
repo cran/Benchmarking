@@ -1,9 +1,10 @@
-# $Id: sfa.R 72 2010-09-11 17:06:14Z Lars $
+# $Id: sfa.R 76 2010-10-12 13:45:37Z lo $
 # \encoding{latin1}
 
 
 sfa <- function(x, y, beta0=NULL, lambda0=1, resfun=ebeta, 
-                TRANSPOSE = FALSE, DEBUG=FALSE, ...,control, hessian=2)  
+                TRANSPOSE = FALSE, DEBUG=FALSE, 
+                control=list(maxeval=1000, stepmax=.1), hessian=2)  
 {
    require(ucminf)
 
@@ -169,7 +170,7 @@ summary.sfa <- function(object, ...)  {
    cat("sigma2v = ", object$sigma2/(1 + object$lambda^2),
    ";  sigma2u = ", 
          object$sigma2*object$lambda^2/(1 + object$lambda^2),"\n")
-   cat("-log likelihood = ",object$value,"\n")
+   cat("log likelihood = ",object$loglik,"\n")
    cat("Convergence = ",object$convergence,"\n")
    # print(object$count)
 }  ## summary.sfa
@@ -208,7 +209,7 @@ coef.sfa <- function(object, ...)  {
 
 
 ## Beregning af teknisk effektivitet
-te.sfa <- function(object, ...)  {
+te.sfa <- function(object)  {
   # Hjælpevariabler
   lambda <- object$lambda
   s2 <- object$sigma2
@@ -224,7 +225,7 @@ te.sfa <- function(object, ...)  {
 }
 teBC.sfa <- te.sfa
 
-teMode.sfa <- function(object, ...)  {
+teMode.sfa <- function(object)  {
   # Hjælpevariabler
   lambda <- object$lambda
   s2 <- object$sigma2
@@ -232,12 +233,12 @@ teMode.sfa <- function(object, ...)  {
 
   # Teknisk efficiens for hver enhed
   TE1 = matrix(exp(pmin(0,-ustar)),ncol=1)
-  colnames(TE1) <- "te1"
+  colnames(TE1) <- "teM"
   return(TE1)
 }
-te1.sfa <- teMode.sfa
+# te1.sfa <- teMode.sfa
 
-teJ.sfa <- function(object, ...)  {
+teJ.sfa <- function(object)  {
   # Hjælpevariabler
   lambda <- object$lambda
   s2 <- object$sigma2
@@ -246,13 +247,13 @@ teJ.sfa <- function(object, ...)  {
 
   # Teknisk efficiens for hver enhed
   TE2 = exp(-ustar -sstar*( dnorm(ustar/sstar)/pnorm(ustar/sstar) ) )
-  colnames(TE2) <- "te2"
+  colnames(TE2) <- "teJ"
   return(TE2)
 }
-te2.sfa <- teJ.sfa
+# te2.sfa <- teJ.sfa
 
 
-te.add.sfa <- function(object, ...)  {
+te.add.sfa <- function(object)  {
   e <- residuals(object)
   s2 <- sigma2.sfa(object)
   lambda <- lambda.sfa(object)
@@ -262,31 +263,32 @@ te.add.sfa <- function(object, ...)  {
   uJ <- sstar * (dnorm(estar)/(1 - pnorm(estar)) - estar)
   teAdd <- 1 - uJ/object$fitted.values
   class(teAdd) <- "matrix"
+  colnames(teAdd) <- "teAdd"
   return(teAdd)
 }
 
 
-sigma2u.sfa <- function(object, ...)  {
+sigma2u.sfa <- function(object)  {
   s2u <- object$lambda^2 / (1+object$lambda^2) * object$sigma2
   names(s2u) <- "sigma2u"
   return(s2u)
 }
 
-sigma2v.sfa <- function(object, ...)  {
+sigma2v.sfa <- function(object)  {
   s2v <- object$sigma2 / (1+object$lambda^2)
   names(s2v) <- "sigma2v"
   return(s2v)
 }
 
 
-sigma2.sfa <- function(object,...) {
+sigma2.sfa <- function(object) {
    s2 <- object$sigma2
   names(s2) <- "sigma2"
   return(s2) 
 }
 
 
-lambda.sfa <- function(object,...)  {
+lambda.sfa <- function(object)  {
    lam <- object$lambda
    names(lam) <- "lambda"
    return(lam)

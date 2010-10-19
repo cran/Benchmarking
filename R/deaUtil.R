@@ -1,4 +1,4 @@
-# $Id: deaUtil.R 72 2010-09-11 17:06:14Z Lars $
+# $Id: deaUtil.R 80 2010-10-20 08:58:43Z Lars $
 
 efficiency <- function(object)  {
 # Returnerer efficencer som et array
@@ -11,10 +11,16 @@ efficiency <- function(object)  {
    } else if ( object$ORIENTATION == "graph" )  {
       colnames(e) <- "G"
    }
+   if ( !is.null(names(object$eff)) )  {
+      rownames(e) <- names(object$eff)
+   }
+   if ( object$TRANSPOSE == TRUE ) {
+      e <- t(e)
+   }
    return(e)
 } ## efficiency
 
-effi <- efficiency
+# effi <- efficiency
 eff <- efficiency
 
 
@@ -68,28 +74,43 @@ peers <- function(object, NAMES=FALSE)  {
       lam <- t(object$lambda)
    }
 
-   # Fjern foranstillet L i søjlenavne for lambda
+   # Fjern foranstillet L_ eller L i søjlenavne for lambda
+   if ( "L_" %in% substr(rownames(lam),1,2) )  {
+      rownames(lam) <- substring(rownames(lam),3)
+   }
    if ( "L" %in% substr(rownames(lam),1,1) )  {
       rownames(lam) <- substring(rownames(lam),2)
    }
 
-   peer <- which(rowSums(lam)>0, 1:dim(lam)[1])
+   peer <- which(rowSums(lam,na.rm=TRUE)>0, 1:dim(lam)[1])
+   # print("Firms der er peers:")
+   # print(peer)
 
    bench <- matrix(NA,nrow=length(peer), ncol=dim(lam)[2])
+   # Saet firms navne som raekkenavne
+   colnames(bench) <- colnames(lam)
 
 #   for ( i in 1:length(peer) ) {  # for hver peer
 #      yper <- which(lam[peer[i],]>0)
 #      bench[i,yper] <- peer[i]
 #   }
 
-   maxj = 0  # det storste antal peers der er gemt
+   maxj = 0  # det storste antal peers for en firm
    for ( i in 1:dim(lam)[2] )  {  # for hver firm
+      # Hvis firm er uden for teknologi maengde er der ingen peers: next
+      if ( sum(lam[peer,i],na.rm=TRUE) == 0 ) next
       pe <- which(lam[peer,i]>0)
       bench[1:length(pe),i] <- peer[pe]
       maxj <- max(maxj,length(pe))
    }
-   bench <- bench[1:maxj,]
+   bench <- bench[1:maxj,,drop = FALSE]
 
+   if (NAMES & !is.null(names(object$eff)) )  {
+      bench_ <- matrix(rownames(lam)[bench], ncol=dim(bench)[2])
+      # print(bench_)
+      colnames(bench_) <- colnames(bench)
+      bench <- bench_
+   }
 
    if ( !object$TRANSPOSE ) {
       bench <- t(bench)
@@ -139,26 +160,20 @@ print.peers  <- function(x, ...)  {
 
 
 get.number.peers  <-  function(object)  {
-
    if ( object$TRANSPOSE ) {
 	   lam <- object$lambda
    } else {
       lam <- t(object$lambda)
    }
-
    # Fjern foranstillet L i søjlenavne for lambda
    if ( "L" %in% substr(rownames(lam),1,1) )  {
       rownames(lam) <- substring(rownames(lam),2)
    }
-
-   peer <- which(rowSums(lam)>0, rownames(lam))
+   peer <- which(rowSums(lam, na.rm=TRUE)>0)
    names(peer) <- NULL
-   number <- rowSums(lam[peer,]>0)
-
+   number <- rowSums(lam[peer,]>0, na.rm=TRUE)
    cbind(peer,"#"=number)
-
 }  # get.number.peers
-
 
 
 lambda.print  <- function(x, KEEPREF=FALSE, ...)  {
@@ -185,14 +200,14 @@ lambda.print  <- function(x, KEEPREF=FALSE, ...)  {
 } ## print.lambda
 
 
-lambda <- function(object, KEEPREF=FALSE, ...)  {
+lambda <- function(object, KEEPREF=FALSE)  {
    if ( object$TRANSPOSE ) {
       lam <- object$lambda
    } else {
       lam <- t(object$lambda)
    }
    if (!KEEPREF && dim(lam)[2]>1 ) {
-      lam <- lam[rowSums(lam)>0,,drop=FALSE]
+      lam <- lam[rowSums(lam, na.rm=TRUE)>0,,drop=FALSE]
    }
    if ( !object$TRANSPOSE )  lam <- t(lam)
    return(lam)

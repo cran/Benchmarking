@@ -1,40 +1,47 @@
-% $Id: typeIerror.Rd 72 2010-09-11 17:06:14Z Lars $
+% $Id: typeIerror.Rd 81 2010-10-20 15:26:25Z Lars $
 \name{typeIerror}
 \alias{typeIerror}
 
-\title{Probability of a type I error for a test in bootstraped DEA
-models}
+\title{Probability of type I error for test in a bootstrap DEA model}
 
 \description{Calculates the probability of a type I error for a test
-in bootstraped DEA models; an after method for the method boot.sw98 in
-the FEAR package}
+   in bootstrapped DEA models; gives an after-method for the method
+   \code{boot.sw98} in the \pkg{FEAR} package}
 
 \usage{typeIerror(shat,s) }
 
 \arguments{
 
-\item{shat}{The value of the statistic for which the propability of a
-type I error is to be calculated}
+\item{shat}{The value of the statistic for which the probability of a
+     type I error is to be calculated}
 
 \item{s}{Vector with calculated values of the statistic for each of
-the \code{NREP} bootstraps; NREP is from \code{boot.sw98} }
+     the \code{NREP} bootstraps; NREP is from \code{boot.sw98} }
 
 }
 
-\details{Needs bootstraped values of the test statistic}
+\details{Needs bootstrapped values of the test statistic}
 
 \value{Returns the probability of a type I error}
 
+\seealso{\code{boot.sw98} in \pkg{FEAR}, Paul W. Wilson (2008),
+   \dQuote{FEAR 1.0: A Software Package for Frontier Efficiency
+   Analysis with R,} \emph{Socio-Economic Planning Sciences} 42,
+   247--254 }
 
 
-\author{Lars Otto \email{lo@foi.dk}}
+
+\author{ Peter Bogetoft and Lars Otto \email{lo@foi.dk}}
 
 
 \examples{
-
+# Probability of getting something larger than 1.96 in 10000 random
+# standard normal variates.
+x <- rnorm(10000)
+typeIerror(1.96,x)
 }
 
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.
-\keyword{ ~kwd1 }
-\keyword{ ~kwd2 }% __ONLY ONE__ keyword per line
+% \keyword{ ~kwd1 }
+% \keyword{ ~kwd2 }% __ONLY ONE__ keyword per line

@@ -1,4 +1,4 @@
-# $Id: bootStat.R 72 2010-09-11 17:06:14Z Lars $
+# $Id: bootStat.R 54 2010-02-08 12:26:51Z lo $
 
 # Calculates the critical value at level |alfa| for the vector of
 # trials |s|

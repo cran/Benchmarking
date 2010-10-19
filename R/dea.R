@@ -1,4 +1,4 @@
-# $Id: dea.R 72 2010-09-11 17:06:14Z Lars $
+# $Id: dea.R 78 2010-10-18 22:09:28Z Lars $
 
 # DEA beregning via brug af lp_solveAPI. Fordelene ved lp_solveAPI er
 # færre kald fra R med hele matricer for hver firm og dermed skulle
@@ -12,8 +12,8 @@
 
 
 dea  <-  function(X,Y, RTS="vrs", ORIENTATION="in", XREF=NULL,YREF=NULL,
-         FRONT.IDX=NULL, SLACK=FALSE, DUAL=TRUE,
-         TRANSPOSE=FALSE, FAST=FALSE, LP=FALSE, CONTROL=NULL, LPK=NULL, ...)  {
+         FRONT.IDX=NULL, SLACK=FALSE, DUAL=TRUE, DIRECT=NULL,
+         TRANSPOSE=FALSE, FAST=FALSE, LP=FALSE, CONTROL=NULL, LPK=NULL)  {
    # XREF, YREF determines the technology
    # FRONT.IDX index for units that determine the technology
 
@@ -71,38 +71,79 @@ dea  <-  function(X,Y, RTS="vrs", ORIENTATION="in", XREF=NULL,YREF=NULL,
       Y <- t(Y)
       XREF <- t(XREF)
       YREF <- t(YREF)
+      if ( !is.null(DIRECT) & class(DIRECT)=="matrix" )
+         DIRECT <- t(DIRECT)
    }
    orgKr <- dim(XREF)
 
    if ( length(FRONT.IDX) > 0 )  {
       if ( !is.vector(FRONT.IDX) )
-         stop("FRONT.IDX is not a vector in 'eff'")
-         XREF <- matrix(XREF[,FRONT.IDX],nrow=dim(XREF)[1])
-         YREF <- matrix(YREF[,FRONT.IDX],nrow=dim(YREF)[1])
+         stop("FRONT.IDX is not a vector in 'dea'")
+      XREF <- XREF[,FRONT.IDX, drop=FALSE]
+      YREF <- YREF[,FRONT.IDX, drop=FALSE]
+      # XREF <- matrix(XREF[,FRONT.IDX],nrow=dim(XREF)[1])
+      # YREF <- matrix(YREF[,FRONT.IDX],nrow=dim(YREF)[1])
    }
+   rNames <- colnames(XREF)
+   if ( is.null(rNames) & !is.null(colnames(YREF)) )
+      rNames <- colnames(YREF)
 
    m = dim(X)[1]  # number of inputs
    n = dim(Y)[1]  # number of outputs
    K = dim(X)[2]  # number of units, firms, DMUs
-   Kr = dim(XREF)[2]  # number of units, firms, DMUs
+   Kr = dim(XREF)[2] # number of units,firms in the reference technology
    oKr <- orgKr[2]
+   if ( !is.null(DIRECT) )  {
+      if ( class(DIRECT)=="matrix" ) {
+         md <- dim(DIRECT)[1]
+         Kd <- dim(DIRECT)[2]
+      } else {
+         md <- length(DIRECT)
+         Kd <- 0
+      }
+   } else {
+      Kd <- 0
+   }
    if (LP) cat("m n K Kr = ",m,n,K,Kr,"\n")
+   if (LP & !is.null(DIRECT) ) cat("md, Kd =",md,Kd,"\n") 
 
    if ( m != dim(XREF)[1] )  {
       print("Number of inputs must be the same in X and XREF",quote=F)
-      return(print("Method 'eff' stops",quote=F))
+      return(print("Method 'dea' stops",quote=F))
    }
    if ( n != dim(YREF)[1] )  {
       print("Number of outputs must be the same in Y and YREF",quote=F)
-      return(print("Method 'eff' stops",quote=F))
+      return(print("Method 'dea' stops",quote=F))
    } 
    if ( K != dim(Y)[2] )  {
       print("Number of units must be the same in X and Y",quote=F)
-      return(print("Method 'eff' stops",quote=F))
+      return(print("Method 'dea' stops",quote=F))
    }
    if ( Kr != dim(YREF)[2] )  {
       print("Number of units must be the same in XREF and YREF",quote=F)
-      return(print("Method 'eff' stops",quote=F))
+      return(print("Method 'dea' stops",quote=F))
+   }
+
+   if ( !is.null(DIRECT) & ORIENTATION=="graph" )
+         stop("DIRECT cannot not be used with ORIENTATION=\"graph\"")
+ 
+   if ( !is.null(DIRECT) & length(DIRECT) > 1 )  {
+      if ( ORIENTATION=="in" & md!=m )
+         stop("Length of DIRECT must be the number of inputs")
+      else if ( ORIENTATION=="out" & md!=n )
+         stop("Length of DIRECT must be the number of outputs")
+      else if ( ORIENTATION=="in-out" & md!=m+n )
+         stop("Length of DIRECT must be the number of inputs plus outputs")
+      if ( class(DIRECT)=="matrix" & (Kd>0 & Kd!=K) )
+         stop("Number of firms in DIRECT must equal firms in X and Y") 
+   }
+   if ( !is.null(DIRECT) & length(DIRECT) == 1 )  {
+      if ( ORIENTATION=="in" & length(DIRECT)!=m )
+         DIRECT <- rep(DIRECT,m)
+      else if ( ORIENTATION=="out" & length(DIRECT)!=n )
+         DIRECT <- rep(DIRECT,n)
+      else if ( ORIENTATION=="in-out" & length(DIRECT)!=m+n )
+         DIRECT <- rep(DIRECT,m+n)
    }
 
    if ( RTS != "crs" && RTS != "add" )  {
@@ -146,6 +187,17 @@ dea  <-  function(X,Y, RTS="vrs", ORIENTATION="in", XREF=NULL,YREF=NULL,
       set.type(lps,2:(1+Kr),"integer")
    }
  
+   if ( !is.null(DIRECT) & Kd==0 )  {
+      # print(Kd)
+      # print(DIRECT)
+      # Samme retning for alle enheder
+      if ( ORIENTATION=="in" )
+         set.column(lps, 1, c(1,-DIRECT),0:m)
+      else if ( ORIENTATION=="out" )
+         set.column(lps, 1, c(1,-DIRECT),c(0,(m+1):(m+n)))
+      else if ( ORIENTATION=="in-out" )
+         set.column(lps, 1, c(1,-DIRECT),0:(m+n))
+   }
 
    set.objfn(lps, 1,1)
    set.constr.type(lps, rep(">=",m+n+rlamb))
@@ -153,8 +205,14 @@ dea  <-  function(X,Y, RTS="vrs", ORIENTATION="in", XREF=NULL,YREF=NULL,
       lp.control(lps, sense="min")
    } else if ( ORIENTATION == "out" )  {
       lp.control(lps, sense="max")
-   } else
+   } else if ( ORIENTATION == "in-out" & !is.null(DIRECT) )  {
+      lp.control(lps, sense="max")
+   } else  
      stop("In 'dea' for ORIENTATION use only 'in', 'out', or 'graph'")
+
+   if ( !is.null(DIRECT) )  {
+      lp.control(lps, sense="max")
+   }
 
    if ( !is.null(CONTROL) )  {
       lp.control(lps,CONTROL)
@@ -173,12 +231,16 @@ dea  <-  function(X,Y, RTS="vrs", ORIENTATION="in", XREF=NULL,YREF=NULL,
      dual <- NULL
    } else {
       lambda <- matrix(NA, nrow=Kr, ncol=K) # lambdas one column per unit
+      rownames(lambda) <- rNames
+      colnames(lambda) <- colnames(X)
       if (DUAL) {
          dual   <- matrix(NA, nrow=sum(dim(lps))+1, ncol=K) # 
          primal <- matrix(NA, nrow=sum(dim(lps))+1, ncol=K) # solutions
+         colnames(dual) <- colnames(X)
+         colnames(primal) <- colnames(X)
       } else {
-        primal <- NULL
-        dual <- NULL
+         primal <- NULL
+         dual <- NULL
       }
    }  
 
@@ -189,12 +251,27 @@ dea  <-  function(X,Y, RTS="vrs", ORIENTATION="in", XREF=NULL,YREF=NULL,
       # automatisk sat til 0.  Derfor maa 1-tallet for
       # kriteriefunktionen med for denne soejle og det er raekke 0.
 
-      if ( ORIENTATION == "in" )  {
-         set.column(lps, 1, c(1,X[,k]),0:m)
-         set.rhs(lps, Y[,k], (m+1):(m+n))
-      }  else   {
-         set.column(lps, 1, c(1,-Y[,k]),c(0,(m+1):(m+n)))
-         set.rhs(lps, -X[,k], 1:m)
+      if ( is.null(DIRECT) )  {
+         if ( ORIENTATION == "in" )  {
+            set.column(lps, 1, c(1,X[,k]),0:m)
+            set.rhs(lps, Y[,k], (m+1):(m+n))
+         } else {
+            set.column(lps, 1, c(1,-Y[,k]),c(0,(m+1):(m+n)))
+            set.rhs(lps, -X[,k], 1:m)
+         }
+      } else {
+         # print(Kd)
+         # print(DIRECT)
+         set.rhs(lps, c(-X[,k],Y[,k]), 1:(m+n))
+         if ( Kd > 1 )  {
+         # retning for enheden
+            if ( ORIENTATION=="in" )
+               set.column(lps, 1, c(1,-DIRECT[,k]),0:m)
+            else if ( ORIENTATION=="out" )
+               set.column(lps, 1, -DIRECT[,k],0:n)
+            else if ( ORIENTATION=="in-out" )
+               set.column(lps, 1, c(1,-DIRECT[,k]),0:(m+n))
+         }
       }
       if ( LP )  print(paste("Firm",k), quote=FALSE)
       if ( LP && k == 1 )  print(lps)
@@ -243,6 +320,9 @@ dea  <-  function(X,Y, RTS="vrs", ORIENTATION="in", XREF=NULL,YREF=NULL,
    lpcontr <- lp.control(lps)
    eps <- lpcontr$epsilon["epsint"]
    e[abs(e-1) < eps] <- 1
+   if ( !is.null(dimnames(X)[[2]]) )  {
+      names(e) <- dimnames(X)[[2]]
+   }
 
 #   if ( ORIENTATION == "in" )  {
 #      names(e) <- "E"
@@ -258,10 +338,14 @@ dea  <-  function(X,Y, RTS="vrs", ORIENTATION="in", XREF=NULL,YREF=NULL,
    }
    if (LP) print("Forbi retur fra FAST")
 
-   if ( length(FRONT.IDX)>0 )  {
-      rownames(lambda) <- paste("L",(1:oKr)[FRONT.IDX],sep="")
+   if ( is.null(rownames(lambda)) )  {
+      if ( length(FRONT.IDX)>0 )  {
+         rownames(lambda) <- paste("L",(1:oKr)[FRONT.IDX],sep="")
+      } else {
+         rownames(lambda) <- paste("L",1:Kr,sep="")
+      }
    } else {
-      rownames(lambda) <- paste("L",1:Kr,sep="")
+       rownames(lambda) <- paste("L",rownames(lambda),sep="_")
    }
 
    sign <- NULL
@@ -313,7 +397,7 @@ dea  <-  function(X,Y, RTS="vrs", ORIENTATION="in", XREF=NULL,YREF=NULL,
             YREF <- t(YREF)
          }
       }
-      sl <- slack(X, Y, oe, XREF, YREF, FRONT.IDX, LP=LP, ...)
+      sl <- slack(X, Y, oe, XREF, YREF, FRONT.IDX, LP=LP)
       oe$slack <- sl$slack
       oe$sx <- sl$sx
       oe$sy <- sl$sy
