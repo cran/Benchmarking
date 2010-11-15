@@ -1,4 +1,4 @@
-# $Id: eff.dens.R 77 2010-10-16 14:52:25Z Lars $
+# $Id: eff.dens.R 85 2010-11-06 22:18:27Z Lars $
 
 # Plot af tæthed for efficiencer, bruger spejlingsprcincip
 
@@ -13,7 +13,7 @@ eff.dens <- function(eff, bw="nrd0")  {
    else if ( min(E) >= 1 )
       orient <- "out"
    else
-      stop("Efficiencies should below 1 or below 1, not on both sides")
+      stop("Efficiencies should be on one side of 1 only, not on both sides")
 
    # Reflection around the boundary 1
    refl <- c(E,2-E)

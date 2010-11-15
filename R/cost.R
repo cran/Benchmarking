@@ -1,4 +1,4 @@
-# $Id: cost.R 75 2010-10-08 20:26:55Z Lars $
+# $Id: cost.R 82 2010-10-24 20:00:48Z Lars $
 
 # Function to calculate minimum cost input.
 
@@ -31,18 +31,13 @@ cost.opt <- function(XREF, YREF, W, YOBS=NULL, RTS="vrs", TRANSPOSE=FALSE,
       stop("Number of outputs in YREF and YOBS differ")
 
    rts <- c("fdh","vrs","drs","crs","irs","irs","add")
-   if ( missing(RTS) ) RTS <- "vrs" 
    if ( is.real(RTS) )  {
       if (LP) cat(paste("Number '",RTS,"'",sep=""),quote=F)
       RTStemp <- rts[1+RTS] # the first fdh is number 0
       RTS <- RTStemp
       if (LP) cat(paste("' is '",RTS,"'\n",sep=""),quote=F)
    }
-   if ( !(RTS %in% rts) )  {
-      print(paste("Unknown scale of returns:", RTS))
-      print("continuees asssuming RTS = \"vrs\"\n")
-      RTS <- "vrs"
-   } 
+   if ( !(RTS %in% rts) ) stop(paste("Unknown scale of returns:", RTS))
 
    if ( RTS != "crs" && RTS != "add" )  {
       rlamb <- 2

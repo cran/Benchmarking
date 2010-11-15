@@ -1,4 +1,4 @@
-# $Id: slack.R 72 2010-09-11 17:06:14Z Lars $
+# $Id: slack.R 85 2010-11-06 22:18:27Z Lars $
 
 # Calculate slack at the efficient points.
 
@@ -63,46 +63,62 @@ slack <- function(X, Y, e, XREF=NULL, YREF=NULL, FRONT.IDX=NULL,
    K = dim(X)[2]  # number of units, firms, DMUs
    Kr = dim(XREF)[2]  # number of units in reference set
 
-   if ( is.null(e$objval) )
-      eff <- e$eff
-   else
-      eff <- e$objval
-
-   if ( e$ORIENTATION == "in" ) {
-      E <- eff
-      FF <- rep(1,K)  # Naturligt at bruge F, men F er FALSE i R
-   } else if ( e$ORIENTATION == "out" )  {
-      FF <- eff
-      E <- rep(1,K)
-   } else if ( e$ORIENTATION == "graph" )  {
-      E <- eff
-      FF <- 1/eff
-   } else {
-     stop(paste("Unknown orientation in slack:", e$ORIENTATION))
-   }
-   if ( m != dim(XREF)[1] )  {
-      print("Number of inputs must be the same in X and XREF",quote=F)
-      return(print("Method 'eff' stops",quote=F))
-   }
-   if ( n != dim(YREF)[1] )  {
-      print("Number of outputs must be the same in Y and YREF",quote=F)
-      return(print("Method 'eff' stops",quote=F))
-   }
-   if ( K !=  dim(Y)[2] )  {
-      print("Number of units must be the same in X and Y",quote=F)
-      return(print("Method 'eff' stops",quote=F))
-   }
-   if ( Kr != dim(YREF)[2] )  {
-      print("Number of units must be the same in XREF and YREF",quote=F)
-      return(print("Method 'eff' stops",quote=F))
-   }
-
+   if ( m != dim(XREF)[1] )
+      stop("Number of inputs must be the same in X and XREF")
+   if ( n != dim(YREF)[1] )
+      stop("Number of outputs must be the same in Y and YREF")
+   if ( K !=  dim(Y)[2] )
+      stop("Number of units must be the same in X and Y")
+   if ( Kr != dim(YREF)[2] )
+      stop("Number of units must be the same in XREF and YREF")
 
    if ( RTS != "crs" && RTS != "add" )  {
       rlamb <- 2
    } else {
       rlamb <- 0
    }
+
+   if ( is.null(e$objval) )
+      eff <- e$eff
+   else
+      eff <- e$objval
+
+   if ( is.null(e$direct) )  {
+      if ( e$ORIENTATION == "in" ) {
+         E <- eff
+         FF <- rep(1,K)  # Naturligt at bruge F, men F er FALSE i R
+      } else if ( e$ORIENTATION == "out" )  {
+         FF <- eff
+         E <- rep(1,K)
+      } else if ( e$ORIENTATION == "graph" )  {
+         E <- eff
+         FF <- 1/eff
+      } else {
+        stop(paste("Unknown orientation in slack:", e$ORIENTATION))
+      }
+   } else {
+      warning("Slack for directional efficiency not yet finished")
+
+      mmd <- switch(e$ORIENTATION, "in"=m, "out"=n, "in-out"=m+n) 
+      ob <- matrix(e$objval,nrow=mmd, ncol=K, byrow=T)
+      if ( class(e$direct)=="matrix" && dim(e$direct)[2] > 1 )  {
+          dir <- e$direct
+      } else {
+          dir <- matrix(e$direct,nrow=mmd, ncol=K)
+      }
+
+      if ( e$ORIENTATION=="in" )  {
+         dirRhs <- rbind(X - ob*dir, -Y)
+      } else if ( e$ORIENTATION=="out" )  {
+         dirRhs <- rbind(X, -Y - ob*dir)
+      } else if ( e$ORIENTATION=="in-out" )  {
+         dirRhs <- rbind(X -ob[1:m,,drop=FALSE]*dir[1:m,,drop=FALSE], 
+           -Y -ob[(m+1):(m+n),,drop=FALSE]*dir[(m+1):(m+n),,drop=FALSE])
+      } else {
+         warning("Illegal ORIENTATION for argument DIRECT when calculating slacks") 
+      }
+
+   }  # if ( is.null(e$direct) )
 
    # Initialiser LP objekt
    lps <- make.lp(m+n +rlamb, m+n+Kr)
@@ -161,13 +177,20 @@ slack <- function(X, Y, e, XREF=NULL, YREF=NULL, FRONT.IDX=NULL,
        # her er der problem med afrunding, sammen med venstrsiden er
        # det ikke sikkert at restriktionen holder naar der er
        # sket afrunding i mellemregningerner.
-
-       rhs <- c(E[k] * X[,k], -FF[k] * Y[,k])
+       if ( is.null(e$direct) )  {
+          rhs <- c(E[k] * X[,k], -FF[k] * Y[,k])
+       } else {
+          rhs <- dirRhs[,k]
+       }
        set.rhs(lps, rhs, 1:(m+n))
        if (LP)  {
           print(paste("Hoejresiden for firm",k))
-          print(E[k] * X[,k])
-          print( -FF[k] * Y[,k])
+          if ( is.null(e$direct) )  {
+             print(E[k] * X[,k])
+             print( -FF[k] * Y[,k])
+          } else {
+             print(rhs)
+          }
           print(lps)
        }
 

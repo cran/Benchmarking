@@ -1,4 +1,4 @@
-% $Id: charnes1981.Rd 81 2010-10-20 15:26:25Z Lars $
+% $Id: charnes1981.Rd 88 2010-11-13 23:26:02Z Lars $
 \name{charnes1981}
 \alias{charnes1981}
 \docType{data}
@@ -39,6 +39,7 @@ teachers at the site, \code{x5}.
     \item{\code{y3}}{self--esteem score}
     \item{\code{pft}}{=1 if in program (program follow through) and 
                       =0 if not in program}
+    \item{\code{name}}{Site name}
   }
 }
 
@@ -46,10 +47,10 @@ teachers at the site, \code{x5}.
 \details{ The command \code{data(charnes1981)} will create a data
 frame named \code{charnes1981} with the above data.
 
-There is further information in the data set, that the first
-50 school sites followed the program and that the last 20 are the
-results for sites not following the program. This is showed by the
-variable \code{pft}.  }
+Beside input and output varianles there is further information in the
+data set, that the first 50 school sites followed the program and that
+the last 20 are the results for sites not following the program. This
+is showed by the variable \code{pft}.  }
 
 
 \note{ Data as \code{.csv} are loaded by the command \code{data} using

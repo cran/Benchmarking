@@ -1,4 +1,4 @@
-# $Id: sfa.R 76 2010-10-12 13:45:37Z lo $
+# $Id: sfa.R 84 2010-11-04 12:26:37Z Lars $
 # \encoding{latin1}
 
 
@@ -190,6 +190,14 @@ residuals.sfa <- function(object, ...)  {
 } ## residuals.sfa
 
 
+fitted.sfa <- function(object, ...)  {
+   return(object$fitted.values)
+}
+
+vcov.sfa <- function(object, ...)  {
+   return(object$vcov)
+}
+
 
 logLik.sfa <- function(object, ...)  {
    val <- -object$value
@@ -205,6 +213,17 @@ coef.sfa <- function(object, ...)  {
 }
 
 
+eff.sfa <- function(object, type="BC", ...)  {
+  switch( type,
+          "BC" = return(te.sfa(object)),
+          "Mode" = return(teMode.sfa(object)),
+          "J" = return(teJ.sfa(object)),
+          "add" = return(te.add.sfa(object)),
+          "add" = return(te.add.sfa(object)),
+          warning("Unknown type:", type)
+        )
+}
+efficiencies.sfa <- eff.sfa
 
 
 
@@ -219,7 +238,7 @@ te.sfa <- function(object)  {
   # Teknisk efficiens for hver enhed
   TE = pnorm(ustar/sstar -sstar)/pnorm(ustar/sstar) * exp(sstar^2/2 -ustar)
   colnames(TE) <- "te"
-   return(TE)
+   return(array(TE))
 #   class(TE) <- "te"
 #   TE
 }
@@ -234,7 +253,7 @@ teMode.sfa <- function(object)  {
   # Teknisk efficiens for hver enhed
   TE1 = matrix(exp(pmin(0,-ustar)),ncol=1)
   colnames(TE1) <- "teM"
-  return(TE1)
+  return(array(TE1))
 }
 # te1.sfa <- teMode.sfa
 
@@ -248,7 +267,7 @@ teJ.sfa <- function(object)  {
   # Teknisk efficiens for hver enhed
   TE2 = exp(-ustar -sstar*( dnorm(ustar/sstar)/pnorm(ustar/sstar) ) )
   colnames(TE2) <- "teJ"
-  return(TE2)
+  return(array(TE2))
 }
 # te2.sfa <- teJ.sfa
 
@@ -264,8 +283,9 @@ te.add.sfa <- function(object)  {
   teAdd <- 1 - uJ/object$fitted.values
   class(teAdd) <- "matrix"
   colnames(teAdd) <- "teAdd"
-  return(teAdd)
+  return(array(teAdd))
 }
+eff.add.sfa <- te.add.sfa
 
 
 sigma2u.sfa <- function(object)  {

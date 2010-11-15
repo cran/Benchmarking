@@ -1,4 +1,4 @@
-# $Id: dea.R 78 2010-10-18 22:09:28Z Lars $
+# $Id: dea.R 89 2010-11-14 13:01:40Z lo $
 
 # DEA beregning via brug af lp_solveAPI. Fordelene ved lp_solveAPI er
 # færre kald fra R med hele matricer for hver firm og dermed skulle
@@ -39,22 +39,26 @@ dea  <-  function(X,Y, RTS="vrs", ORIENTATION="in", XREF=NULL,YREF=NULL,
       if (LP) print(paste("' is '",RTS,"'\n",sep=""),quote=F)
    }
    RTS <- tolower(RTS)
-   if ( !(RTS %in% rts) )  {
-      print(paste("Unknown scale of returns:", RTS))
-      print("continuees asssuming RTS = \"vrs\"\n")
-      RTS <- "vrs"
-   } 
+   if ( !(RTS %in% rts) )  stop(paste("Unknown scale of returns:", RTS))
 
    orientation <- c("in-out","in","out","graph")
    if ( is.real(ORIENTATION) )  {
       ORIENTATION_ <- orientation[ORIENTATION+1]  # "in-out" er nr. 0
       ORIENTATION <- ORIENTATION_
    }
+   ORIENTATION <- tolower(ORIENTATION)
    if ( !(ORIENTATION %in% orientation) ) {
-      print(paste("Unknown value for ORIENTATION:",ORIENTATION),quote=F)
-      ORIENTATION <- "in"
-      print(paste("Continues with ORIENTATION =",ORIENTATION),quote=F)
+      stop(paste("Unknown value for ORIENTATION:",ORIENTATION),quote=F)
    }
+
+   if ( class(X)!="matrix" )
+      stop("X is not a matrix")
+   if ( class(Y)!="matrix" )
+      stop("Y is not a matrix")
+   if ( !is.null(XREF) && class(XREF)!="matrix" )
+      stop("XREF is not a matrix")
+   if ( !is.null(YREF) && class(YREF)!="matrix" )
+      stop("YREF is not a matrix")
 
    .xyref.missing <- FALSE
    if ( missing(XREF) || is.null(XREF) )  {
@@ -77,21 +81,22 @@ dea  <-  function(X,Y, RTS="vrs", ORIENTATION="in", XREF=NULL,YREF=NULL,
    orgKr <- dim(XREF)
 
    if ( length(FRONT.IDX) > 0 )  {
+      if (LP) print("FRONT.IDX")
+      if (LP) print(FRONT.IDX)
       if ( !is.vector(FRONT.IDX) )
          stop("FRONT.IDX is not a vector in 'dea'")
       XREF <- XREF[,FRONT.IDX, drop=FALSE]
       YREF <- YREF[,FRONT.IDX, drop=FALSE]
-      # XREF <- matrix(XREF[,FRONT.IDX],nrow=dim(XREF)[1])
-      # YREF <- matrix(YREF[,FRONT.IDX],nrow=dim(YREF)[1])
    }
    rNames <- colnames(XREF)
    if ( is.null(rNames) & !is.null(colnames(YREF)) )
       rNames <- colnames(YREF)
 
-   m = dim(X)[1]  # number of inputs
-   n = dim(Y)[1]  # number of outputs
-   K = dim(X)[2]  # number of units, firms, DMUs
-   Kr = dim(XREF)[2] # number of units,firms in the reference technology
+   m <- dim(X)[1]  # number of inputs
+   n <- dim(Y)[1]  # number of outputs
+   K <- dim(X)[2]  # number of units, firms, DMUs
+   Ky <- dim(Y)[2]  
+   Kr <- dim(XREF)[2] # number of units,firms in the reference technology
    oKr <- orgKr[2]
    if ( !is.null(DIRECT) )  {
       if ( class(DIRECT)=="matrix" ) {
@@ -107,22 +112,14 @@ dea  <-  function(X,Y, RTS="vrs", ORIENTATION="in", XREF=NULL,YREF=NULL,
    if (LP) cat("m n K Kr = ",m,n,K,Kr,"\n")
    if (LP & !is.null(DIRECT) ) cat("md, Kd =",md,Kd,"\n") 
 
-   if ( m != dim(XREF)[1] )  {
-      print("Number of inputs must be the same in X and XREF",quote=F)
-      return(print("Method 'dea' stops",quote=F))
-   }
-   if ( n != dim(YREF)[1] )  {
-      print("Number of outputs must be the same in Y and YREF",quote=F)
-      return(print("Method 'dea' stops",quote=F))
-   } 
-   if ( K != dim(Y)[2] )  {
-      print("Number of units must be the same in X and Y",quote=F)
-      return(print("Method 'dea' stops",quote=F))
-   }
-   if ( Kr != dim(YREF)[2] )  {
-      print("Number of units must be the same in XREF and YREF",quote=F)
-      return(print("Method 'dea' stops",quote=F))
-   }
+   if ( m != dim(XREF)[1] )
+      stop("Number of inputs must be the same in X and XREF")
+   if ( n != dim(YREF)[1] )
+      stop("Number of outputs must be the same in Y and YREF")
+   if ( K != Ky )
+      stop("Number of units must be the same in X and Y")
+   if ( Kr != dim(YREF)[2] )
+      stop("Number of units must be the same in XREF and YREF")
 
    if ( !is.null(DIRECT) & ORIENTATION=="graph" )
          stop("DIRECT cannot not be used with ORIENTATION=\"graph\"")
@@ -154,7 +151,8 @@ dea  <-  function(X,Y, RTS="vrs", ORIENTATION="in", XREF=NULL,YREF=NULL,
 
    # Initialiser LP objekt
    lps <- make.lp(m+n +rlamb,1+Kr)
-   name.lp(lps, paste("Dea",ORIENTATION,RTS,sep="-"))
+   if ( is.null(DIRECT) ) dirStreng<-"" else dirStreng<-"Dir"
+   name.lp(lps, paste("Dea",ORIENTATION,RTS,dirStreng,sep="-"))
 
    # saet raekker i matrix med restriktioner, saet 0'er for den foerste
    # soejle for den skal alligevel aendres for hver firm.
@@ -186,8 +184,8 @@ dea  <-  function(X,Y, RTS="vrs", ORIENTATION="in", XREF=NULL,YREF=NULL,
    } else if ( RTS == "add" )  {
       set.type(lps,2:(1+Kr),"integer")
    }
- 
-   if ( !is.null(DIRECT) & Kd==0 )  {
+
+   if ( !is.null(DIRECT) && Kd==0 && DIRECT[1] != "min" )  {
       # print(Kd)
       # print(DIRECT)
       # Samme retning for alle enheder
@@ -199,6 +197,13 @@ dea  <-  function(X,Y, RTS="vrs", ORIENTATION="in", XREF=NULL,YREF=NULL,
          set.column(lps, 1, c(1,-DIRECT),0:(m+n))
    }
 
+   if ( !is.null(DIRECT) )  {
+      # Ved super efficiency for directional kan loesning vaere
+      # negativ saa loensingen skal kunne vaere negativ, dvs. objval
+      # kan vaere negativ.
+      set.bounds(lps,lower=-Inf, columns=1)
+   }
+
    set.objfn(lps, 1,1)
    set.constr.type(lps, rep(">=",m+n+rlamb))
    if ( ORIENTATION %in% c("in","graph") )  {
@@ -208,9 +213,9 @@ dea  <-  function(X,Y, RTS="vrs", ORIENTATION="in", XREF=NULL,YREF=NULL,
    } else if ( ORIENTATION == "in-out" & !is.null(DIRECT) )  {
       lp.control(lps, sense="max")
    } else  
-     stop("In 'dea' for ORIENTATION use only 'in', 'out', or 'graph'")
+     stop("In 'dea' for ORIENTATION use only 'in', 'out', 'graph', or 'in-out (only for DIRECT)")
 
-   if ( !is.null(DIRECT) )  {
+   if ( !is.null(DIRECT) && DIRECT[1] != "min" )  {
       lp.control(lps, sense="max")
    }
 
@@ -244,12 +249,63 @@ dea  <-  function(X,Y, RTS="vrs", ORIENTATION="in", XREF=NULL,YREF=NULL,
       }
    }  
 
+   if ( !is.null(DIRECT) && DIRECT[1] == "min")  {
+      directMin <- TRUE
+      if ( ORIENTATION=="in" )  {
+         directMatrix <- matrix(NA, nrow=m, ncol=K)
+      } else if ( ORIENTATION=="out" )  {
+         directMatrix <- matrix(NA, nrow=n, ncol=K)
+      } else if ( ORIENTATION=="in-out" )  {
+         directMatrix <- matrix(NA, nrow=m+n, ncol=K)
+      }
+   } else {
+      directMin <- FALSE
+   }
+
    # The loop for each firm
    for ( k in 1:K)  {
+      if ( LP )  print(paste("Firm",k), quote=FALSE)
+ 
       # Af en eller anden grund saetter set.column ogsaa vaerdi for
       # kriteriefunktion og hvis der ikke er nogen vaerdi bliver den
       # automatisk sat til 0.  Derfor maa 1-tallet for
       # kriteriefunktionen med for denne soejle og det er raekke 0.
+
+
+      if ( directMin )  {
+         # Find retningen og saet foerste soejle til den
+         set.rhs(lps, c(-X[,k],Y[,k]), 1:(m+n))
+         if ( ORIENTATION=="in" )  {
+            lp.control(lps, sense="min")
+            DIRECT <- minDirection(lps, X[,k], m, n, ORIENTATION, LP=LP)
+            lp.control(lps, sense="max")
+            set.column(lps, 1, c(1,-DIRECT),0:m)
+         } else if ( ORIENTATION=="out" )  {
+            DIRECT <- minDirection(lps, Y[,k], m, n, ORIENTATION, LP=LP)
+            set.column(lps, 1, c(1,DIRECT), c(0,(m+1):(m+n)) )
+         } else if ( ORIENTATION=="in-out" )  {
+              stop(paste("ORIENTATION=\"in-out\" does at the moment",
+                         "not work with DIRECT=\"min\""))
+            # DIRECT <- minDirection(lps, X[,k], m, n, ORIENTATION, Y[,k])
+            # set.column(lps, 1, c(1,-DIRECT),0:(m+n))
+         }
+         directMatrix[,k] <- DIRECT
+         if (LP) { print("Min DIRECT:"); print(DIRECT) }
+         # Check om DIRECT er 0, hvis den er nul gaa til naeste firm
+         lpcontr <- lp.control(lps)
+         eps <- sqrt(lpcontr$epsilon["epsint"])
+         if ( max(DIRECT) < eps | max(DIRECT)/mean(c(X[,k],Y[,k])) < eps )
+         {
+            if (LP) print(paste("Direction 0 for firm",k))
+            objval[k] <- 0
+            if ( !FAST )  {
+               lambda[,k] <- rep(0,Kr)
+               lambda[k,k] <- 1
+            }
+            next  # ingen direction at gaa, tag naeste firm
+         }
+      }  # if ( directMin )
+
 
       if ( is.null(DIRECT) )  {
          if ( ORIENTATION == "in" )  {
@@ -268,12 +324,11 @@ dea  <-  function(X,Y, RTS="vrs", ORIENTATION="in", XREF=NULL,YREF=NULL,
             if ( ORIENTATION=="in" )
                set.column(lps, 1, c(1,-DIRECT[,k]),0:m)
             else if ( ORIENTATION=="out" )
-               set.column(lps, 1, -DIRECT[,k],0:n)
+               set.column(lps, 1, c(1,-DIRECT[,k]),0:n)
             else if ( ORIENTATION=="in-out" )
                set.column(lps, 1, c(1,-DIRECT[,k]),0:(m+n))
          }
       }
-      if ( LP )  print(paste("Firm",k), quote=FALSE)
       if ( LP && k == 1 )  print(lps)
       status <- solve(lps)
       if ( status != 0 ) {
@@ -314,11 +369,39 @@ dea  <-  function(X,Y, RTS="vrs", ORIENTATION="in", XREF=NULL,YREF=NULL,
       }
    }  # loop for each firm
 
+   e <- objval
+
+if (FALSE)  {
    # Afrund efficiencer der naermest er 1 til 1 saa der ikke er
    # afrundingsfejl; noget stoerre end sqrt(.Machine$double.eps)
-   e <- objval
+   if ( is.null(DIRECT) )  {
+      e <- objval
+   } else { 
+      mmd <- switch(ORIENTATION, "in"=m, "out"=n, "in-out"=m+n) 
+      ob <- matrix(objval,nrow=mmd, ncol=K, byrow=T)
+      if ( class(DIRECT)=="matrix" && dim(DIRECT)[2] > 1 )  {
+          dir <- DIRECT
+      } else {
+          dir <- matrix(DIRECT,nrow=mmd, ncol=K)
+      }
+      if ( ORIENTATION=="in" )  {
+         e <- 1 - ob*dir/X
+      } else if ( ORIENTATION=="out" )  {
+         e <- 1 + ob*dir/Y
+      } else if ( ORIENTATION=="in-out" )  {
+         e <- cbind(1 - ob[1:m,,drop=FALSE]*dir[1:m,,drop=FALSE]/X, 
+           1 + ob[(m+1):(m+n),,drop=FALSE]*dir[(m+1):(m+n),,drop=FALSE]/Y)
+      } else {
+         warning("Illegal ORIENTATION for argument DIRECT") 
+      }
+      if ( class(e)=="matrix" && ( dim(e)[1]==1 || dim(e)==1 ) )
+         e <- c(e) 
+   }
+} # if (FALSE)
+
+
    lpcontr <- lp.control(lps)
-   eps <- lpcontr$epsilon["epsint"]
+   eps <- sqrt(lpcontr$epsilon["epsint"])
    e[abs(e-1) < eps] <- 1
    if ( !is.null(dimnames(X)[[2]]) )  {
       names(e) <- dimnames(X)[[2]]
@@ -348,10 +431,8 @@ dea  <-  function(X,Y, RTS="vrs", ORIENTATION="in", XREF=NULL,YREF=NULL,
        rownames(lambda) <- paste("L",rownames(lambda),sep="_")
    }
 
-   sign <- NULL
-   if ( ORIENTATION == "out" ) sign <- -1 else sign <- 1
-
    if ( DUAL )  {
+     if ( ORIENTATION == "out" ) sign <- -1 else sign <- 1
      ux <- sign*dual[2:(1+m),,drop=FALSE] 
      vy <- sign*dual[(2+m):(1+m+n),,drop=FALSE] 
      rownames(ux) <- paste("u",1:m,sep="")
@@ -367,6 +448,8 @@ dea  <-  function(X,Y, RTS="vrs", ORIENTATION="in", XREF=NULL,YREF=NULL,
    if (LP) print("DUAL faerdig")  
    
    if ( !TRANSPOSE ) {
+      if ( class(e)=="matrix" )
+         e <- t(e)
       lambda <- t(lambda)
       if (DUAL)  {
          ux <- t(ux)
@@ -375,6 +458,10 @@ dea  <-  function(X,Y, RTS="vrs", ORIENTATION="in", XREF=NULL,YREF=NULL,
          dual <- t(dual)
          if ( !is.null(gamma) ) gamma <- t(gamma)
       }
+      if (directMin)
+         DIRECT <- t(directMatrix) 
+      else if ( !is.null(DIRECT) & class(DIRECT)=="matrix" )
+         DIRECT <- t(DIRECT)
    }
 
    oe <- list(eff=e, lambda=lambda, objval=objval, RTS=RTS,
@@ -382,6 +469,10 @@ dea  <-  function(X,Y, RTS="vrs", ORIENTATION="in", XREF=NULL,YREF=NULL,
               ORIENTATION=ORIENTATION, TRANSPOSE=TRANSPOSE
               # ,slack=slack_, sx=sx, sy=sy
               )
+   if (!is.null(DIRECT))  {
+      oe$direct <- DIRECT
+   }
+   
    class(oe) <- "Farrell"
 
 

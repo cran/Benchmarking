@@ -1,4 +1,4 @@
-% $Id: sfa.Rd 81 2010-10-20 15:26:25Z Lars $
+% $Id: sfa.Rd 84 2010-11-04 12:26:37Z Lars $
 \name{sfa}
 \alias{sfa}
 \alias{lambda.sfa}
@@ -18,6 +18,9 @@
 \alias{teMode.sfa}
 \alias{te.add.sfa}
 
+% \alias{efficiencies.sfa}
+% \alias{eff.sfa}
+
 
 \title{Stochastic frontier estimation}
 
@@ -31,6 +34,8 @@ sfa(x, y, beta0 = NULL, lambda0 = 1, resfun = ebeta,
     TRANSPOSE = FALSE, DEBUG=FALSE,
     control=list(maxeval=1000, stepmax=.1), hessian=2)
 
+% \method{efficiencies}{sfa}(object)
+% \method{eff}{sfa}(object)
 te.sfa(object)
 teBC.sfa(object)
 teMode.sfa(object)
@@ -159,8 +164,8 @@ on this see \code{ucminf}}
 
 \references{
 
- Bogetoft and Otto; \emph{Benchmarking with DEA, SFA, and
-R}, chapters 7 and 8; Springer 2011
+Bogetoft and Otto; \emph{Benchmarking with DEA, SFA, and R}, Springer
+2011; chapters 7 and 8.
 
 }
 
@@ -168,7 +173,8 @@ R}, chapters 7 and 8; Springer 2011
 \seealso{ See the method \code{ucminf} for the possible optimization
    methods and further options to use in the option \code{control}.
 
-The method \code{sfa} in the package \pkg{frontier} gives another way to estimate stochastic production functions.
+   The method \code{sfa} in the package \pkg{frontier} gives another
+   way to estimate stochastic production functions.
 
 }
 
@@ -177,16 +183,18 @@ The method \code{sfa} in the package \pkg{frontier} gives another way to estimat
 
 
 \note{ Calculation of technical efficiencies for each unit can be done
-by the method te.sfa as shown in the examples.
+     by the method te.sfa as shown in the examples.
 
-\code{te.sfa(sfaObject), teBC.sfa(sfaObject)}: Efficiencies estimated by minimizing the mean square error; Eq. (7.21) in Bogetoft
-     and Otto (2011, 219) and Battese and Coelli (1988, 392)
+\code{te.sfa(sfaObject), teBC.sfa(sfaObject)}: Efficiencies estimated
+     by minimizing the mean square error; Eq. (7.21) in Bogetoft and
+     Otto (2011, 219) and Battese and Coelli (1988, 392)
 
-\code{teMode.sfa(sfaObject), te1.sfa(sfaObject)}: Efficiencies estimates using the conditional mode approach; Bogetoft and Otto
+\code{teMode.sfa(sfaObject), te1.sfa(sfaObject)}: Efficiencies
+     estimates using the conditional mode approach; Bogetoft and Otto
      (2011, 219), Jondrow et al. (1982, 235).
 
-\code{teJ.sfa(sfaObject), te2.sfa(sfaObject)}: Efficiencies estimates using the conditional mean approach Jondrow et al. (1982,
-     235).
+\code{teJ.sfa(sfaObject), te2.sfa(sfaObject)}: Efficiencies estimates
+     using the conditional mean approach Jondrow et al. (1982, 235).
 
 \code{te.add.sfa(sfaObject)} Efficiency in the additive model,
       Bogetoft and Otto (2011, 219)
@@ -197,8 +205,8 @@ The variance pf the distribution of efficiency can be calculated by
       (sum of variances of efficiency and random noise) by
       \code{sigma2.sfa}.
 
-The ratio of variances of the efficiency and the random noise can be found from
-      the method \code{lambda.sfa}
+The ratio of variances of the efficiency and the random noise can be
+      found from the method \code{lambda.sfa}
 
 The generic method \code{summary} prints the parameters, standard
       errors, t-values, and a few more statistics from the
@@ -225,10 +233,12 @@ summary(sfa(x,y))
 
 # Estimate efficiency for each unit
 o <- sfa(x,y)
+eff(o)
+
 te <- te.sfa(o)
 teM <- teMode.sfa(o)
 teJ <- teJ.sfa(o)
-cbind(te,teM,teJ)[1:10,]
+cbind(eff(o),te,Mode=eff(o, type="Mode"),teM,teJ)[1:10,]
 
 
 sigma2.sfa(o)       # Estimated varians

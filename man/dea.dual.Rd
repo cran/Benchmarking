@@ -1,4 +1,4 @@
-% $Id: dea.dual.Rd 81 2010-10-20 15:26:25Z Lars $
+% $Id: dea.dual.Rd 85 2010-11-06 22:18:27Z Lars $
 \name{dea.dual}
 \alias{dea.dual}
 % \alias{dea.dual.mat}
@@ -38,18 +38,20 @@ dea.dual(X, Y, RTS = "vrs", ORIENTATION = "in",
  technology / returns to scale assumption.
 
 \tabular{rcl}{
-0 \tab "fdh" \tab Free disposability hull, no convexity assumption \cr
+0 \tab "fdh" \tab  \emph{Not available.}\cr
 1 \tab "vrs" \tab Variable returns to scale, convexity and free disposability \cr
 2 \tab "drs" \tab Decreasing returns to scale, convexity, down-scaling and free disposability \cr
 3 \tab "crs" \tab Constant returns to scale, convexity and free disposability \cr
 4 \tab "irs" \tab Increasing returns to scale, (up-scaling, but not down-scaling), convexity and free disposability \cr
-5 \tab "add" \tab Additivity (scaling up and down, but only with integers), and free disposability
+5 \tab "add" \tab  \emph{Not available.}
 }
 
 }
 
 \item{ORIENTATION}{Input efficiency "in" (1), output efficiency "out"
-      (2), and graph efficiency "graph" (3) (not yet implemented). }
+      (2), and graph efficiency "graph" (3) (not yet implemented). For
+      use with \code{DIRECT} an additional option is "in-out" (0). In
+      this case, "graph" is not feasible}
 
 \item{XREF}{Input of the firms determining the technology, defaults to
 \code{X}}
@@ -154,7 +156,8 @@ depend on the order of the complete efficient firms.
 x <- matrix(c(2,5 , 1,2 , 2,2 , 3,2 , 3,1 , 4,1), ncol=2,byrow=TRUE)
 y <- matrix(1,nrow=dim(x)[1])
 dea.plot.isoquant(x[,1],x[,2],txt=1:dim(x)[1])
-for (i in 1:dim(x)[1]) lines(c(0,x[i,1]), c(0,x[i,2]),lty="dotted")
+segments(0,0, x[,1], x[,2], lty="dotted")
+
 
 e <- dea(x,y,RTS="crs",SLACK=TRUE)
 ed <- dea.dual(x,y,RTS="crs")

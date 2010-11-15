@@ -1,0 +1,63 @@
+$Id: NEWS 88 2010-11-13 23:26:02Z Lars $
+
+Changes to Benchmarking version 0.16
+
+
+ * eff() now returns efficiencies as array and not as matrix; makes it
+   easier with further calculations with eff as dimensions are now a
+   lesser problem.   
+
+ * Use of S3 method for efficiencies, compatible with the package
+   frontier.
+
+ * New function excess returns excess input and/or output for Farrell
+   object.
+
+ * The function dea checks if X and Y are matrices and aborts if not.
+
+ * make.merge can now use a named list to define mergers.
+
+ * New function eladder and eladder.plot.
+
+ * New function dea.direct for simplified directional efficiency with
+   an interpretation a la Farrell.
+
+ * The function slack works for directional efficiency
+
+ * sdea (super-efficiency)  works with directional efficiency
+
+ * A wrapper around FEAR::boot.sw89 such that it can be called and
+   deliver results as other functions in Benchmarking.
+
+ * A new value for RTS in dea.plot: "fdh+". At the moment, however, it
+   only works for in-out direction.
+
+ * The documentation has been corrected and somewhat expanded.
+
+ 
+
+Changes to Benchmarking version 0.15
+
+  * The methods now stops if there is an unknown value for RTS
+    or ORIENTATION
+
+  * dea.dual now has argument DIRECT same way as dea
+ 
+  * new function mea calculates multi-directional efficiencies
+
+  * new function mea.lines draw lines in connection with mea
+
+  * minor clarifications in the manual for dea.dual
+
+  bug fixes
+
+  * dea argument DIRECT fixed for DIRECTION="out"; only worked
+    when number of inputs and outputs was equal
+
+
+
+Changes to Benchmarking version 0.14
+  * make.merge can now use a factor to define mergers
+  * data sets included
+  * dea new argument DIRECT for directional efficiency
+  * opdated all manuals

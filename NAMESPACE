@@ -1,6 +1,8 @@
-# $Id: NAMESPACE 78 2010-10-18 22:09:28Z Lars $
-export(dea, sdea, efficiency, eff,
+# $Id: NAMESPACE 85 2010-11-06 22:18:27Z Lars $
+export(dea, sdea,   # efficiency, eff,
+excess, eladder, eladder.plot,
 dea.dual,
+dea.direct, dea.boot,
 #  dea.mat, dea.dual.mat,
 dea.add,
 # print.Farrell, summary.Farrell,
@@ -21,7 +23,8 @@ teJ.sfa, teBC.sfa, teMode.sfa,
 lambda.sfa,
 critValue, typeIerror,
 outlier.ap, outlier.ap.plot,
-eff.dens, eff.dens.plot
+eff.dens, eff.dens.plot,
+mea, mea.lines
 )
 
 S3method("print", "Farrell")
@@ -39,3 +42,25 @@ S3method("summary", "sfa")
 S3method("residuals", "sfa")
 S3method("logLik", "sfa")
 S3method("coef", "sfa")
+
+export( "eff" )
+export( "efficiencies" )
+S3method( "efficiencies", "default" )
+S3method( "eff", "Farrell" )
+S3method( "eff", "sfa" )
+S3method( "eff.add", "sfa" )
+S3method( "efficiencies", "Farrell" )
+S3method( "efficiencies", "sfa" )
+
+S3method( "coef", "sfa" )
+S3method( "logLik", "sfa" )
+S3method( "print", "sfa" )
+S3method( "residuals", "sfa" )
+S3method( "fitted", "sfa" )
+S3method( "summary", "sfa" )
+# S3method( "print", "summary.sfa" )
+S3method( "vcov", "sfa" )
+
+
+# importFrom(FEAR,boot.sw98)
+

@@ -1,4 +1,4 @@
-% $Id: norWood2004.Rd 81 2010-10-20 15:26:25Z Lars $
+% $Id: norWood2004.Rd 82 2010-10-24 20:00:48Z Lars $
 \name{norWood2004}
 \alias{norWood2004}
 \docType{data}
@@ -38,7 +38,7 @@ is a semicolon separated file and not a comma separated file.  }
 
 
 \source{
-Collected from farmers in forestry.
+ Norwegian Agricultural Economics Research Institute.
 }
 
 

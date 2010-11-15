@@ -1,38 +1,35 @@
-# $Id: dea.plot.R 79 2010-10-19 09:02:04Z Lars $
+# $Id: dea.plot.R 87 2010-11-12 00:06:02Z Lars $
 "dea.plot" <-
 function(x, y, RTS="vrs", ORIENTATION="in-out", txt=NULL, add=FALSE, 
             wx=NULL, wy=NULL, TRANSPOSE = FALSE, fex=1, GRID=FALSE,
-            RANGE=FALSE, ..., xlim, ylim, xlab, ylab)
+            RANGE=FALSE, param=NULL, ..., xlim, ylim, xlab, ylab)
 # x er input 1 og y er iput 2 eller output.
 # Hvis der flere varer i de to input/output bliver de lagt sammen som
 # vægtet sum med vægte wx og wy; default vægte som være simpel addition.
 #
 {
-   rts <- c("fdh","vrs","drs","crs","irs","irs2","add")
+   rts <- c("fdh","vrs","drs","crs","irs","irs2","add","fdh+")
    if ( is.real(RTS) )  {
       cat("Number '",RTS,sep="")
       RTStemp <- rts[1+RTS] # the first fdh is number 0
       RTS <- RTStemp
       cat("' is '",RTS,"'\n",sep="")
    }
-   if ( missing(RTS) ) RTS <- "vrs" 
-   else RTS <- tolower(RTS)
-   if ( !(RTS %in% rts) )  {
-      print(paste("Unknown value for RTS:",RTS),quote=F)
-      RTS <- "vrs"
-      print(paste("Continuous with RTS =",RTS),quote=F)
-   }
+   RTS <- tolower(RTS)
+   if ( !(RTS %in% rts) ) stop(paste("Unknown value for RTS:",RTS),quote=F)
 
    orientation <- c("in-out","in","out","graph")
    if ( is.real(ORIENTATION) )  {
       ORIENTATION_ <- orientation[ORIENTATION+1]  # "in-out" er nr. 0
       ORIENTATION <- ORIENTATION_
    }
+   ORIENTATION <- tolower(ORIENTATION)
    if ( !(ORIENTATION %in% orientation) ) {
-      print(paste("Unknown value for ORIENTATION:",ORIENTATION),quote=F)
-      ORIENTATION <- "in"
-      print(paste("Continues with ORIENTATION =",ORIENTATION),quote=F)
+      stop(paste("Unknown value for ORIENTATION:",ORIENTATION),quote=F)
    }
+
+   if ( RTS=="fdh+" && ORIENTATION!="in-out" )
+      stop("RTS=\"fdh+\" only works for ORIENTATION=\"in-out\"")
 
    if (TRANSPOSE) {
       x <- t(x)
@@ -68,6 +65,17 @@ function(x, y, RTS="vrs", ORIENTATION="in-out", txt=NULL, add=FALSE,
                         "in"="x1", "out"="y1", "in-out"="X")}
       if (missing(ylab) ) {ylab <- switch(ORIENTATION, 
                         "in"="x2", "out"="y2", "in-out"="Y")}
+
+      if ( RTS=="fdh+" ) {
+         if ( is.null(param) )  {
+            delta <- .15
+         } else {
+            delta <- param
+         }
+         xlim <- c(1-delta,1+delta)*xlim
+         ylim <- c(1-delta,1+delta)*ylim
+      }
+
       # plot points with axes
       plot(x,y,xlim=xlim,ylim=ylim,xaxs="i",yaxs="i",xlab=xlab,ylab=ylab,
                 frame=FALSE,...)
@@ -75,11 +83,19 @@ function(x, y, RTS="vrs", ORIENTATION="in-out", txt=NULL, add=FALSE,
          grid(col="darkgray")
          box(col="grey")
       }
-      if ( length(txt) > 0 ) {
+      if ( class(txt)=="logical" && txt )  {
+         if ( class(x)=="matrix" )
+            txt <- 1:dim(x)[1]
+         else
+            txt <- 1:length(x)
+      }
+      if ( class(txt)!="logical" && length(txt) > 0 ) {
         # Evt. tekst på punkter sættes lidt nede til højre
         text(x,y,txt,adj=c(-.75,.75),cex=fex)
       }
    }  # if ( add == FALSE )
+
+
 
    if ( RTS == "add" )   {
       # Lav alle mulige additive kombinatinoner af data
@@ -119,6 +135,20 @@ function(x, y, RTS="vrs", ORIENTATION="in-out", txt=NULL, add=FALSE,
       # til at optraede som punkter
       RTS <- "fdh"
    }
+
+
+
+   if ( RTS == "fdh+" )  {
+      if ( is.null(param) )  {
+         delta <- .15
+      } else {
+         delta <- param
+      }
+      dea.plot.fdhPlus(x,y,delta, ...)
+   }  # "fdh+"
+
+
+
 
    if ( ORIENTATION == "in" ) {
       # inputkravmængde, input afstandsfunktion
@@ -248,16 +278,16 @@ function(x, y, RTS="vrs", ORIENTATION="in-out", txt=NULL, add=FALSE,
 
 dea.plot.frontier <- function(x, y, RTS="vrs",...)
 {
-        dea.plot(x, y, RTS=RTS, ORIENTATION=0,...)
+        dea.plot(x, y, RTS=RTS, ORIENTATION="in-out",...)
 }
 
 dea.plot.isoquant <- function(x1, x2, RTS="vrs",...)
 {
-        dea.plot(x1, x2, RTS=RTS, ORIENTATION=1,...)
+        dea.plot(x1, x2, RTS=RTS, ORIENTATION="in",...)
 }
 
 dea.plot.transform <- function(y1, y2, RTS="vrs",...)
 {
-        dea.plot(y1, y2, RTS=RTS, ORIENTATION=2,...)
+        dea.plot(y1, y2, RTS=RTS, ORIENTATION="out",...)
 }
 

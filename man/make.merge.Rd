@@ -1,4 +1,4 @@
-% $Id: make.merge.Rd 81 2010-10-20 15:26:25Z Lars $
+% $Id: make.merge.Rd 86 2010-11-11 09:00:13Z Lars $
 \name{make.merge}
 \alias{make.merge}
 
@@ -10,15 +10,15 @@
  }
 
 \usage{
-make.merge(grp, nFirm = NULL, X = NULL)
+make.merge(grp, nFirm = NULL, X = NULL, names = NULL)
 }
 
 
 \arguments{
 
  \item{grp}{ Either a list of length Kg for Kg firms after mergers;
-       each component of the list is a list with the firm numbers
-       going into this merger.
+       each component of the list is a (named) list with the firm numbers or
+       names going into this merger.
 
        Or a factor of length K with Kg levels where where each level
        determines a merger; to exclude firms for mergers set the
@@ -28,6 +28,10 @@ make.merge(grp, nFirm = NULL, X = NULL)
 
  \item{X}{A matrix of inputs or outputs where the rows corresponds to
        the number of original (starting) firms }
+
+ \item{names}{A list with names of all firms, only needed if the
+       mergers are given as a list of names, i.e. \code{grp} is a list
+       of names.}
 
 }
 
@@ -46,7 +50,7 @@ firms and \code{m} inputs, and \code{M <- make.merge(gr,K)} then
 
 
 \value{ Returns an aggregation matrix of dimension Kg times K where
-rows corresponds to new merged firms and collums are 1 for firms to be
+rows corresponds to new merged firms and columns are 1 for firms to be
 included and 0 for firms to be excluded in the the given merger as
 defined by the row. }
 
@@ -81,5 +85,12 @@ fgr <- factor(c("en","en",NA,"to","to"))
 M2 <- make.merge(fgr)
 print(M2)
 
+# Name of mergers
+M3 <- make.merge(list(AB=c("A","B"), DE=c("D","E")), names=LETTERS[1:5])
+print(M3)
+
+# No name of mergers
+M4 <- make.merge(list(c("A","B"), c("D","E")), names=LETTERS[1:5])
+print(M4)
 }
 

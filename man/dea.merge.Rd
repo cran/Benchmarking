@@ -1,4 +1,4 @@
-% $Id: dea.merge.Rd 81 2010-10-20 15:26:25Z Lars $
+% $Id: dea.merge.Rd 85 2010-11-06 22:18:27Z Lars $
 \name{dea.merge}
 \alias{dea.merge}
 
@@ -10,8 +10,7 @@ similar firms (horizontal integration).  }
 \usage{
 
 dea.merge(X, Y, M, RTS = "vrs", ORIENTATION = "in",
-          XREF = NULL, YREF = NULL, FRONT.IDX = NULL, 
-          TRANSPOSE=FALSE, LP=FALSE, CONTROL=NULL, LPK=NULL)
+          XREF = NULL, YREF = NULL, FRONT.IDX = NULL, TRANSPOSE=FALSE)
 }
 
 \arguments{\item{}{ Most of the arguments correspond to the arguments in
@@ -36,14 +35,6 @@ dea.merge(X, Y, M, RTS = "vrs", ORIENTATION = "in",
   \item{FRONT.IDX}{ as in \code{dea} }
 
   \item{TRANSPOSE}{ as in \code{dea} }
-
-  \item{LP}{ as in \code{dea} }
-
-  \item{CONTROL}{ as in \code{dea} }
-
-  \item{LPK}{ as in \code{dea} }
-
-%  \item{\dots}{ as in \code{dea} }
 
 }
 

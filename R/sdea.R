@@ -1,15 +1,17 @@
-# $Id: sdea.R 75 2010-10-08 20:26:55Z Lars $
+# $Id: sdea.R 88 2010-11-13 23:26:02Z Lars $
 
 
 # Calculates super efficiency
-sdea <- function(X,Y, RTS="vrs", ORIENTATION="in", TRANSPOSE=FALSE,
-                 LP=FALSE)
+sdea <- function(X,Y, RTS="vrs", ORIENTATION="in", DIRECT=NULL,
+                 TRANSPOSE=FALSE, LP=FALSE)
 {
    # Input is as for the method eff
    # Antal firmaer i data er K
    if (!TRANSPOSE)  {
       X <- t(X)
       Y <- t(Y)
+      if ( !is.null(DIRECT) & class(DIRECT)=="matrix" )
+         DIRECT <- t(DIRECT)
    }
    K = dim(X)[2]
    if (LP)  {
@@ -46,6 +48,16 @@ sdea <- function(X,Y, RTS="vrs", ORIENTATION="in", TRANSPOSE=FALSE,
       ORIENTATION <- "in"
       print(paste("Continues with ORIENTATION =",ORIENTATION),quote=F)
    }
+
+   direct <- NULL
+   directMatrix <- FALSE
+   if ( !is.null(DIRECT) )  {
+      if ( class(DIRECT) == "matrix" )
+         directMatrix <- TRUE
+      else
+         direct <- DIRECT
+   }
+
    for ( i in 1:K ) {
       if (LP) print(paste("=====>> Unit",i),quote=F)
       # For hver enhed i laver vi beregningen og saetter resultat paa
@@ -54,9 +66,10 @@ sdea <- function(X,Y, RTS="vrs", ORIENTATION="in", TRANSPOSE=FALSE,
       # beregnes efficiens for, den i'te.
       # Den anden brug er ved XREF og YREF for at angive hvilken teknologi
       # der skal bruges, de definerer teknologien.
+      if ( directMatrix ) direct <- DIRECT[,i]
       e <- dea(X[,i,drop=FALSE], Y[,i,drop=FALSE],
          RTS,ORIENTATION, XREF=X[,-i,drop=FALSE], YREF=Y[,-i,drop=FALSE],
-         TRANSPOSE=TRUE,LP=LP)
+         TRANSPOSE=TRUE, DIRECT=direct, LP=LP)
       supereff[i] <- e$eff
       # print(dim(lambda))
       # print(dim(e$lambda))
@@ -73,6 +86,8 @@ sdea <- function(X,Y, RTS="vrs", ORIENTATION="in", TRANSPOSE=FALSE,
    colnames(lambda) <- colnames(X)
    if (!TRANSPOSE)  {
       lambda <- t(lambda)
+      if ( !is.null(DIRECT) & class(DIRECT)=="matrix" )
+         DIRECT <- t(DIRECT)
    }
 
    if (LP) {

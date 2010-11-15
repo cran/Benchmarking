@@ -1,8 +1,19 @@
-# $Id: addModel.R 76 2010-10-12 13:45:37Z lo $
+# $Id: addModel.R 82 2010-10-24 20:00:48Z Lars $
 
 # Additive model, corresponds to eqs. 4.34-4.38 in Cooper et al., 2007 
 dea.add <- function(X, Y, RTS="vrs", TRANSPOSE=FALSE,
         XREF=NULL, YREF=NULL, FRONT.IDX=NULL, LP=FALSE)  {
+
+   rts <- c("fdh","vrs","drs","crs","irs","irs","add")
+   if ( is.real(RTS) )  {
+      if (LP) print(paste("Number '",RTS,"'",sep=""),quote=F)
+      RTStemp <- rts[1+RTS] # the first fdh is number 0
+      RTS <- RTStemp
+      if (LP) print(paste("' is '",RTS,"'\n",sep=""),quote=F)
+   }
+   RTS <- tolower(RTS)
+   if ( !(RTS %in% rts) ) stop(paste("Unknown scale of returns:", RTS))
+
 	if ( TRANSPOSE ) {
 		K <- dim(X)[2]
 	} else {

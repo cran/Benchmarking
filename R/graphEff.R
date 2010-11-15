@@ -1,4 +1,4 @@
-# $Id: graphEff.R 75 2010-10-08 20:26:55Z Lars $
+# $Id: graphEff.R 84 2010-11-04 12:26:37Z Lars $
 
 # Funktion til beregning af graf efficiens.  Beregning sker via
 # bisection hvor der itereres mellem mulige og ikke-mulige løsninger
@@ -10,7 +10,7 @@
 # der tilpasses for at se om der er en mulig løsning.
 
 graphEff <- function(lps, X, Y, XREF, YREF, RTS, FRONT.IDX, rlamb, oKr, 
-                          TRANSPOSE, SLACK, FAST, LP) 
+                     TRANSPOSE=FALSE, SLACK=FALSE, FAST=FALSE, LP=FALSE) 
 {
    m = dim(X)[1]  # number of inputs
    n = dim(Y)[1]  # number of outputs
@@ -24,7 +24,8 @@ graphEff <- function(lps, X, Y, XREF, YREF, RTS, FRONT.IDX, rlamb, oKr,
       lambda <- matrix(NA, nrow=Kr, ncol=K) # lambdas one column per unit
    }
    set.column(lps, 1, rep(0,dim(lps)[1]))
-   tol <- 1e-6
+   lpcontr <- lp.control(lps)
+   tol <- lpcontr$epsilon["epsint"]
    for ( k in 1:K)  {
       if ( LP )  print(paste("Firm",k), quote=FALSE)
       # Lav bisection
@@ -80,9 +81,7 @@ graphEff <- function(lps, X, Y, XREF, YREF, RTS, FRONT.IDX, rlamb, oKr,
    }  # loop for each firm
 
    e <- objval
-   # lpcontr <- lp.control(lps)
-   # eps <- lpcontr$epsilon["epsint"]
-   e[abs(e-1) < tol] <- 1
+   e[abs(e-1) < sqrt(tol)] <- 1
 
    if ( FAST ) { 
       return(e)

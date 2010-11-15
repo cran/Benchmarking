@@ -1,9 +1,11 @@
-% $Id: dea.Rd 81 2010-10-20 15:26:25Z Lars $
+% $Id: dea.Rd 88 2010-11-13 23:26:02Z Lars $
 \name{dea}
 \alias{dea}
 % \alias{dea.mat}
-\alias{efficiency}
-\alias{eff}
+% \alias{efficiencies}
+% \alias{eff}
+% \alias{efficiencies.Farrell}
+% \alias{eff.Farrell}
 \alias{sdea}
 \alias{slack}
 \alias{print.slack}
@@ -28,9 +30,6 @@ dea(X, Y, RTS="vrs", ORIENTATION="in", XREF=NULL, YREF=NULL,
     FRONT.IDX=NULL, SLACK=FALSE, DUAL=TRUE, DIRECT=NULL,
     TRANSPOSE=FALSE, FAST=FALSE, LP=FALSE, CONTROL=NULL, LPK=NULL)
 
-efficiency(object)
-eff(object)
-
 \method{print}{Farrell}(x, digits=4, ...) 
 \method{summary}{Farrell}(object, digits=4, ...)
 
@@ -43,8 +42,8 @@ print.peers(x, ...)
 lambda(object, KEEPREF=FALSE)
 lambda.print(x, KEEPREF=FALSE, ...)
 
-sdea(X, Y, RTS="vrs", ORIENTATION="in", TRANSPOSE=FALSE, LP=FALSE)  
-
+sdea(X, Y, RTS="vrs", ORIENTATION="in", DIRECT=NULL,
+     TRANSPOSE=FALSE, LP=FALSE)
 }
 
 
@@ -78,42 +77,41 @@ technology / returns to scale assumption.
 
 \item{ORIENTATION}{Input efficiency "in" (1), output efficiency "out"
     (2), and graph efficiency "graph" (3). For use with \code{DIRECT},
-    an additional option is "in-out" (0). In this case, "graph" is not
-    feasible}
+    an additional option is "in-out" (0).}
 
 \item{XREF}{Inputs of the firms determining the technology, defaults
-to \code{X}}
+    to \code{X}}
 
 \item{YREF}{Outputs of the firms determining the technology, defaults
-to \code{Y}}
+    to \code{Y}}
 
 \item{FRONT.IDX}{Index for firms determining the technology}
 
-\item{SLACK}{Calculate slack in a phase II calculation; the
-  precision for calculating slacks for orientation graph is low.}
+\item{SLACK}{Calculate slack in a phase II calculation; the precision
+    for calculating slacks for orientation graph is low.}
 
 \item{DUAL}{Calculate dual variables, i.e. shadow prices; not
-  calculated for orientation graph as that is not an LP problem.}
+    calculated for orientation graph as that is not an LP problem.}
 
 
 \item{DIRECT}{Directional efficiency, \code{DIRECT} is either a
-     scalar, an array, or a matrix with non-negative elements.
+    scalar, an array, or a matrix with non-negative elements.
 
-     If a scalar, the direction is (1,1,...,1) times the scalar; the
-     value of the efficiency depends on the scalar as well as on the
-     unit of measurements.
+    If the argument is a scalar, the direction is (1,1,...,1) times
+    the scalar; the value of the efficiency depends on the scalar as
+    well as on the unit of measurements.
 
-     If an array, this is used for the direction for every firm;
-     the length of the array must correspond to the number of inputs
-     and/or outputs depending on the \code{ORIENTATION}.
+    If the argument an array, this is used for the direction for every
+    firm; the length of the array must correspond to the number of
+    inputs and/or outputs depending on the \code{ORIENTATION}.
 
-     If a matrix then different directions are used for each firm. The
-     dimensions depends on the \code{ORIENTATION} (and
-     \code{TRANSPOSE}), the number of firms must correspond to the
-     number of firms in \code{X} and \code{Y}.  
+    If the argument is a matrix then different directions are used for
+    each firm. The dimensions depends on the \code{ORIENTATION} (and
+    \code{TRANSPOSE}), the number of firms must correspond to the
+    number of firms in \code{X} and \code{Y}.
 
-     \code{DIRECT} must not be used in connection with
-     \code{DIRECTION="graph"}.
+    \code{DIRECT} must not be used in connection with
+    \code{DIRECTION="graph"}.
 
      }
 
@@ -194,10 +192,14 @@ The graph orientated efficiency is calculated by bisection between
 feasible and infeasible values of G. The precision in the result is
 less than for the other orientations.
 
-The directional efficency can be restricted to inputs
+When the argument \code{DIRECT=d} is used then the returned value
+\code{e} for input orientation is the exces input measured in \code{d}
+units of measurements, i.e. \eqn{x-e d}, and for output orientation
+\eqn{y+e d}.  The directional efficency can be restricted to inputs
 (\code{ORIENTAION="in"}), restricted to outputs
 (\code{ORIENTAION="out"}), or both include inputs and output
-directions (\code{ORIENTAION="in-out"})
+directions (\code{ORIENTAION="in-out"}). Dirctional efficiency is
+discussed on pages 31--25 and 121--127 in Bogetoft and Otto (2011).
 
 }
 
@@ -206,13 +208,15 @@ directions (\code{ORIENTAION="in-out"})
     following components.  The method \code{slack} only returns the
     last three components in the list relevant for slacks.
 
-\item{eff}{The efficiencies }
+\item{eff}{The efficiencies.  Note when DIRECT is used then the
+    efficencies are not Farrell efficiencies but rather exces values
+    in DIRECT units of measurement }
 
 \item{lambda}{The lambdas, i.e. the weight of the peers, for each firm}
 
 \item{objval}{The objective value as returned from the LP program;
-normally the same as eff, but for \code{slack} it is the the sum of
-the slacks. }
+    normally the same as eff, but for \code{slack} it is the the sum
+    of the slacks. }
 
 \item{RTS}{The return to scale assumption as in the option \code{RTS}
      in the call}
@@ -273,6 +277,11 @@ by directional efficiency; set the direction, the argument
 \code{DIRECT}, equal to the variable, discretionary inputs (outputs)
 and 0 for the fixed inputs (outputs).
 
+When the the argument \code{DIRECT=X} is used the then the returned
+effiency is equal to 1 minus the Farrell efficiency for input
+orientation anf to the Farrell effiency minus 1 for output
+orientation.
+
 To use matrices \code{X} and \code{Y} prepared for the methods in the
 package \pkg{FEAR} (Wilson 2008) set the options
 \code{TRANSPOSE=TRUE}; for consistency with \pkg{FEAR} the options
@@ -328,27 +337,8 @@ dea.plot.frontier(x[-n],y[-n],txt=(1:4)[-n],lty=1, xlim=rngx, ylim=rngy)
 # Plot and label firm 3
 points(x[n],y[n],cex=1.25,pch=16)
 text(x[n],y[n],n,adj=c(-.75,.75))
-
-
-# Directional efficiency
-x <- matrix(c(100,200,300,500,600,100),ncol=1)
-y <- matrix(c(75,100,300,400,400,50),ncol=1)
-E <- dea(x,y)
-e <- dea(x,y,DIRECT=1)
-(1-E$eff)*x
-e$eff
-
-z <- matrix(c(x,y),ncol=2)
-dea(x,y,ORIENTATION="in-out",DIRECT=z)
-
-
-x <- matrix(c(2,5 , 1,2 , 2,2 , 3,2 , 3,1 , 4,1), ncol=2,byrow=TRUE)
-y <- matrix(1,nrow=dim(x)[1])
-E <- dea(x,y,RTS="crs")
-e <- dea(x,y,RTS="crs",DIRECT=x)
-1-E$eff
-e$eff
 }
+
 
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.
