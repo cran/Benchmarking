@@ -1,4 +1,4 @@
-% $Id: cost.opt.Rd 81 2010-10-20 15:26:25Z Lars $
+% $Id: cost.opt.Rd 97 2010-12-02 23:27:26Z Lars $
 \name{cost.opt}
 \alias{cost.opt}
 \alias{print.cost.opt}
@@ -111,10 +111,10 @@ The methods \code{print} and \code{summary} is working for
 \value{ The values returned is the optimal input, and/or optimal
         output. When saved in an object the following is available:
 
-\item{xopt}{The optimal input, returned as a matrix; for
+\item{xopt}{The optimal input, returned as a matrix by
      \code{cost.opt} and \code{profit.cost}.}
 
-\item{yopt}{The optimal output, returned as a matrix; for
+\item{yopt}{The optimal output, returned as a matrix by
      \code{revenue.opt} and \code{profit.cost}.}
 
 \item{cost}{The optimal/minimal cost.}
@@ -123,7 +123,11 @@ The methods \code{print} and \code{summary} is working for
 
 \item{profit}{The optimal/maximal profit}
 
-\item{lambda}{The peer weights that determines the technology.}
+\item{lambda}{The peer weights that determines the technology, a
+    matrix. Each row is the lambdas for the firm corresponding to that
+    row; for the vrs technology the rows sum to 1. A columns shows for
+    a given firm how other firms are compared to this firm; i.e. peers
+    are firms with a positive element in their columns.}
 
 }
 

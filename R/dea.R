@@ -1,4 +1,4 @@
-# $Id: dea.R 89 2010-11-14 13:01:40Z lo $
+# $Id: dea.R 97 2010-12-02 23:27:26Z Lars $
 
 # DEA beregning via brug af lp_solveAPI. Fordelene ved lp_solveAPI er
 # færre kald fra R med hele matricer for hver firm og dermed skulle
@@ -12,7 +12,7 @@
 
 
 dea  <-  function(X,Y, RTS="vrs", ORIENTATION="in", XREF=NULL,YREF=NULL,
-         FRONT.IDX=NULL, SLACK=FALSE, DUAL=TRUE, DIRECT=NULL,
+         FRONT.IDX=NULL, SLACK=FALSE, DUAL=FALSE, DIRECT=NULL, param=NULL,
          TRANSPOSE=FALSE, FAST=FALSE, LP=FALSE, CONTROL=NULL, LPK=NULL)  {
    # XREF, YREF determines the technology
    # FRONT.IDX index for units that determine the technology
@@ -30,7 +30,7 @@ dea  <-  function(X,Y, RTS="vrs", ORIENTATION="in", XREF=NULL,YREF=NULL,
       # print("When  FAST then neither DUAL nor SLACK") 
    }
 
-   rts <- c("fdh","vrs","drs","crs","irs","irs","add")
+   rts <- c("fdh","vrs","drs","crs","irs","irs","add","fdh+")
    if ( missing(RTS) ) RTS <- "vrs" 
    if ( is.real(RTS) )  {
       if (LP) print(paste("Number '",RTS,"'",sep=""),quote=F)
@@ -70,7 +70,7 @@ dea  <-  function(X,Y, RTS="vrs", ORIENTATION="in", XREF=NULL,YREF=NULL,
       YREF <- Y
    }
    
-   if ( !TRANSPOSE )  {
+   if ( TRANSPOSE )  {
       X <- t(X)
       Y <- t(Y)
       XREF <- t(XREF)
@@ -85,23 +85,23 @@ dea  <-  function(X,Y, RTS="vrs", ORIENTATION="in", XREF=NULL,YREF=NULL,
       if (LP) print(FRONT.IDX)
       if ( !is.vector(FRONT.IDX) )
          stop("FRONT.IDX is not a vector in 'dea'")
-      XREF <- XREF[,FRONT.IDX, drop=FALSE]
-      YREF <- YREF[,FRONT.IDX, drop=FALSE]
+      XREF <- XREF[FRONT.IDX,, drop=FALSE]
+      YREF <- YREF[FRONT.IDX,, drop=FALSE]
    }
-   rNames <- colnames(XREF)
-   if ( is.null(rNames) & !is.null(colnames(YREF)) )
-      rNames <- colnames(YREF)
+   rNames <- rownames(XREF)
+   if ( is.null(rNames) & !is.null(rownames(YREF)) )
+      rNames <- rownames(YREF)
 
-   m <- dim(X)[1]  # number of inputs
-   n <- dim(Y)[1]  # number of outputs
-   K <- dim(X)[2]  # number of units, firms, DMUs
-   Ky <- dim(Y)[2]  
-   Kr <- dim(XREF)[2] # number of units,firms in the reference technology
-   oKr <- orgKr[2]
+   m <- dim(X)[2]  # number of inputs
+   n <- dim(Y)[2]  # number of outputs
+   K <- dim(X)[1]  # number of units, firms, DMUs
+   Ky <- dim(Y)[1]  
+   Kr <- dim(XREF)[1] # number of units,firms in the reference technology
+   oKr <- orgKr[1]
    if ( !is.null(DIRECT) )  {
       if ( class(DIRECT)=="matrix" ) {
-         md <- dim(DIRECT)[1]
-         Kd <- dim(DIRECT)[2]
+         md <- dim(DIRECT)[2]
+         Kd <- dim(DIRECT)[1]
       } else {
          md <- length(DIRECT)
          Kd <- 0
@@ -112,13 +112,13 @@ dea  <-  function(X,Y, RTS="vrs", ORIENTATION="in", XREF=NULL,YREF=NULL,
    if (LP) cat("m n K Kr = ",m,n,K,Kr,"\n")
    if (LP & !is.null(DIRECT) ) cat("md, Kd =",md,Kd,"\n") 
 
-   if ( m != dim(XREF)[1] )
+   if ( m != dim(XREF)[2] )
       stop("Number of inputs must be the same in X and XREF")
-   if ( n != dim(YREF)[1] )
+   if ( n != dim(YREF)[2] )
       stop("Number of outputs must be the same in Y and YREF")
    if ( K != Ky )
       stop("Number of units must be the same in X and Y")
-   if ( Kr != dim(YREF)[2] )
+   if ( Kr != dim(YREF)[1] )
       stop("Number of units must be the same in XREF and YREF")
 
    if ( !is.null(DIRECT) & ORIENTATION=="graph" )
@@ -143,6 +143,19 @@ dea  <-  function(X,Y, RTS="vrs", ORIENTATION="in", XREF=NULL,YREF=NULL,
          DIRECT <- rep(DIRECT,m+n)
    }
 
+   if ( RTS=="fdh" && ORIENTATION!="graph" && !FAST && DUAL==FALSE )  {
+      e <- fdh(X,Y, ORIENTATION=ORIENTATION, XREF=XREF, YREF=YREF, 
+               FRONT.IDX=FRONT.IDX, DIRECT=DIRECT, TRANSPOSE=FALSE)
+      return(e)
+   }
+   if ( RTS=="fdh+" )  {
+      e <- dea.fdhPlus(X, Y, ORIENTATION=ORIENTATION,
+          XREF=XREF, YREF=YREF, FRONT.IDX=FRONT.IDX, DIRECT=DIRECT, 
+          param=param, TRANSPOSE=FALSE)
+      return(e)
+   }
+
+ 
    if ( RTS != "crs" && RTS != "add" )  {
       rlamb <- 2
    } else 
@@ -157,9 +170,9 @@ dea  <-  function(X,Y, RTS="vrs", ORIENTATION="in", XREF=NULL,YREF=NULL,
    # saet raekker i matrix med restriktioner, saet 0'er for den foerste
    # soejle for den skal alligevel aendres for hver firm.
    for ( h in 1:m )
-       set.row(lps,h, c(0,-XREF[h,]))
+       set.row(lps,h, c(0,-XREF[,h]))
    for ( h in 1:n)
-       set.row(lps,m+h, c(0,YREF[h,]))
+       set.row(lps,m+h, c(0,YREF[,h]))
    # restriktioner paa lambda
    if ( RTS != "crs" && RTS != "add" )  {
       set.row(lps, m+n+1, c(0,rep(-1,Kr)))
@@ -226,6 +239,7 @@ dea  <-  function(X,Y, RTS="vrs", ORIENTATION="in", XREF=NULL,YREF=NULL,
    if ( ORIENTATION == "graph" )  {
       oe <- graphEff(lps, X, Y, XREF, YREF, RTS, FRONT.IDX, rlamb, oKr, 
                           TRANSPOSE, SLACK,FAST,LP) 
+      rm(lps)
       return(oe)
    }
 
@@ -235,28 +249,28 @@ dea  <-  function(X,Y, RTS="vrs", ORIENTATION="in", XREF=NULL,YREF=NULL,
      primal <- NULL
      dual <- NULL
    } else {
-      lambda <- matrix(NA, nrow=Kr, ncol=K) # lambdas one column per unit
-      rownames(lambda) <- rNames
-      colnames(lambda) <- colnames(X)
+      lambda <- matrix(NA, nrow=K, ncol=Kr) # lambdas one column per unit
+      rownames(lambda) <- rownames(X)
+      colnames(lambda) <- rNames
       if (DUAL) {
-         dual   <- matrix(NA, nrow=sum(dim(lps))+1, ncol=K) # 
-         primal <- matrix(NA, nrow=sum(dim(lps))+1, ncol=K) # solutions
-         colnames(dual) <- colnames(X)
-         colnames(primal) <- colnames(X)
+         dual   <- matrix(NA, nrow=K, ncol=sum(dim(lps))+1) # 
+         primal <- matrix(NA, nrow=K, ncol=sum(dim(lps))+1) # solutions
+         rownames(dual) <- rownames(X)
+         rownames(primal) <- rownames(X)
       } else {
          primal <- NULL
          dual <- NULL
       }
    }  
 
-   if ( !is.null(DIRECT) && DIRECT[1] == "min")  {
+   if ( !is.null(DIRECT) && DIRECT[1] == "min" )  {
       directMin <- TRUE
       if ( ORIENTATION=="in" )  {
-         directMatrix <- matrix(NA, nrow=m, ncol=K)
+         directMatrix <- matrix(NA, nrow=K, ncol=m)
       } else if ( ORIENTATION=="out" )  {
-         directMatrix <- matrix(NA, nrow=n, ncol=K)
+         directMatrix <- matrix(NA, nrow=K, ncol=n)
       } else if ( ORIENTATION=="in-out" )  {
-         directMatrix <- matrix(NA, nrow=m+n, ncol=K)
+         directMatrix <- matrix(NA, nrow=K, ncol=m+n)
       }
    } else {
       directMin <- FALSE
@@ -274,32 +288,32 @@ dea  <-  function(X,Y, RTS="vrs", ORIENTATION="in", XREF=NULL,YREF=NULL,
 
       if ( directMin )  {
          # Find retningen og saet foerste soejle til den
-         set.rhs(lps, c(-X[,k],Y[,k]), 1:(m+n))
+         set.rhs(lps, c(-X[k,],Y[k,]), 1:(m+n))
          if ( ORIENTATION=="in" )  {
             lp.control(lps, sense="min")
-            DIRECT <- minDirection(lps, X[,k], m, n, ORIENTATION, LP=LP)
+            DIRECT <- minDirection(lps, X[k,], m, n, ORIENTATION, LP=LP)
             lp.control(lps, sense="max")
             set.column(lps, 1, c(1,-DIRECT),0:m)
          } else if ( ORIENTATION=="out" )  {
-            DIRECT <- minDirection(lps, Y[,k], m, n, ORIENTATION, LP=LP)
+            DIRECT <- minDirection(lps, Y[k,], m, n, ORIENTATION, LP=LP)
             set.column(lps, 1, c(1,DIRECT), c(0,(m+1):(m+n)) )
          } else if ( ORIENTATION=="in-out" )  {
               stop(paste("ORIENTATION=\"in-out\" does at the moment",
                          "not work with DIRECT=\"min\""))
-            # DIRECT <- minDirection(lps, X[,k], m, n, ORIENTATION, Y[,k])
+            # DIRECT <- minDirection(lps, X[k,], m, n, ORIENTATION, Y[k,])
             # set.column(lps, 1, c(1,-DIRECT),0:(m+n))
          }
-         directMatrix[,k] <- DIRECT
+         directMatrix[k,] <- DIRECT
          if (LP) { print("Min DIRECT:"); print(DIRECT) }
          # Check om DIRECT er 0, hvis den er nul gaa til naeste firm
          lpcontr <- lp.control(lps)
          eps <- sqrt(lpcontr$epsilon["epsint"])
-         if ( max(DIRECT) < eps | max(DIRECT)/mean(c(X[,k],Y[,k])) < eps )
+         if ( max(DIRECT) < eps | max(DIRECT)/mean(c(X[k,],Y[k,])) < eps )
          {
             if (LP) print(paste("Direction 0 for firm",k))
             objval[k] <- 0
             if ( !FAST )  {
-               lambda[,k] <- rep(0,Kr)
+               lambda[k,] <- rep(0,Kr)
                lambda[k,k] <- 1
             }
             next  # ingen direction at gaa, tag naeste firm
@@ -309,46 +323,48 @@ dea  <-  function(X,Y, RTS="vrs", ORIENTATION="in", XREF=NULL,YREF=NULL,
 
       if ( is.null(DIRECT) )  {
          if ( ORIENTATION == "in" )  {
-            set.column(lps, 1, c(1,X[,k]),0:m)
-            set.rhs(lps, Y[,k], (m+1):(m+n))
+            set.column(lps, 1, c(1,X[k,]),0:m)
+            set.rhs(lps, Y[k,], (m+1):(m+n))
          } else {
-            set.column(lps, 1, c(1,-Y[,k]),c(0,(m+1):(m+n)))
-            set.rhs(lps, -X[,k], 1:m)
+            set.column(lps, 1, c(1,-Y[k,]),c(0,(m+1):(m+n)))
+            set.rhs(lps, -X[k,], 1:m)
          }
       } else {
          # print(Kd)
          # print(DIRECT)
-         set.rhs(lps, c(-X[,k],Y[,k]), 1:(m+n))
+         set.rhs(lps, c(-X[k,],Y[k,]), 1:(m+n))
          if ( Kd > 1 )  {
          # retning for enheden
             if ( ORIENTATION=="in" )
-               set.column(lps, 1, c(1,-DIRECT[,k]),0:m)
+               set.column(lps, 1, c(1,-DIRECT[k,]),0:m)
             else if ( ORIENTATION=="out" )
-               set.column(lps, 1, c(1,-DIRECT[,k]),0:n)
+               set.column(lps, 1, c(1,-DIRECT[k,]),0:n)
             else if ( ORIENTATION=="in-out" )
-               set.column(lps, 1, c(1,-DIRECT[,k]),0:(m+n))
+               set.column(lps, 1, c(1,-DIRECT[k,]),0:(m+n))
          }
       }
       if ( LP && k == 1 )  print(lps)
       status <- solve(lps)
       if ( status != 0 ) {
-        if (status == 2) {
-	        print(paste("Firm",k,"not in the technology set"), quote=F)
+        if ( status == 2 || status == 3 ) {
+	        # print(paste("Firm",k,"not in the technology set"), quote=F)
+           # print(paste("Status =",status))
+           objval[k] <- ifelse(ORIENTATION=="in",Inf,-Inf)
         } else {
 	        print(paste("Error in solving for firm",k,":  Status =",status), 
              quote=F)
+           objval[k] <- NA
         }
-        objval[k] <- NA
         sol <- NA
       }  else {
          objval[k] <- get.objective(lps)
          if ( !FAST ) sol <- get.variables(lps)
       }
       if ( !FAST )  {
-         lambda[,k] <- sol[2:(1+Kr)]
+         lambda[k,] <- sol[2:(1+Kr)]
          if ( DUAL )  {
-            primal[,k] <- get.primal.solution(lps)
-            dual[,k] <- get.dual.solution(lps)
+            primal[k,] <- get.primal.solution(lps)
+            dual[k,] <- get.dual.solution(lps)
          }
       }
 
@@ -371,40 +387,12 @@ dea  <-  function(X,Y, RTS="vrs", ORIENTATION="in", XREF=NULL,YREF=NULL,
 
    e <- objval
 
-if (FALSE)  {
-   # Afrund efficiencer der naermest er 1 til 1 saa der ikke er
-   # afrundingsfejl; noget stoerre end sqrt(.Machine$double.eps)
-   if ( is.null(DIRECT) )  {
-      e <- objval
-   } else { 
-      mmd <- switch(ORIENTATION, "in"=m, "out"=n, "in-out"=m+n) 
-      ob <- matrix(objval,nrow=mmd, ncol=K, byrow=T)
-      if ( class(DIRECT)=="matrix" && dim(DIRECT)[2] > 1 )  {
-          dir <- DIRECT
-      } else {
-          dir <- matrix(DIRECT,nrow=mmd, ncol=K)
-      }
-      if ( ORIENTATION=="in" )  {
-         e <- 1 - ob*dir/X
-      } else if ( ORIENTATION=="out" )  {
-         e <- 1 + ob*dir/Y
-      } else if ( ORIENTATION=="in-out" )  {
-         e <- cbind(1 - ob[1:m,,drop=FALSE]*dir[1:m,,drop=FALSE]/X, 
-           1 + ob[(m+1):(m+n),,drop=FALSE]*dir[(m+1):(m+n),,drop=FALSE]/Y)
-      } else {
-         warning("Illegal ORIENTATION for argument DIRECT") 
-      }
-      if ( class(e)=="matrix" && ( dim(e)[1]==1 || dim(e)==1 ) )
-         e <- c(e) 
-   }
-} # if (FALSE)
-
 
    lpcontr <- lp.control(lps)
    eps <- sqrt(lpcontr$epsilon["epsint"])
    e[abs(e-1) < eps] <- 1
-   if ( !is.null(dimnames(X)[[2]]) )  {
-      names(e) <- dimnames(X)[[2]]
+   if ( !is.null(dimnames(X)[[1]]) )  {
+      names(e) <- dimnames(X)[[1]]
    }
 
 #   if ( ORIENTATION == "in" )  {
@@ -416,6 +404,7 @@ if (FALSE)  {
 #   }
 
    if ( FAST ) { 
+      rm(lps)
       return(e)
       stop("Her skulle vi ikke kunne komme i 'dea'")
    }
@@ -423,31 +412,36 @@ if (FALSE)  {
 
    if ( is.null(rownames(lambda)) )  {
       if ( length(FRONT.IDX)>0 )  {
-         rownames(lambda) <- paste("L",(1:oKr)[FRONT.IDX],sep="")
+         colnames(lambda) <- paste("L",(1:oKr)[FRONT.IDX],sep="")
       } else {
-         rownames(lambda) <- paste("L",1:Kr,sep="")
+         colnames(lambda) <- paste("L",1:Kr,sep="")
       }
    } else {
-       rownames(lambda) <- paste("L",rownames(lambda),sep="_")
+       colnames(lambda) <- paste("L",rNames,sep="_")
    }
 
    if ( DUAL )  {
      if ( ORIENTATION == "out" ) sign <- -1 else sign <- 1
-     ux <- sign*dual[2:(1+m),,drop=FALSE] 
-     vy <- sign*dual[(2+m):(1+m+n),,drop=FALSE] 
-     rownames(ux) <- paste("u",1:m,sep="")
-     rownames(vy) <- paste("v",1:n,sep="")
+     ux <- sign*dual[,2:(1+m),drop=FALSE] 
+     vy <- sign*dual[,(2+m):(1+m+n),drop=FALSE] 
+     colnames(ux) <- paste("u",1:m,sep="")
+     colnames(vy) <- paste("v",1:n,sep="")
      if ( rlamb > 0 ) 
-        gamma <- dual[(1+m+n+1):(1+m+n+rlamb),,drop=FALSE]
+        gamma <- dual[,(1+m+n+1):(1+m+n+rlamb),drop=FALSE]
      else
         gamma <- NULL
      
    } else {
      ux <- vy <- NULL
    }
-   if (LP) print("DUAL faerdig")  
+   if (LP) print("DUAL faerdig")
+
+   if ( directMin )  {
+      DIRECT <- directMatrix
+   }
+ 
    
-   if ( !TRANSPOSE ) {
+   if ( TRANSPOSE ) {
       if ( class(e)=="matrix" )
          e <- t(e)
       lambda <- t(lambda)
@@ -458,17 +452,16 @@ if (FALSE)  {
          dual <- t(dual)
          if ( !is.null(gamma) ) gamma <- t(gamma)
       }
-      if (directMin)
-         DIRECT <- t(directMatrix) 
-      else if ( !is.null(DIRECT) & class(DIRECT)=="matrix" )
+      if ( !is.null(DIRECT) & class(DIRECT)=="matrix" )
          DIRECT <- t(DIRECT)
    }
 
    oe <- list(eff=e, lambda=lambda, objval=objval, RTS=RTS,
               primal=primal, dual=dual, ux=ux, vy=vy, gamma=gamma,
               ORIENTATION=ORIENTATION, TRANSPOSE=TRANSPOSE
-              # ,slack=slack_, sx=sx, sy=sy
+              # ,slack=slack_, sx=sx, sy=sy 
               )
+
    if (!is.null(DIRECT))  {
       oe$direct <- DIRECT
    }
@@ -477,7 +470,7 @@ if (FALSE)  {
 
 
    if ( SLACK ) {
-      if ( !TRANSPOSE )  { # Transponer tilbage hvis de blev transponeret
+      if ( TRANSPOSE )  { # Transponer tilbage hvis de blev transponeret
          X <- t(X)
          Y <- t(Y)
          if (.xyref.missing) {
@@ -500,7 +493,7 @@ if (FALSE)  {
          print(oe$slack)
       }
    }
-
+   rm(lps)
 
    return(oe)
 

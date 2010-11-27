@@ -1,4 +1,4 @@
-% $Id: eladder.Rd 86 2010-11-11 09:00:13Z Lars $
+% $Id: eladder.Rd 96 2010-11-27 22:47:25Z Lars $
 \name{eladder}
 \alias{eladder}
 \alias{eladder.plot}

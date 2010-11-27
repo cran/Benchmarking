@@ -1,4 +1,4 @@
-# $Id: sdea.R 88 2010-11-13 23:26:02Z Lars $
+# $Id: sdea.R 95 2010-11-22 22:39:59Z Lars $
 
 
 # Calculates super efficiency
@@ -7,26 +7,26 @@ sdea <- function(X,Y, RTS="vrs", ORIENTATION="in", DIRECT=NULL,
 {
    # Input is as for the method eff
    # Antal firmaer i data er K
-   if (!TRANSPOSE)  {
+   if ( TRANSPOSE )  {
       X <- t(X)
       Y <- t(Y)
       if ( !is.null(DIRECT) & class(DIRECT)=="matrix" )
          DIRECT <- t(DIRECT)
    }
-   K = dim(X)[2]
+   K = dim(X)[1]
    if (LP)  {
       print(paste("K =",K))
       print(dim(X))
       print(dim(Y))
    }
-   lambda <- matrix(NA,K,K)
+   lambda <- matrix(0,K,K)
    # Superefficiens skal gemmes i en K-vektor som vi til en start 
    # saetter til NA.
    supereff = rep(NA,K)
-   if ( !is.null(dimnames(X)[[2]]) )  {
-      names(supereff) <- dimnames(X)[[2]]
+   if ( !is.null(dimnames(X)[[1]]) )  {
+      names(supereff) <- dimnames(X)[[1]]
    }
-   rts <- c("fdh","vrs","drs","crs","irs","irs","add")
+   rts <- c("fdh","vrs","drs","crs","irs","irs","add","fdh+")
    if ( missing(RTS) ) RTS <- "vrs" 
    if ( is.real(RTS) )  {
       RTS_ <- rts[1+RTS] # the first fdh is number 0
@@ -66,25 +66,25 @@ sdea <- function(X,Y, RTS="vrs", ORIENTATION="in", DIRECT=NULL,
       # beregnes efficiens for, den i'te.
       # Den anden brug er ved XREF og YREF for at angive hvilken teknologi
       # der skal bruges, de definerer teknologien.
-      if ( directMatrix ) direct <- DIRECT[,i]
-      e <- dea(X[,i,drop=FALSE], Y[,i,drop=FALSE],
-         RTS,ORIENTATION, XREF=X[,-i,drop=FALSE], YREF=Y[,-i,drop=FALSE],
-         TRANSPOSE=TRUE, DIRECT=direct, LP=LP)
+      if ( directMatrix ) direct <- DIRECT[i,]
+      e <- dea(X[i,,drop=FALSE], Y[i,,drop=FALSE],
+         RTS,ORIENTATION, XREF=X[-i,,drop=FALSE], YREF=Y[-i,,drop=FALSE],
+         TRANSPOSE=FALSE, DIRECT=direct, LP=LP)
       supereff[i] <- e$eff
       # print(dim(lambda))
-      # print(dim(e$lambda))
-      lambda[-i,i] <- e$lambda[,1]
+      if (LP) print(dim(e$lambda))
+      lambda[i,-i] <- e$lambda[1,]
    }
-# print("sdea: færdig med gennemløb")
+   if (LP) print("sdea: faerdig med gennemloeb")
 
 # print(colnames(X))
-   if ( is.null(colnames(X)) )  {
-      rownames(lambda) <- paste("L",1:K,sep="")
+   if ( is.null(rownames(X)) )  {
+      colnames(lambda) <- paste("L",1:K,sep="")
    } else {
-       rownames(lambda) <- paste("L",colnames(X),sep="_")
+       colnames(lambda) <- paste("L",rownames(X),sep="_")
    }
-   colnames(lambda) <- colnames(X)
-   if (!TRANSPOSE)  {
+   rownames(lambda) <- rownames(X)
+   if (TRANSPOSE)  {
       lambda <- t(lambda)
       if ( !is.null(DIRECT) & class(DIRECT)=="matrix" )
          DIRECT <- t(DIRECT)

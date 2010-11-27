@@ -1,4 +1,4 @@
-% $Id: dea.plot.Rd 88 2010-11-13 23:26:02Z Lars $
+% $Id: dea.plot.Rd 96 2010-11-27 22:47:25Z Lars $
 \name{dea.plot}
 \alias{dea.plot}
 \alias{dea.plot.frontier}
@@ -48,7 +48,7 @@ dea.plot.transform(y1, y2, RTS="vrs",...)
 
   \item{txt}{\code{txt} is an array to label the observations. If
       \code{txt=TRUE} the observations are labeled by the observation
-      number. }
+      number or rownames if there are any. }
 
   \item{add}{For \code{add=T} the technology is drawn on top of an
       existing graph. With the default \code{add=F}, a new graph is
@@ -111,14 +111,17 @@ dea.plot.transform(y1, y2, RTS="vrs",...)
 
 
 \references{ Peter Bogetoft and Lars Otto; \emph{Benchmarking with
-   DEA, SFA, and R}; Springer 2011 }
+   DEA, SFA, and R}; Springer 2011 
+
+Paul Murrell; \emph{R Graphics}; Chapman & Hall 2006}
 
 
 \author{ Peter Bogetoft and Lars Otto \email{lo@foi.dk}}
 
 
-\seealso{ \code{plot} and Paul Murrell: \emph{R Graphics}, Chapman &
-Hall 2006 for further options and on customizing plots.  }
+\seealso{The documentation for the function \code{plot} and Murrell
+(2006) for further options and on customizing plots.  }
+
 
 \examples{
 

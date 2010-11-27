@@ -1,4 +1,4 @@
-# $Id: rev.R 72 2010-09-11 17:06:14Z Lars $
+# $Id: rev.R 97 2010-12-02 23:27:26Z Lars $
 
 # Function to calculate maximun revenue for given input and given
 # output prices.
@@ -95,9 +95,9 @@ revenue.opt <- function(XREF, YREF, P, XOBS=NULL, RTS="vrs",
 
    yopt <- matrix(NA,n,K)
    lambda <- matrix(NA,nrow=Kr,ncol=K)
-   rev <- matrix(NA,1,K)
+   rev <- rep(NA,K)
 
-   for ( k in 1:K ) {
+   for ( k in 1:K )  {
       if ( dim(P)[2] != 1 && k > 1 ) { 
          set.objfn(lps, c(P[,k],rep(0,K)))
 	   }
@@ -122,12 +122,14 @@ revenue.opt <- function(XREF, YREF, P, XOBS=NULL, RTS="vrs",
       }
 
    }  # for ( k in 1:K )
+   rm(lps)
 
    rownames(lambda) <- paste("L",1:Kr,sep="")
    rownames(rev) <- rownames(XOBS)
 
    if (!TRANSPOSE) {
       yopt <- t(yopt)
+      # rev <- t(rev)
       lambda <- t(lambda)
    }
 

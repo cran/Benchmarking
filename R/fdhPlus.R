@@ -1,166 +1,264 @@
-# $Id: fdhPlus.R 87 2010-11-12 00:06:02Z Lars $
+# $Id: fdhPlus.R 97 2010-12-02 23:27:26Z Lars $
 
 
-dea.plot.fdhPlus <- function(x, y, delta=0.15, ...)  {
+# FDH+.  Beregn foerst CRS efficiency med kun en mulig peer; se om
+# lambda ligger inden for graenderne; hvis er den goer er alt ok,
+# ellers saet lambda svarende til den overtradte graense og beregn
+# efficiency svarende.
 
+dea.fdhPlus <- function(X, Y, ORIENTATION="in",
+          XREF=NULL, YREF=NULL, FRONT.IDX=NULL, 
+          DIRECT=NULL, param=0.15, TRANSPOSE=FALSE)
+{
 
-# if ( RTS == "fdh+" )  {
-
-# Vaer sikker paa at x og y er matricer
-x <- matrix(x)
-y <- matrix(y)
-
-
-# Find FDH frontier
-idx <- sort(x, index.return=TRUE)
-effektive <- rep(NA, dim(x)[1])
-j <- 1
-prev <- idx$ix[1]
-effektive[j] <- prev
-for ( i in idx$ix )  {
-   if ( y[i] > y[prev] )  {
-   	j <- j+1
-      effektive[j] <- i
-      prev <- i
+   orientation <- c("in","out","graph")
+   if ( is.real(ORIENTATION) )  {
+      ORIENTATION_ <- orientation[ORIENTATION]
+      ORIENTATION <- ORIENTATION_
    }
-}
-# Frontier/rand og antal firms i randen
-rand <- effektive[!is.na(effektive)]
-x <- matrix(x[rand])
-y <- matrix(y[rand])
-# kun (x,y) på FDH frontier er nu tilbage
-sx <- sort(x,index.return=TRUE)
-ix <- sx$ix
-# crs-linjestykker starter i foerste soejles koordinat og 
-# slutter i 2. soejles
-x0 <- t(outer(c(1-delta,1+delta),x[ix]))
-y0 <- t(outer(c(1-delta,1+delta),y[ix]))
-
-if (FALSE)  {
-points(x,y,pch=16,col="red")
-text(x,y,1:dim(x)[1],adj=c(-.25,.75))
-segments(x0[,1],y0[,1], x0[,2],y0[,2],col="lightgreen",lwd=1)
-points(t(x0),t(y0),pch=c(2,0))
-}
-
-# text(x0[,1],y0[,1],1:dim(x0)[1],adj=c(-.75,.75))
-
-# Det sidst tegnede linjestykke ender i (x_,y_)
-segments(x0[1,1],0,  x0[1,1],y0[1,1] , ...)
-x_ <- x0[1,1]
-y_ <- y0[1,1]
-
-nx <- dim(x0)[1]
-for ( i in 1:(nx-1) )  {
-   # Loeb alle de fdh effektive punkter igennem
-   # Ved starten skal punkt være start eller punkt på linjestykke 
-   # der skal tegnes
-# print(i)
-# if ( i==15 ) break
-   if ( x_ > x0[i,2] ) next; # vi er kommet laengere
-   xk <- x_
-   yk <- y_
-   # Foerst ser vi om der er en linje over, dvs om der er en linje der
-   # starter foer den nuvaerende slutter
-   h <- 0
-   while ( i+h+1<=nx && x0[i+h+1,1] < x0[i,2] )  {
-      # Der er en linje foer det er slut, men er den ogsaa over?
-      h <- h+1
-      lambda <- (x0[i+h,1]-x0[i,1])/(x0[i,2]-x0[i,1])
-      xk <- x0[i+h,1]
-      yk <- (1-lambda)*y0[i,1] + lambda*y0[i,2]
-      if ( y0[i+h,1] > yk ) break  # Linjen ligger over
+   ORIENTATION <- tolower(ORIENTATION)
+   if ( !(ORIENTATION %in% orientation) ) {
+      stop(paste("Unknown value for ORIENTATION:",ORIENTATION),quote=F)
    }
-   if ( h > 0 && y0[i+h,1] > yk )  {
-      # Der var en linje foer slut og den ligger oven over
-      # Er vi allerede forbi det punkt?
-      if ( x_ > xk || y_ > yk  )  next
-      segments(x_,y_, xk,yk, ...) 
-      segments(xk,yk,  x0[i+h,1],y0[i+h,1], ...)
-      x_ <- x0[i+h,1]
-      y_ <- y0[i+h,1]
-      # vi er kommet til start paa ny linje
+
+   if ( ORIENTATION=="graph" )
+      stop("ORIENTATION==\"graph\" does not work for fdh+")
+
+   if ( missing(XREF) || is.null(XREF) )  {
+      XREF <- X
    }
-      # Saa maa det vaere en lavere linje; find den forfra fordi den
-      # maaske er sprunget over i soegen efter en hoejere
-      
-      # Den foerste linje maa vaere den lavere vi soeger
-      # Er der en lavere linje?
-   else if ( i+1<=nx && (x0[i+1,1] < x0[i,2] || y0[i+1,1] < y0[i,2]) )  {
-         # der er en linje der starter lavere
-         segments(x_,y_, x0[i,2],y0[i,2], ...)
-         # Der er en lavere linje, find hvor den skal rammes vandret
-         lambda <- (y0[i,2]-y0[i+1,1])/(y0[i+1,2]-y0[i+1,1])
-         xk <- (1-lambda)*x0[i+1,1] + lambda*x0[i+1,2]
-         yk <- y0[i,2]
-         # Er der en hoejere linje foer xk?
-         h <- 0
-         while ( i+h<nx && x0[i+h+1,1] < xk )  {
-            h <- h+1
-            if ( y0[i+h,1] > yk ) break
-         }
-         if ( h > 0 && y0[i+h,1] > yk )  {
-		      # der er en linje der starter over
-            segments(x0[i,2],y0[i,2], x0[i+h,1], y0[i,2], ...)
-            segments(x0[i+h,1], y0[i,2],  x0[i+h,1], y0[i+h,1], ...)
-	         x_ <- x0[i+h,1]
-	         y_ <- y0[i+h,1]
-            # Vi er paa starten af en nyt linjesykke
-	   } else {
-            # Der må så være et stykke der starter under. 
-            # Find det foerste der starter under
-            lambda <- (y0[i,2]-y0[i+1,1])/(y0[i+1,2]-y0[i+1,1])
-            xk <- (1-lambda)*x0[i+1,1] + lambda*x0[i+1,2]
-            yk <- y0[i,2]
-            h <- 1
-            hmin <- 1
-            xkmin <- xk
-            while ( i+h+1<=nx )  {
-               # det er ikke til at vide hvor de sidste numre rammer 
-               # fra neden
-               h <- h+1
-               lambda <- (y0[i,2]-y0[i+h,1])/(y0[i+h,2]-y0[i+h,1])
-               if ( lambda < 0 || lambda > 1 ) break
-               xk <- (1-lambda)*x0[i+h,1] + lambda*x0[i+h,2]
-               if ( xk < xkmin )  {
-                  hmin <- h
-                  xkmin <- xk
-               }
-            }
-            segments(x0[i,2],y0[i,2], xkmin,yk, ...)
-            x_ <- xkmin
-            y_ <- yk
-            # Vi er på nyt linjestykke
-         }
+   if ( missing(YREF) || is.null(YREF) )  {
+      YREF <- Y
+   }
+
+   if ( length(FRONT.IDX) > 0 )  {
+      if ( !is.vector(FRONT.IDX) )
+         stop("FRONT.IDX is not a vector in 'dea'")
+      XREF <- XREF[,FRONT.IDX, drop=FALSE]
+      YREF <- YREF[,FRONT.IDX, drop=FALSE]
+   }
+   rNames <- colnames(XREF)
+   if ( is.null(rNames) & !is.null(colnames(YREF)) )
+      rNames <- colnames(YREF)
+
+
+   # Saet parametrene low og high
+   if ( is.null(param) )  {
+      param <- .15
+   }
+   if ( length(param) == 1 )  {
+      low <- 1-param
+      high <- 1+param
    } else {
-      # Der var ingen linjestykker foer slut saa tegn linjen til slut
-      segments(x_,y_, x0[i,2],y0[i,2], ...)
-      x_ <- x0[i,2]
-      y_ <- y0[i,2]
-      # Find saa en vandret streg
-      if ( i+1 > nx )  break
-      if ( y0[i,2] > y0[i+1,1] )  {
-         # Det naeste punkt starter lavere
-         lambda <- (y0[i,2]-y0[i+1,1])/(y0[i+1,2]-y0[i+1,1])
-         xk <- (1-lambda)*x0[i+1,1] + lambda*x0[i+1,2]
-         yk <- y0[i,2]
-         segments(x_,y_, xk,yk, ...)
-         x_ <- xk
-	   y_ <- yk
-      } else {
-	   # saa ma naeste punkt ligge over
-         segments(x_,y_,  x0[i+1,1],y_, ...)
-         segments(x0[i+1,1],y_,  x0[i+1,1],y0[i+1,1], ...)
-         x_ <- x0[i+1,1]
-         y_ <- y0[i+1,1]
-      }
+      low <- param[1]
+      high <- param[2]
    }
-}
-
-segments(x_,y_, x0[nx,2],y0[nx,2], ...)
-segments(x0[nx,2],y0[nx,2], 2*x0[nx,2],y0[nx,2], ...)
 
 
+   m <- dim(X)[2]  # number of inputs
+   n <- dim(Y)[2]  # number of outputs
+   K <- dim(X)[1]  # number of units, firms, DMUs
+   Kr <- dim(XREF)[1] # number of units,firms in the reference technology
+
+
+# # Find dominating reference firms for each of the Kr reference firms
+# Dom <- list(NA,Kr)  # list of dominating reference firms
+# for ( i in 1:Kr )  {
+#  # Stoerre for
+#  Dom[[i]] <- which(
+#   rowSums(matrix(XREF[i,,drop=FALSE],nrow=Kr,ncol=m,byrow=TRUE) > 
+#           XREF) == m
+#   &
+#   rowSums(matrix(YREF[i,,drop=FALSE],nrow=Kr,ncol=n,byrow=TRUE) < 
+#           YREF) == n
+#   )
 # }
 
+
+E <- rep(NA,K)
+peer <- rep(NA, K)
+lambda <- matrix(0, nrow=K, ncol=Kr)
+lamR <- matrix(NA, nrow=K, ncol=Kr)
+
+
+
+
+# Directional efficiency
+if ( !is.null(DIRECT) )  {
+
+   if ( class(DIRECT)=="matrix" && dim(DIRECT)[1] > 1 ) {
+      if ( ORIENTATION=="in" )  {
+         dirX <- DIRECT  # matrix(DIRECT, nrow=K, ncol=m)
+         # dirY <- matrix(.Machine$double.xmin, nrow=K, ncol=n)
+         dirY <- matrix(NA, nrow=K, ncol=n)
+      } else if ( ORIENTATION=="out" )  {
+         # dirX <- matrix(.Machine$double.xmin, nrow=K, ncol=m)
+         dirX <- matrix(NA, nrow=K, ncol=m)
+         dirY <- DIRECT  # matrix(DIRECT, nrow=K, ncol=n)
+      } else if ( ORIENTATION=="in-out" )  {
+         dirX <- DIRECT[,1:m,drop=FALSE]   
+                 # matrix(DIRECT[,1:m], nrow=K, ncol=m)
+         dirY <- DIRECT[,(m+1):(m+n), drop=FALSE]  
+                 # matrix(DIRECT[,(m+1):(m+n)], nrow=K, ncol=n)
+      }
+   } else {
+      # Her er DIRECT en vektor og derfor ens for alle firms, dvs.
+      # alle raekker skal vaere ens
+      if ( ORIENTATION=="in" )  {
+         dirX <- matrix(DIRECT, nrow=K, ncol=m, byrow=T)
+         # dirY <- matrix(.Machine$double.xmin, nrow=K, ncol=n)
+         dirY <- matrix(NA, nrow=K, ncol=n)
+      } else if ( ORIENTATION=="out" )  {
+         # dirX <- matrix(.Machine$double.xmin, nrow=K, ncol=m)
+         dirX <- matrix(NA, nrow=K, ncol=m)
+         dirY <- matrix(DIRECT, nrow=K, ncol=n, byrow=T)
+      } else if ( ORIENTATION=="in-out" )  {
+         dirX <- matrix(DIRECT[1:m], nrow=K, ncol=m, byrow=T)
+         dirY <- matrix(DIRECT[(m+1):(m+n)], nrow=K, ncol=n, byrow=T)
+      }
+   }
+
+   for ( k in 1:K )  {
+      # For each firm find max(XREF/X) over inputs (rows)
+      # Se kun for de firmaer der dominerer firm k i den retning der 
+      # ikke aendres
+      xk <-  NULL  # matrix(X[k,,drop=FALSE], nrow=Kr, ncol=m, byrow=TRUE)
+      yk <-  NULL  # matrix(Y[k,,drop=FALSE], nrow=Kr, ncol=n, byrow=TRUE)
+      if ( ORIENTATION=="in" )  {
+         yk <- matrix(Y[k,], nrow=Kr, ncol=n, byrow=TRUE)
+         idx <- rowSums(yk <= YREF) == n
+      } else if ( ORIENTATION=="out" )  {
+         xk <-  matrix(X[k,], nrow=Kr, ncol=m, byrow=TRUE)
+         idx <- rowSums(xk >= XREF) == m
+      } else if ( ORIENTATION=="in-out" )  {
+         xk <-  matrix(X[k,], nrow=Kr, ncol=m, byrow=TRUE)
+         yk <-  matrix(Y[k,], nrow=Kr, ncol=n, byrow=TRUE)
+         idx <- rowSums(xk >= XREF) == m & rowSums(yk <= YREF) == n
+      }
+      if ( is.null(xk) ) 
+         xk <-  matrix(X[k,,drop=FALSE], nrow=sum(idx), ncol=m, byrow=TRUE)
+      else
+         xk <-  xk[idx,,drop=FALSE]
+
+      if ( is.null(yk) )  
+         yk <-  matrix(Y[k,,drop=FALSE], nrow=sum(idx), ncol=n, byrow=TRUE)
+      else 
+         yk <-  yk[idx,,drop=FALSE]
+
+      allDir <- cbind( (xk-XREF[idx,])/dirX[rep(k,sum(idx)),], 
+                       (YREF[idx,]-yk)/dirY[rep(k,sum(idx)),])
+      minDir <- apply(allDir,1,min, na.rm=TRUE)
+      eff[k] <- max(minDir)
+      # der er kun gjort plads til een peer per firm
+      peer[k] <- (1:Kr)[idx][which.max(minDir)]
+   }
+   # we only need lambda to be able to call peers() to get peers.
+   lam <- matrix(0, nrow=K, ncol=Kr)
+   for (k in 1:K)  {
+       lam[k, peer[k]] <- 1
+   }
+   e <- list(eff=eff, objval=eff, peers=peer, lambda=lam, RTS="fdh",
+             direct=DIRECT, ORIENTATION=ORIENTATION, TRANSPOSE=FALSE)
+   class(e) <- "Farrell"
+   return(e)
+}  # if !is.null(DIRECT)
+
+
+
+
+for ( k in 1:K )  {
+   # Loeb hver firm der skal beregnes for, igennem
+   # xk <- X[k,,drop=FALSE]
+   # yk <- Y[k,,drop=FALSE]
+   xk <- X[k,]
+   yk <- Y[k,]
+   ek <- rep(NA,Kr)
+   # For alle mulige reference firms
+   for ( r in 1:Kr )  {
+     xref <- XREF[r,,drop=FALSE]
+     yref <- YREF[r,,drop=FALSE] 
+     # Drop this firm as reference if it does not dominate the firm at
+     # question at the ends of the possible lambda interval.
+     # Tager hensyn saa det ogsaa virker med super efficiens
+     if ( ORIENTATION=="in" && yk > high*yref )  next
+     else if ( ORIENTATION=="out" && xk < low*xref )  next
+     etemp <- dea.csrOne(xk,yk, xref, yref, ORIENTATION)  
+     #etemp <- dea(xk,yk, RTS="crs", ORIENTATION, XREF=xref, YREF=yref)
+     lamR[k,r] <- etemp$lambda
+     ek[r] <- etemp$eff
+     if ( ORIENTATION=="in" && etemp$lambda < low )  {
+           ek[r] <- max( low*xref/xk )
+           lamR[k,r] <- low
+     } else if ( ORIENTATION=="out" && etemp$lambda > high )  {
+           ek[r] <- min( high*yref/yk )
+           lamR[k,r] <- high
+     }
+   }  # for r
+   # Lad vaere med at printe warning hvis min/max er Inf/-Inf, 
+   # men saet vaerdien direkte i en finaly clause
+   if ( ORIENTATION=="in" )  {
+      tryCatch ( E[k] <- min(ek, na.rm=TRUE), warning = function(w) NULL, 
+          finaly = (E[k] <- Inf) )
+   } else {
+	tryCatch ( E[k] <- max(ek, na.rm=TRUE), warning = function(w) NULL,
+          finaly = (E[k] <- -Inf)  )
+   }
+   # print(ek)
+   if ( !is.na(E[k]) && abs(E[k]) < Inf  )  { 
+      peer[k] <- which.min(ek) 
+   } else { 
+      peer[k] <- NA 
+   }
+} # for k
+
+for (k in 1:K)  { 
+   if (!is.na(peer[k])) { lambda[k,peer[k]] <- lamR[k,peer[k]] }
 }
+
+obj <- list(eff=E, lambda=lambda,RTS="fdh+",  lamR=lamR, peers=peer, 
+            ORIENTATION=ORIENTATION, TRANSPOSE=FALSE)
+class(obj) <- "Farrell"
+
+return(obj)
+
+} # function
+
+
+
+
+# dea.csrOne only works for one firm when there is ONE peer for that firm
+dea.csrOne <- function(X,Y, XREF, YREF, ORIENTATION="in")  {
+   # X and Y are vectors of input and outout for ONE firm
+   m <- length(X)
+   n <- length(Y)
+   Kr <- dim(XREF)[1]
+
+   # alle kombinationer af x og y så vi kan finde all partielle
+   # produktiviteter. Index ix og iy så vi blot kan bruge y[iy]/x[ix]
+
+   ix <- gl(m,1,m*n)
+   iy <- gl(n,m)
+
+   # Produktivity for each input-output combination
+   yx0 <- Y[iy]/X[ix]
+   ek <- rep(NA,Kr)
+   for ( k in 1:Kr )  {
+      # Find max relative productivity compared to each potential peer
+      yxk <- YREF[k,iy] / XREF[k,ix]
+      ek[k] <- max(yx0/yxk)
+   }
+   if ( ORIENTATION == "in" )  {
+      peer <- which.min(ek)
+      E <- ek[peer]
+      lam <- max(Y/YREF[peer,])
+   } else {
+      peer <- which.min(1/ek)
+      E <- 1/ek[peer]
+      lam <- min(X/XREF[peer,])
+   }
+   # print(paste(h,":: E =",E[h],"; peer =", peer[h],"; lambda =",lam[h]),quote=FALSE)
+   
+   obj <- list(eff=E, lambda=lam, peer=peer)
+   return(obj)
+} # dea.csrOne
+

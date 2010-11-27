@@ -1,8 +1,8 @@
 Package: Benchmarking
 Type: Package
 Title: Benchmark and frontier analysis using DEA and SFA (BeDS)
-Version: 0.16
-Date: 2010-11-15 ($Date: 2010-11-15 09:47:34 +0100 (ma, 15 nov 2010) $)
+Version: 0.17
+Date: 2010-11-21 ($Date: 2010-11-27 23:47:25 +0100 (27 nov 2010) $)
 Author: Peter Bogetoft and Lars Otto
 Maintainer: Lars Otto <lo@foi.dk>
 Depends: lpSolveAPI, ucminf
@@ -10,20 +10,21 @@ Suggests: FEAR
 Description: The package contains methods to support frontier analysis.
         It covers Data Envelopment Analysis (DEA). DEA is supported
         under different technology assumptions (fdh, vrs, drs, crs,
-        irs, add), and using different efficiency measures (input
-        based, output based, hyperbolic graph, additive, super,
-        directional). Peers and slacks are available, partial price
-        information can be included, and optimal cost, revenue and
-        profit can be calculated. Evaluation of mergers are also
-        supported. Methods for graphing the technology sets are also
-        included. The package also support comparative methods based on
-        Stochastic Frontier Analyses (SFA). In general, the methods can
-        be used to solve not only standard models, but also many other
-        model variants. The package complements the textbook, Bogetoft
-        and Otto, Benchmarking with DEA, SFA, and R, Springer-Verlag,
-        2011, but can of course also be used as a stand-alone package.
+        irs, add/frh, and fdh+), and using different efficiency
+        measures (input based, output based, hyperbolic graph,
+        additive, super, and directional efficency). Peers and slacks
+        are available, partial price information can be included, and
+        optimal cost, revenue and profit can be calculated. Evaluation
+        of mergers is also supported.  Methods for graphing the
+        technology sets are also included. The package also support
+        comparative methods based on Stochastic Frontier Analyses
+        (SFA). In general, the methods can be used to solve not only
+        standard models, but also many other model variants. The
+        package complements the book, Bogetoft and Otto, Benchmarking
+        with DEA, SFA, and R, Springer-Verlag, 2011, but can of course
+        also be used as a stand-alone package.
 License: GPL (>= 2)
 LazyLoad: yes
-Packaged: 2010-11-15 08:47:49 UTC; lo
+Packaged: 2010-12-02 23:28:20 UTC; Lars
 Repository: CRAN
-Date/Publication: 2010-11-15 10:55:53
+Date/Publication: 2010-12-03 08:31:54

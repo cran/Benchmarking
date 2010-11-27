@@ -1,4 +1,4 @@
-% $Id: addModel.Rd 81 2010-10-20 15:26:25Z Lars $
+% $Id: addModel.Rd 96 2010-11-27 22:47:25Z Lars $
 \name{dea.add}
 \alias{dea.add}
 

@@ -1,4 +1,4 @@
-# $Id: dea.plot.R 87 2010-11-12 00:06:02Z Lars $
+# $Id: dea.plot.R 93 2010-11-21 15:29:03Z Lars $
 "dea.plot" <-
 function(x, y, RTS="vrs", ORIENTATION="in-out", txt=NULL, add=FALSE, 
             wx=NULL, wy=NULL, TRANSPOSE = FALSE, fex=1, GRID=FALSE,
@@ -69,11 +69,19 @@ function(x, y, RTS="vrs", ORIENTATION="in-out", txt=NULL, add=FALSE,
       if ( RTS=="fdh+" ) {
          if ( is.null(param) )  {
             delta <- .15
+            low <- 1-delta
+            high <- 1+delta
          } else {
-            delta <- param
+            if ( length(param) == 1 )  {
+               low <- 1-param
+               high <- 1+param
+            } else {
+               low <- param[1]
+               high <- param[2]
+            }
          }
-         xlim <- c(1-delta,1+delta)*xlim
-         ylim <- c(1-delta,1+delta)*ylim
+         xlim <- c(low,high)*xlim
+         ylim <- c(low,high)*ylim
       }
 
       # plot points with axes
@@ -84,10 +92,17 @@ function(x, y, RTS="vrs", ORIENTATION="in-out", txt=NULL, add=FALSE,
          box(col="grey")
       }
       if ( class(txt)=="logical" && txt )  {
-         if ( class(x)=="matrix" )
-            txt <- 1:dim(x)[1]
-         else
+         if ( class(x)=="matrix" )  {
+            if ( !is.null(rownames(x)) )  {
+               txt <- rownames(x)
+            } else if ( !is.null(rownames(y)) )  {
+               txt <- rownames(y)
+            } else {
+               txt <- 1:dim(x)[1]
+            }
+         } else {
             txt <- 1:length(x)
+         }
       }
       if ( class(txt)!="logical" && length(txt) > 0 ) {
         # Evt. tekst på punkter sættes lidt nede til højre
@@ -139,12 +154,7 @@ function(x, y, RTS="vrs", ORIENTATION="in-out", txt=NULL, add=FALSE,
 
 
    if ( RTS == "fdh+" )  {
-      if ( is.null(param) )  {
-         delta <- .15
-      } else {
-         delta <- param
-      }
-      dea.plot.fdhPlus(x,y,delta, ...)
+      dea.plot.fdhPlus(x,y,param, ...)
    }  # "fdh+"
 
 

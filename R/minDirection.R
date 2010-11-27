@@ -1,4 +1,4 @@
-# $Id: minDirection.R 88 2010-11-13 23:26:02Z Lars $
+# $Id: minDirection.R 93 2010-11-21 15:29:03Z Lars $
 
 # Function to calculate the min step for each input or max step for
 # each output to the frontier, retninger i MEA. A series of LP problems
@@ -27,11 +27,10 @@ minDirection <- function(lps, Z, m, n, ORIENTATION, LP=FALSE)  {
       if (LP) print(lps)
       solve(lps)
       if (LP) print(get.objective(lps))
-      temp_ <- get.objective(lps)
-      if ( abs(temp_) < eps )  temp_ <- 0.0
-      Direct[h] <- temp_
+      Direct[h] <- get.objective(lps)
    }
    Direct <- Z - Direct
+   Direct[ abs(Direct) < eps ] <- 0
    if (LP) { print("Min direction:"); print(Direct) }
    return(Direct)
 }

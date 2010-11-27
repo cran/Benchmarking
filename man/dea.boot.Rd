@@ -1,4 +1,4 @@
-% $Id: dea.boot.Rd 86 2010-11-11 09:00:13Z Lars $
+% $Id: dea.boot.Rd 96 2010-11-27 22:47:25Z Lars $
 \name{dea.boot}
 \alias{dea.boot}
 
@@ -6,7 +6,8 @@
 \title{ Bootstrap DEA models }
 
 \description{ A wrapper for \code{boot.sw89} from the package
-   \pkg{FEAR}.  All bootstrap is done by in \code{boot.sw89}. }
+   \pkg{FEAR} such that the returns are bootstrap of Farrell
+   efficiencies.  All bootstrap is done by in \code{boot.sw89}. }
 
 
 \usage{

@@ -1,4 +1,4 @@
-# $Id: graphEff.R 84 2010-11-04 12:26:37Z Lars $
+# $Id: graphEff.R 93 2010-11-21 15:29:03Z Lars $
 
 # Funktion til beregning af graf efficiens.  Beregning sker via
 # bisection hvor der itereres mellem mulige og ikke-mulige løsninger
@@ -12,16 +12,16 @@
 graphEff <- function(lps, X, Y, XREF, YREF, RTS, FRONT.IDX, rlamb, oKr, 
                      TRANSPOSE=FALSE, SLACK=FALSE, FAST=FALSE, LP=FALSE) 
 {
-   m = dim(X)[1]  # number of inputs
-   n = dim(Y)[1]  # number of outputs
-   K = dim(X)[2]  # number of units, firms, DMUs
-   Kr = dim(YREF)[2]  # number of units, firms, DMUs
+   m = dim(X)[2]  # number of inputs
+   n = dim(Y)[2]  # number of outputs
+   K = dim(X)[1]  # number of units, firms, DMUs
+   Kr = dim(YREF)[1]  # number of units, firms, DMUs
 
    objval <- rep(NA,K)   # vector for the final efficiencies
    if ( FAST ) {
      lambda <- NULL
    } else {
-      lambda <- matrix(NA, nrow=Kr, ncol=K) # lambdas one column per unit
+      lambda <- matrix(NA, nrow=K, ncol=Kr) # lambdas one column per unit
    }
    set.column(lps, 1, rep(0,dim(lps)[1]))
    lpcontr <- lp.control(lps)
@@ -34,7 +34,7 @@ graphEff <- function(lps, X, Y, XREF, YREF, RTS, FRONT.IDX, rlamb, oKr,
       nIter <- 0
       while ( b-a > tol && nIter < 50 )  {
          G <- (a+b)/2
-         set.rhs(lps, c(-G*X[,k],Y[,k]/G), 1:(m+n))
+         set.rhs(lps, c(-G*X[k,],Y[k,]/G), 1:(m+n))
          # if ( k==1 ) print(lps)
          status <- solve(lps)
          if (LP) print(paste("G = ",G,"(",k,"); status =",status))
@@ -51,7 +51,7 @@ graphEff <- function(lps, X, Y, XREF, YREF, RTS, FRONT.IDX, rlamb, oKr,
          # øvre grænse. Det er nødvendigt med en mulig løsning for at
          # kunne få lambdaer og duale værdier.
          G <- b
-	      set.rhs(lps, c(-G*X[,k],Y[,k]/G), 1:(m+n))
+	      set.rhs(lps, c(-G*X[k,],Y[k,]/G), 1:(m+n))
          status <- solve(lps)
 	   }
       if (LP)  {
@@ -66,7 +66,7 @@ graphEff <- function(lps, X, Y, XREF, YREF, RTS, FRONT.IDX, rlamb, oKr,
       if ( !FAST ) 
       if ( !FAST )  {
          sol <- get.variables(lps)
-         lambda[,k] <- sol[2:(1+Kr)]
+         lambda[k,] <- sol[2:(1+Kr)]
       }
    	if (LP && status==0) {
          print(paste("Objval, firm",k))
@@ -89,15 +89,15 @@ graphEff <- function(lps, X, Y, XREF, YREF, RTS, FRONT.IDX, rlamb, oKr,
    }
 
    if ( length(FRONT.IDX)>0 )  {
-      rownames(lambda) <- paste("L",(1:oKr)[FRONT.IDX],sep="")
+      colnames(lambda) <- paste("L",(1:oKr)[FRONT.IDX],sep="")
    } else {
-      rownames(lambda) <- paste("L",1:Kr,sep="")
+      colnames(lambda) <- paste("L",1:Kr,sep="")
    }
 
    primal <- dual <- NULL
    ux <- vy <- NULL
 
-   if ( !TRANSPOSE ) {
+   if ( TRANSPOSE ) {
       lambda <- t(lambda)
    }
 
@@ -109,7 +109,7 @@ graphEff <- function(lps, X, Y, XREF, YREF, RTS, FRONT.IDX, rlamb, oKr,
    class(oe) <- "Farrell"
 
    if ( SLACK ) {
-      if ( !TRANSPOSE )  { # Transponer tilbage hvis de blev transponeret
+      if ( TRANSPOSE )  { # Transponer tilbage hvis de blev transponeret
          X <- t(X)
          Y <- t(Y)
          XREF <- t(XREF)

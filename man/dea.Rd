@@ -1,4 +1,4 @@
-% $Id: dea.Rd 88 2010-11-13 23:26:02Z Lars $
+% $Id: dea.Rd 96 2010-11-27 22:47:25Z Lars $
 \name{dea}
 \alias{dea}
 % \alias{dea.mat}
@@ -6,44 +6,22 @@
 % \alias{eff}
 % \alias{efficiencies.Farrell}
 % \alias{eff.Farrell}
-\alias{sdea}
-\alias{slack}
-\alias{print.slack}
-\alias{summary.slack}
 \alias{print.Farrell}
 \alias{summary.Farrell}
-\alias{peers}
-\alias{get.number.peers}
-\alias{peerslambda}
-\alias{print.peers}
-\alias{lambda}
-\alias{lambda.print}
 \encoding{UTF-8}
 
 \title{DEA efficiency}
 
 \description{Estimates a DEA frontier and calculates 
-efficiency measures, peers, peer importances (lambdas) and slacks}
+efficiency measures}
 
 \usage{
 dea(X, Y, RTS="vrs", ORIENTATION="in", XREF=NULL, YREF=NULL,
-    FRONT.IDX=NULL, SLACK=FALSE, DUAL=TRUE, DIRECT=NULL,
+    FRONT.IDX=NULL, SLACK=FALSE, DUAL=FALSE, DIRECT=NULL, param=NULL,
     TRANSPOSE=FALSE, FAST=FALSE, LP=FALSE, CONTROL=NULL, LPK=NULL)
 
 \method{print}{Farrell}(x, digits=4, ...) 
 \method{summary}{Farrell}(object, digits=4, ...)
-
-slack(X, Y, e, XREF=NULL, YREF=NULL, FRONT.IDX=NULL, LP=FALSE)
-
-peers(object,  NAMES=FALSE)
-get.number.peers(object)
-peerslambda(object)
-print.peers(x, ...)
-lambda(object, KEEPREF=FALSE)
-lambda.print(x, KEEPREF=FALSE, ...)
-
-sdea(X, Y, RTS="vrs", ORIENTATION="in", DIRECT=NULL,
-     TRANSPOSE=FALSE, LP=FALSE)
 }
 
 
@@ -65,12 +43,27 @@ sdea(X, Y, RTS="vrs", ORIENTATION="in", DIRECT=NULL,
 technology / returns to scale assumption.
 
 \tabular{rcl}{
+
 0 \tab "fdh" \tab Free disposability hull, no convexity assumption \cr
-1 \tab "vrs" \tab Variable returns to scale, convexity and free disposability \cr
-2 \tab "drs" \tab Decreasing returns to scale, convexity, down-scaling and free disposability \cr
-3 \tab "crs" \tab Constant returns to scale, convexity and free disposability \cr
-4 \tab "irs" \tab Increasing returns to scale, (up-scaling, but not down-scaling), convexity and free disposability \cr
-5 \tab "add" \tab Additivity (scaling up and down, but only with integers), and free disposability
+
+1 \tab "vrs" \tab Variable returns to scale, convexity and free
+disposability \cr
+
+2 \tab "drs" \tab Decreasing returns to scale, convexity, down-scaling
+and free disposability \cr
+
+3 \tab "crs" \tab Constant returns to scale, convexity and free
+disposability \cr
+
+4 \tab "irs" \tab Increasing returns to scale, (up-scaling, but not
+down-scaling), convexity and free disposability \cr
+
+5 \tab "add" \tab Additivity (scaling up and down, but only with
+integers), and free disposability \cr
+
+6 \tab "fdh+" \tab A combination of free disposability and restricted
+ or local constant return to scale \cr
+
 }
 
 }
@@ -88,11 +81,12 @@ technology / returns to scale assumption.
 \item{FRONT.IDX}{Index for firms determining the technology}
 
 \item{SLACK}{Calculate slack in a phase II calculation; the precision
-    for calculating slacks for orientation graph is low.}
+    for calculating slacks for orientation graph is low. The
+    calculation is then done by an intern call of the function
+    \code{\link{slack}}.}
 
 \item{DUAL}{Calculate dual variables, i.e. shadow prices; not
     calculated for orientation graph as that is not an LP problem.}
-
 
 \item{DIRECT}{Directional efficiency, \code{DIRECT} is either a
     scalar, an array, or a matrix with non-negative elements.
@@ -115,6 +109,10 @@ technology / returns to scale assumption.
 
      }
 
+\item{param}{Possible parameters. At the moment only used for
+    RTS="fdh+" to set low and high values for restrictions on lambda;
+    see the section details and examples for its use. Future versions
+    might also use \code{param} for other purposes.}
 
 \item{TRANSPOSE}{Input and output matrices are treated as firms
       times goods matrices for the default value \code{TRANSPOSE=FALSE}
@@ -133,22 +131,11 @@ technology / returns to scale assumption.
 \item{CONTROL}{Possible controls to \pkg{lpSolveAPI}, see the
       documentation for that package.}
 
-\item{\dots}{Optional parameters for print and summary methods.}
+\item{\dots}{Optional parameters for the print and summary methods.}
 
-\item{e, object, x}{An object of class Farrell (returned by the
+\item{object, x}{An object of class Farrell (returned by the
     function \code{dea}) -- R code uses \sQuote{\code{object}} and
     \sQuote{\code{x}} alternating for generic methods.}
-
-\item{KEEPREF}{if \code{TRUE} then all firms are kept as reference
-   firms even though they have all zero weights (lambda); might come
-   handy if one needs to calculate \code{X} x \code{lambda} such that the
-   firms in \code{X} and \code{lambda} agree. If \code{FALSE}, the
-   default, then only weight for the peers are in the matrix
-   \code{lambda}. }
-
-\item{NAMES}{use names instead of just indices for peers if names are
-   available in the form of row(/column) names for the reference firms
-   determining the technology set.}
 
 \item{digits}{digits in printed output, handled by format in print.}
 
@@ -165,23 +152,22 @@ The return from \code{dea} and \code{sdea} is an object of class
 Farrell.  The efficiency in \code{dea} is calculated by the LP method
 in the package \pkg{lpSolveAPI}.  Slacks can be calculated either in
 the call of \code{dea} using the option \code{SLACK=TRUE} or in a
-following call to the method \code{slack}.
+following call to the function \code{\link{slack}}.
 
 The directional efficiency when the argument \code{DIRECT} is used,
 depends on the unit of measurement and is not restricted to be less
 than 1 (or greater than 1 for output efficiency) and is therefore
 completely different from the Farrell efficiency.
 
-The method \code{sdea} calculates super-effciency and returns the same
-class of object as \code{dea}.
-
-The \code{peers} returns a matrix with numbers for the peers for each
-firm; for firms with efficiency 1 the peers are the firm itself.  If
-there is slack in the evaluation of a firm with efficiency 1, this can
-be found with a call to slack, either directly or by option SLACK.
-
-The \code{get.number.peers} returns the number of firms that a peer
-serves as a peer for.
+The crs factor in RTS="fdh+" that sets the lower and upper bound can
+be changed by the argument \code{param} that will set the lower and
+upper bound to 1-param and 1+param; the default value is
+param=.15. The value must be greater than or equal to 0 and strictly
+less than 1. A value of 0 corresponds to RTS="fdh".  To get an
+asymmetric interval set param to a 2 dimentional array with values for
+the low and high end for interval, for instance
+\code{param=c(.8,1.15)}.  The FDH+ technology set is described in
+Bogetoft and Otto (2011) pages 72--73.
 
 % The method \code{dea.mat} uses \code{lpSolve} as the LP engine instead
 % of the \code{lpSolveAOI} LP engine. The result is that \code{dea.mat}
@@ -205,8 +191,8 @@ discussed on pages 31--25 and 121--127 in Bogetoft and Otto (2011).
 
 
 \value{ The results are returned in a Farrell object with the
-    following components.  The method \code{slack} only returns the
-    last three components in the list relevant for slacks.
+    following components.  The last three components in the list are
+    only part of the object when \code{SLACK=TRUE}.
 
 \item{eff}{The efficiencies.  Note when DIRECT is used then the
     efficencies are not Farrell efficiencies but rather exces values
@@ -257,13 +243,8 @@ firms in the reference technology. The same lack of uniqueness also
 make the peers for some firms depend on the order of firms in the
 reference technology.
 
-Calculation of slacks for super efficiency should be done by using the
-option \code{SLACK=TRUE} in the call of the method \code{sdea}.  If
-the two phases are done in two steps as first a call to \code{sdea}
-and then a call to \code{slacks} the user must make sure to set the
-reference technology to the one corresponding to super-efficiency in
-the call to \code{slack} and this requires a loop with calls to
-\code{slack}.
+To calucalte slack use the argument \code{SLACK=TRUE} or use the
+function \code{\link{slack}} directly.
 
 When there is slack, and slack is not taken into consideration, then
 the peers for a firm with slack might depend on the order of firms in
@@ -309,34 +290,20 @@ eff(e)
 print(e)
 summary(e)
 lambda(e)
-peers(e)
 
 # Input savings potential for each firm
 (1-eff(e)) * x
 (1-e$eff) * x
 
 # calculate slacks
-sl <- slack(x,y,e)
-data.frame(e$eff,sl$slack,sl$sx,sl$sy)
-
 el <- dea(x,y,SLACK=TRUE)
 data.frame(e$eff,el$eff,el$slack,el$sx,el$sy)
 
 # Fully efficient units, eff==1 and no slack
-which(eff(e) == 1 & !sl$slack)
+which(eff(e) == 1 & !el$slack)
 
-
-# Super efficiency
-se <- sdea(x,y)
-data.frame(eff(e),eff(se), lambda(se))
-rngx <- range(x) * c(0,1.2)
-rngy <- range(y) * c(0,1.2)
-# Leave out firm 3 as a determining firm of the technology set
-n <- 3
-dea.plot.frontier(x[-n],y[-n],txt=(1:4)[-n],lty=1, xlim=rngx, ylim=rngy)
-# Plot and label firm 3
-points(x[n],y[n],cex=1.25,pch=16)
-text(x[n],y[n],n,adj=c(-.75,.75))
+# fdh+ with limits in the interval [.7, 1.2]
+dea(x,y,RTS="fdh+", param=c(.7,1.2))
 }
 
 

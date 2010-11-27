@@ -1,4 +1,4 @@
-# $Id: deaUtil.R 89 2010-11-14 13:01:40Z lo $
+# $Id: deaUtil.R 97 2010-12-02 23:27:26Z Lars $
 
 
 efficiencies <- function( object, ... )  {
@@ -48,6 +48,7 @@ efficiencies.Farrell <- function(object, type="Farrell", ...)  {
 } ## efficiency
 
 
+
 eff.Farrell <- function(object, type="Farrell", ...)  {
       return( efficiencies.Farrell(object, type, ...) )
 }
@@ -67,20 +68,62 @@ print.Farrell  <- function(x, digits=4, ...)  {
 
 
 summary.Farrell <- function(object, digits=4, ...)  {
-   cat("Efficiency:\n")
-   print.Farrell(object,digits=digits,...)
-   cat("Weights (lambda):\n")
-   x <- object$lambda
-   xx <- round(x, digits)
-   # xx <- format(unclass(x), digits=digits)
-   if (any(ina <- is.na(x))) 
-      xx[ina] <- ""
-   if ( any(i0 <- !ina & abs(x) < 1e-9) ) 
-      xx[i0] <- sub("0", ".", xx[i0])
-   print(xx, quote=FALSE, rigth=TRUE, ...)
+   eps <- 1e-6
+   eff <- object$eff
+   cat("Summary of efficiencies\n")
+   cat("The technology is", object$RTS,"and",object$ORIENTATION,
+       "orientated efficiency\n")
+   cat("Number of firms with efficiency==1 are",
+      sum(abs(eff-1) < eps), 
+      "\nMean efficiency ", format(mean(object$eff),digit=3), "\n---" )
+   if ( object$ORIENTATION!="out" )  {
+      minE <- min(eff)
+      minE <- floor( 10 * minE ) / 10
+      dec <- seq(from=minE, to=1, by=.1)
+      Estr <- "<= E <"
+      Eeff <- "      E ==1   "
+      n <- length(dec)
+      estr <- rep(NA,n)
+      for ( i in 1:(n-1) )
+         estr[i] <- paste(dec[i],Estr,dec[i+1],"  ",sep="")
+      estr[n-1] <- paste(estr[n-1]," ")
+      estr[n] <- Eeff
+      antal <- rep(NA,n)
+      for ( i in 1:(n-1) )
+         antal[i] <- sum(dec[i]-eps <= eff & eff < dec[i+1]-eps)
+      antal[n] <- sum(abs(eff-1) < eps)
+   } else {
+      maxF <- max(eff)
+      maxF <- ceiling( 10 * maxF ) / 10
+      dec <- seq(from=1, to=maxF, by=.1)
+      Estr <- "< F =<"
+      Eeff <- "F ==1   "
+      n <- length(dec)
+      if ( n > 10 )  {
+         dec_  <- c(1,1.1,1.2,1.3,1.5,2.0,5.0,10.0,100.0,Inf)
+         n <- length(dec_) 
+         while ( n>1 && dec_[n-1] > maxF )
+            n <- n - 1 
+         dec <- dec_[1:n]
+      }
+      estr <- rep(NA,n)
+      estr[1] <- paste("    ",Eeff)
+      for ( i in 2:n )
+         estr[i] <- paste(format(dec[i-1],digits=2,width=3),Estr,
+                          format(dec[i],digits=3,width=3),"  ",sep="")
+      antal <- rep(NA,n)
+      antal[1] <- sum(abs(eff-1) < eps)
+      for ( i in 2:n )
+         antal[i] <- sum(dec[i-1]-eps <= eff & eff < dec[i]-eps)
+   }
+   andel <- antal/sum(!is.na(eff))
+
+   a <- cbind(antal , 100*andel)
+   dimnames(a) <- list("  Eff range"=estr,c( "#", "%"))
+   print(a,digits=c(2,3),quote=F,...)
    invisible(object)
-   # printSpMatrix(Matrix(object$lambda),digits=4, col.names=T,...)
 }  ## summary.Farrell
+
 
 
 
@@ -98,50 +141,50 @@ peers <- function(object, NAMES=FALSE)  {
       stop(paste("Object is not of class 'Farrell' (or 'slack');",
              "you might have used FAST=TRUE in 'dea'"))
    if ( object$TRANSPOSE ) {
-	   lam <- object$lambda
+	   lam <- t(object$lambda)
    } else {
-      lam <- t(object$lambda)
+      lam <- object$lambda
    }
 
    # Fjern foranstillet L_ eller L i søjlenavne for lambda
-   if ( "L_" %in% substr(rownames(lam),1,2) )  {
-      rownames(lam) <- substring(rownames(lam),3)
+   if ( "L_" %in% substr(colnames(lam),1,2) )  {
+      colnames(lam) <- substring(colnames(lam),3)
    }
    if ( "L" %in% substr(rownames(lam),1,1) )  {
-      rownames(lam) <- substring(rownames(lam),2)
+      colnames(lam) <- substring(colnames(lam),2)
    }
 
-   peer <- which(rowSums(lam,na.rm=TRUE)>0, 1:dim(lam)[1])
+   # peers har positiv vaerdi af lambda i deres soejle
+   peer <- which(colSums(lam,na.rm=TRUE)>0)  #  , 1:dim(lam)[2])
    # print("Firms der er peers:")
    # print(peer)
 
-   bench <- matrix(NA,nrow=length(peer), ncol=dim(lam)[2])
-   # Saet firms navne som raekkenavne
-   colnames(bench) <- colnames(lam)
-
-   # for ( i in 1:length(peer) ) {  # for hver peer
-   #    yper <- which(lam[peer[i],]>0)
-   #    bench[i,yper] <- peer[i]
-   # }
+   # Matrix til i hver raekke at holde raekkens/firmaets peers
+   bench <- matrix(NA, nrow=dim(lam)[1], ncol=length(peer))
+   # Saet firms navne som soejlenavne
+   rownames(bench) <- rownames(lam)
 
    maxj = 0  # det storste antal peers for en firm
-   for ( i in 1:dim(lam)[2] )  {  # for hver firm
-      # Hvis firm er uden for teknologi maengde er der ingen peers: next
-      if ( sum(lam[peer,i],na.rm=TRUE) == 0 ) next
-      pe <- which(lam[peer,i]>0)
-      bench[1:length(pe),i] <- peer[pe]
+   for ( i in 1:dim(lam)[1] )  {  # for hver firm
+      # Hvis firm er uden for teknologi maengden er der ingen peers: next
+      if ( sum(lam[i,peer],na.rm=TRUE) == 0 ) next
+      # Hvem er peers for firm i
+      pe <- which(lam[i,peer]>0)
+      bench[i,1:length(pe)] <- peer[pe]
       maxj <- max(maxj,length(pe))
    }
-   bench <- bench[1:maxj,,drop = FALSE]
+   # Der er hoejst maxj peers for en firm
+   bench <- bench[,1:maxj,drop = FALSE]
 
-   if (NAMES & !is.null(names(object$eff)) )  {
-      bench_ <- matrix(rownames(lam)[bench], ncol=dim(bench)[2])
+   # Skal der navne i matricen bench med peers i steder for blot numre
+   if (NAMES & (!is.null(rownames(lam)) || !is.null(names(object$eff))))  {
+      bench_ <- matrix(rownames(lam)[bench], nrow=dim(bench)[1])
       # print(bench_)
-      colnames(bench_) <- colnames(bench)
+      rownames(bench_) <- rownames(bench)
       bench <- bench_
    }
 
-   if ( !object$TRANSPOSE ) {
+   if ( object$TRANSPOSE ) {
       bench <- t(bench)
    }
 
@@ -188,6 +231,7 @@ print.peers  <- function(x, ...)  {
 } ## print.cost.opt
 
 
+
 get.number.peers  <-  function(object)  {
    if ( object$TRANSPOSE ) {
 	   lam <- object$lambda
@@ -203,6 +247,21 @@ get.number.peers  <-  function(object)  {
    number <- rowSums(lam[peer,]>0, na.rm=TRUE)
    cbind(peer,"#"=number)
 }  # get.number.peers
+
+
+
+get.which.peers <- function(object, N=1:length(object$eff))  {
+   if ( object$TRANSPOSE ) {
+	   lam <- object$lambda
+   } else {
+      lam <- t(object$lambda)
+   }
+   p <- apply(object$lambda[,N,drop=FALSE]>0,2,which)
+   p0 <- p[lapply(p,length) > 0]
+   return(p0)
+}  # get.which.peers
+
+
 
 
 lambda.print  <- function(x, KEEPREF=FALSE, ...)  {
@@ -229,6 +288,7 @@ lambda.print  <- function(x, KEEPREF=FALSE, ...)  {
 } ## print.lambda
 
 
+
 lambda <- function(object, KEEPREF=FALSE)  {
    if ( object$TRANSPOSE ) {
       lam <- object$lambda
@@ -244,6 +304,7 @@ lambda <- function(object, KEEPREF=FALSE)  {
    if ( !object$TRANSPOSE )  lam <- t(lam)
    return(lam)
 }
+
 
 
 # Calculate excess input or output

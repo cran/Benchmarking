@@ -1,4 +1,4 @@
-% $Id: eff.Rd 86 2010-11-11 09:00:13Z Lars $
+% $Id: eff.Rd 96 2010-11-27 22:47:25Z Lars $
 \name{eff, efficiencies}
 \alias{eff}
 \alias{efficiencies}
@@ -8,13 +8,13 @@
 \alias{efficiencies.sfa}
 \alias{efficiencies.Farrell}
 
-\title{
-Calculate efficiencies for Farrell and sfa object
-}
 
-\description{
-Calculate efficiencies for Farrell and sfa object. For a sfa there are several types
-}
+\title{ Calculate efficiencies for Farrell and sfa object }
+
+
+\description{ Calculate efficiencies for Farrell and sfa object. For a
+   sfa there are several types }
+
 
 \usage{
 eff( object, ... )
@@ -26,24 +26,30 @@ efficiencies( object, ... )
 \method{eff}{sfa}(object, type = "BC", ...)
 }
 
+
 \arguments{
 
   \item{object}{ A Farrell object returned from a DEA function like
-      \link{dea}, \link{sdea}, or \link{mea} or a sfa object returned
+      \link{dea}, \link{sdea}, or \link{mea} or an sfa object returned
       from the function \link{sfa}.  }
 
   \item{type}{ The type of efficiencies to be calculated. For a
-      Farrell object the possibilities are Farrell efficiency or
-      Shephard efficiency. For a sfa object the possibilities are BC,
-      Mode, J, or add. }
+      Farrell object the possibilities are \dQuote{Farrell} efficiency
+      or \dQuote{Shephard} efficiency. For a sfa object the
+      possibilities are \dQuote{BC}, \dQuote{Mode}, \dQuote{J}, or
+      \dQuote{add}. }
 
   \item{\dots}{Further arguments ... }
 
 }
 
+
 \details{
 
-The possible types for sfa efficiencies are
+The possible types for class \code{Farrell} (an object returned from
+\code{\link{dea}} et al. are \dQuote{Farrell} and \dQuote{Shephard}.
+
+The possible types for class \code{sfa} efficiencies are
 
 \describe{
 
@@ -64,6 +70,7 @@ The possible types for sfa efficiencies are
 
 }
 
+
 \value{
 The efficiencies are returned as an array.
 }
@@ -73,9 +80,7 @@ Bogetoft and Otto; \emph{Benchmarking with DEA, SFA, and R}, Springer
 2011
 }
 
-\author{
-Peter Bogetoft and Lars Otto \email{lo@foi.dk}
-}
+\author{ Peter Bogetoft and Lars Otto \email{lo@foi.dk} }
 
 \note{ For the Farrell object the orientation is determined by the
  calculations that led to the object and can not be changed here.  }
@@ -90,9 +95,7 @@ Peter Bogetoft and Lars Otto \email{lo@foi.dk}
 ##---- Should be DIRECTLY executable !! ----
 ##-- ==>  Define data, use random,
 ##--	or do  help(data=index)  for the standard data sets.
-
 }
-% Add one or more standard keywords, see file 'KEYWORDS' in the
-% R documentation directory.
-\keyword{ ~kwd1 }
-\keyword{ ~kwd2 }% __ONLY ONE__ keyword per line
+
+
+\keyword{ efficiency }

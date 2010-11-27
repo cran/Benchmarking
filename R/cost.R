@@ -1,4 +1,4 @@
-# $Id: cost.R 82 2010-10-24 20:00:48Z Lars $
+# $Id: cost.R 97 2010-12-02 23:27:26Z Lars $
 
 # Function to calculate minimum cost input.
 
@@ -85,9 +85,9 @@ cost.opt <- function(XREF, YREF, W, YOBS=NULL, RTS="vrs", TRANSPOSE=FALSE,
 
    xopt <- matrix(NA,m,K)
    lambda <- matrix(NA,nrow=Kr,ncol=K)
-   cost <- matrix(NA,1,K)
+   cost <- rep(NA,K)
 
-   for ( k in 1:K ) {
+   for ( k in 1:K )  {
       if ( dim(W)[2] != 1 && k > 1 ) { 
          set.objfn(lps, c(W[,k],rep(0,K)))
 	   }
@@ -112,12 +112,14 @@ cost.opt <- function(XREF, YREF, W, YOBS=NULL, RTS="vrs", TRANSPOSE=FALSE,
       }
 
    }  # for ( k in 1:K )
+   rm(lps)
 
    rownames(lambda) <- paste("L",1:Kr,sep="")
    rownames(cost) <- rownames(YOBS)
 
    if (!TRANSPOSE) {
       xopt <- t(xopt)
+      # cost <- t(cost)
       lambda <- t(lambda)
    }
 

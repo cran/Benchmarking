@@ -1,4 +1,4 @@
-# $Id: NAMESPACE 85 2010-11-06 22:18:27Z Lars $
+# $Id: NAMESPACE 96 2010-11-27 22:47:25Z Lars $
 export(dea, sdea,   # efficiency, eff,
 excess, eladder, eladder.plot,
 dea.dual,
@@ -8,8 +8,9 @@ dea.add,
 # print.Farrell, summary.Farrell,
 slack, # print.slack, summary.slack,
 lambda,
-peers, get.number.peers,
-print.peers, lambda.print, 
+peers, get.number.peers, get.which.peers,
+# print.peers, 
+lambda.print, 
 dea.plot, dea.plot.frontier, dea.plot.isoquant, dea.plot.transform,
 cost.opt, print.cost.opt, summary.cost.opt,
 revenue.opt, print.revenue.opt, summary.revenue.opt,

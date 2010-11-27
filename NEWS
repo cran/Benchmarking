@@ -1,7 +1,31 @@
-$Id: NEWS 88 2010-11-13 23:26:02Z Lars $
+$Id: NEWS 97 2010-12-02 23:27:26Z Lars $
+
+Changes to Benchmarking version 0.17
+
+ * The function dea now accepts the argument RTS="fdh+", a technology
+   the combines free disposability and restricted or local constant
+   return to scale.
+
+ * Changed internal use of matrices such that the corresponds to
+   stasndard R use, and, therefore, are not transposed in the start of
+   many functions. For normal use this speeds up the functions
+   marginally, but the internal structure of the functions are nicer.
+
+ * Directional efficiency now works for RTS="fdh", but still waiting
+   for RTS="fdh+".
+
+ * Every group of functions are now documented in a separate file
+
+ * Efficiencies with no solutions returns -Inf or Inf depending on the
+   orientation. This is in agreement with the use in super efficiency.
+
+ * Better summaries for Farrell and slack objects
+
+ * Fixed bug in slack when either input and/or outputs have big values
+
+
 
 Changes to Benchmarking version 0.16
-
 
  * eff() now returns efficiencies as array and not as matrix; makes it
    easier with further calculations with eff as dimensions are now a
@@ -11,7 +35,7 @@ Changes to Benchmarking version 0.16
    frontier.
 
  * New function excess returns excess input and/or output for Farrell
-   object.
+   objects.
 
  * The function dea checks if X and Y are matrices and aborts if not.
 

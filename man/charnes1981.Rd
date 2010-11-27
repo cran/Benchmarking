@@ -1,4 +1,4 @@
-% $Id: charnes1981.Rd 88 2010-11-13 23:26:02Z Lars $
+% $Id: charnes1981.Rd 96 2010-11-27 22:47:25Z Lars $
 \name{charnes1981}
 \alias{charnes1981}
 \docType{data}
@@ -80,7 +80,6 @@ Program Follow Through}, \emph{Management Science}, volume 27, number
 data(charnes1981)
 x <- with(charnes1981, cbind(x1,x2,x3,x4,x5))
 y <- with(charnes1981, cbind(y1,y2,y3))
-pairs(charnes1981, gap=0)
 
 # Farrell inpout efficiency; vrs technology
 e <- dea(x,y)
@@ -90,9 +89,12 @@ np <- get.number.peers(e)
 # times they are peers
 np[which(np[,2]>20),]
 
+# Plot first input against first output and emphasize the peers that
+# are peers for more than 20 schools in the model with five inputs and
+# three outputs
 inp <- np[which(np[,2]>20),1]
-dea.plot(x,y)
-points(rowSums(x[inp,]),rowSums(y[inp,]), pch=16, col="red")
+dea.plot(x[,1],y[,1])
+points(x[inp,1], y[inp,1], pch=16, col="red")
 }
 
 \keyword{datasets}

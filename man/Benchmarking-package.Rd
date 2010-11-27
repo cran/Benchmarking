@@ -1,4 +1,4 @@
-% $Id: Benchmarking-package.Rd 88 2010-11-13 23:26:02Z Lars $
+% $Id: Benchmarking-package.Rd 97 2010-12-02 23:27:26Z Lars $
 \name{Benchmarking-package}
 \alias{Benchmarking-package}
 \alias{Benchmarking}
@@ -38,8 +38,8 @@ can of course also be used as a stand-alone package.
 \tabular{ll}{
 Package: \tab Benchmarking\cr
 Type: \tab Package\cr
-Version: \tab 0.16 ($Revision: 88 $)\cr
-Date: \tab $Date: 2010-11-14 00:26:02 +0100 (14 nov 2010) $\cr
+Version: \tab 0.17 ($Revision: 97 $)\cr
+Date: \tab $Date: 2010-12-03 00:27:26 +0100 (fr, 03 dec 2010) $\cr
 License: \tab Copyright\cr
 }
 
@@ -170,6 +170,7 @@ peers(e)
 peers(e, NAMES=TRUE)
 print(peers(e, NAMES=TRUE), quote=FALSE)
 lambda(e)
+summary(e)
 
 
 # Calculating super efficiency
@@ -207,6 +208,7 @@ data.frame(sl$sx,sl$sy)
 peers(sl)
 lambda(sl)
 sl$lambda
+summary(sl)
 
 # The two phases in one function call
 e2 <- dea(x,y,SLACK=TRUE)

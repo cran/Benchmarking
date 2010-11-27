@@ -1,4 +1,4 @@
-# $Id: dea.dual.R 85 2010-11-06 22:18:27Z Lars $
+# $Id: dea.dual.R 96 2010-11-27 22:47:25Z Lars $
 
 # In the calculation in the method input/output matrices X and Y are
 # of the order good x firms.  Ie. X, Y etc must be transformed as
@@ -56,7 +56,7 @@ dea.dual <- function(X,Y, RTS="vrs", ORIENTATION="in",
       YREF <- Y
    }
    
-   if ( !TRANSPOSE )  {
+   if ( TRANSPOSE )  {
       X <- t(X)
       Y <- t(Y)
       XREF <- t(XREF)
@@ -69,21 +69,19 @@ dea.dual <- function(X,Y, RTS="vrs", ORIENTATION="in",
    if ( length(FRONT.IDX) > 0 )  {
       if ( !is.vector(FRONT.IDX) )
          stop("FRONT.IDX is not a vector in 'eff'")
-      XREF <- XREF[,FRONT.IDX, drop=FALSE]
-      YREF <- YREF[,FRONT.IDX, drop=FALSE]
-      # XREF <- matrix(XREF[,FRONT.IDX],nrow=dim(XREF)[1])
-      # YREF <- matrix(YREF[,FRONT.IDX],nrow=dim(YREF)[1])
+      XREF <- XREF[FRONT.IDX,, drop=FALSE]
+      YREF <- YREF[FRONT.IDX,, drop=FALSE]
    }
 
-   m = dim(X)[1]  # number of inputs
-   n = dim(Y)[1]  # number of outputs
-   K = dim(X)[2]  # number of units, firms, DMUs
-   Kr = dim(XREF)[2]  # number of units, firms, DMUs
-   okr <- orgKr[2]
+   m = dim(X)[2]  # number of inputs
+   n = dim(Y)[2]  # number of outputs
+   K = dim(X)[1]  # number of units, firms, DMUs
+   Kr = dim(XREF)[1]  # number of units, firms, DMUs
+   okr <- orgKr[1]
    if ( !is.null(DIRECT) )  {
       if ( class(DIRECT)=="matrix" ) {
-         md <- dim(DIRECT)[1]
-         Kd <- dim(DIRECT)[2]
+         md <- dim(DIRECT)[2]
+         Kd <- dim(DIRECT)[1]
       } else {
          md <- length(DIRECT)
          Kd <- 0
@@ -95,13 +93,13 @@ dea.dual <- function(X,Y, RTS="vrs", ORIENTATION="in",
    if (LP) cat("m n k kr = ",m,n,K,Kr,"\n")
    if (LP & !is.null(DIRECT) ) cat("md, Kd =",md,Kd,"\n") 
 
-   if ( m != dim(XREF)[1] )
+   if ( m != dim(XREF)[2] )
       stop("Number of inputs must be the same in X and XREF")
-   if ( n != dim(YREF)[1] )
+   if ( n != dim(YREF)[2] )
       stop("Number of outputs must be the same in Y and YREF")
-   if ( K != dim(Y)[2] )
+   if ( K != dim(Y)[1] )
       stop("Number of units must be the same in X and Y")
-   if ( Kr != dim(YREF)[2] )  
+   if ( Kr != dim(YREF)[1] )  
       stop("Number of units must be the same in XREF and YREF")
 
    if ( !is.null(DUAL) && ( !is.matrix(DUAL) ||
@@ -198,10 +196,10 @@ if ( is.null(AD) )  {
    # saet soejler i matrix med restriktioner, saet 0'er for den foerste
    # raekke for den skal alligevel aendres for hver firm.
    for ( h in 1:m ) 
-      set.column(lps,h, c( 0, -XREF[h,], AD[h,]))
+      set.column(lps,h, c( 0, -XREF[,h], AD[h,]))
    # if ( LP || !is.null(LPK) ) print(lps)
    for ( h in 1:n)
-       set.column(lps,m+h, c( 0, YREF[h,], AD[m+h,]))
+       set.column(lps,m+h, c( 0, YREF[,h], AD[m+h,]))
    # restriktioner paa lambda
    objgamma <- NULL
    if ( rlamb > 0 )  {
@@ -256,22 +254,22 @@ if ( is.null(AD) )  {
 
 # if ( LP || !is.null(LPK) ) print(lps)
 
-   u <- matrix(NA,m,K)   # vector for the final efficiencies
-   v <- matrix(NA,n,K)   # vector for the final efficiencies
+   u <- matrix(NA,K,m)   # vector for the final efficiencies
+   v <- matrix(NA,K,n)   # vector for the final efficiencies
    objval <- rep(NA,K)   # vector for the final efficiencies
-   sol <- matrix(NA, 1 + sum(dim(lps)), K)
+   sol <- matrix(NA, K, 1 + sum(dim(lps)) )
    gamma <- NULL
    if (rlamb > 0)  {
-      gamma <- matrix(NA,rlamb,K)
+      gamma <- matrix(NA,K,rlamb)
    }
 
 
 
-   for ( k in 1:K ) { # Finds the efficiencies for each unit
+   for ( k in 1:K )  { # Finds the efficiencies for each unit
        if ( is.null(DIRECT) )  {
           # object function and first collumn
           if ( ORIENTATION == "in" )  {
-             objrow <- c(rep(0,m),Y[,k], objgamma)
+             objrow <- c(rep(0,m),Y[k,], objgamma)
              if (LP) { 
                 print(lps); 
                 print("objgamma:") 
@@ -280,25 +278,25 @@ if ( is.null(AD) )  {
                 print(objrow)
              }
              set.objfn(lps, objrow)
-             set.row(lps, 1, c(X[,k]),1:m)
+             set.row(lps, 1, c(X[k,]),1:m)
           }  else  {
-             objrow <- c(X[,k], rep(0,n), objgamma)
+             objrow <- c(X[k,], rep(0,n), objgamma)
              set.objfn(lps, objrow)
-             set.row(lps, 1, c(-Y[,k]),(m+1):(m+n))
+             set.row(lps, 1, c(-Y[k,]),(m+1):(m+n))
           }
        } else {
-          objrow <- c(X[,k],-Y[,k], objgamma)
+          objrow <- c(X[k,],-Y[k,], objgamma)
           set.objfn(lps, objrow)
           # print(Kd)
           # print(DIRECT)
           if ( Kd > 1 )  {
              # retning for enheden
              if ( ORIENTATION=="in" )
-                set.row(lps, 1, -DIRECT[,k], 1:m)
+                set.row(lps, 1, -DIRECT[k,], 1:m)
              else if ( ORIENTATION=="out" )
-                set.row(lps, 1, -DIRECT[,k], 1:n)
+                set.row(lps, 1, -DIRECT[k,], 1:n)
              else if ( ORIENTATION=="in-out" )
-                set.row(lps, 1, -DIRECT[,k])
+                set.row(lps, 1, -DIRECT[k,])
           }
        }
 
@@ -319,12 +317,12 @@ if ( is.null(AD) )  {
          objval[k] <- get.objective(lps)
 
          losning <- get.variables(lps)
-         # sol[,k] <- get.variables(lps)
-         sol[,k] <- get.primal.solution(lps)
-         u[,k] <- losning[1:m]
-         v[,k] <- losning[(m+1):(m+n)]
+         # sol[k,] <- get.variables(lps)
+         sol[k,] <- get.primal.solution(lps)
+         u[k,] <- losning[1:m]
+         v[k,] <- losning[(m+1):(m+n)]
          if ( rlamb > 0 )  {
-            gamma[,k] <- losning[(m+n+1):(m+n+rlamb)]
+            gamma[k,] <- losning[(m+n+1):(m+n+rlamb)]
          }
       }
 
@@ -335,8 +333,8 @@ if ( is.null(AD) )  {
          print("Solution")
          print(sol)
          print("Dual values:")
-         print(u[,k])
-         print(v[,k])
+         print(u[k,])
+         print(v[k,])
          print("get.variables")
          print(get.variables(lps))
          print("Primal solution")
@@ -357,19 +355,19 @@ if ( is.null(AD) )  {
       eff <- objval
    } else { 
       mmd <- switch(ORIENTATION, "in"=m, "out"=n, "in-out"=m+n) 
-      ob <- matrix(objval,nrow=mmd, ncol=K, byrow=T)
-      if ( class(DIRECT)=="matrix" && dim(DIRECT)[2] > 1 )  {
+      ob <- matrix(objval, nrow=K, ncol=mmd)
+      if ( class(DIRECT)=="matrix" && dim(DIRECT)[1] > 1 )  {
           dir <- DIRECT
       } else {
-          dir <- matrix(DIRECT,nrow=mmd, ncol=K)
+          dir <- matrix(DIRECT, nrow=K, ncol=mmd, byrow=TRUE)
       }
       if ( ORIENTATION=="in" )  {
          eff <- 1 - ob*dir/X
       } else if ( ORIENTATION=="out" )  {
          eff <- 1 + ob*dir/Y
       } else if ( ORIENTATION=="in-out" )  {
-         eff <- cbind(1 - ob[1:m,,drop=FALSE]*dir[1:m,,drop=FALSE]/X, 
-           1 + ob[(m+1):(m+n),,drop=FALSE]*dir[(m+1):(m+n),,drop=FALSE]/Y)
+         eff <- cbind(1 - ob[,1:m,drop=FALSE]*dir[,1:m,drop=FALSE]/X, 
+           1 + ob[,(m+1):(m+n),drop=FALSE]*dir[,(m+1):(m+n),drop=FALSE]/Y)
       } else {
          warning("Illegal ORIENTATION for argument DIRECT") 
       }
@@ -380,12 +378,18 @@ if ( is.null(AD) )  {
    }
 
    # undgaa afrundingsfejl i e naar den er taet ved 1.
-   eff[abs(1-eff) < 1e-5] <- 1
+   lpcontr <- lp.control(lps)
+   eps <- sqrt(lpcontr$epsilon["epsint"])
+   eff[abs(eff-1) < eps] <- 1
 
-   rownames(u) <- paste("u",1:m,sep="")
-   rownames(v) <- paste("v",1:n,sep="")
+   # Slut med at bruge lps
+   rm(lps)
 
-   if ( !TRANSPOSE )  {
+
+   colnames(u) <- paste("u",1:m,sep="")
+   colnames(v) <- paste("v",1:n,sep="")
+
+   if ( TRANSPOSE )  {
       u <- t(u)
       v <- t(v)
       if ( class(eff)=="matrix" )

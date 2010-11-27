@@ -1,4 +1,4 @@
-# $Id: profit.R 72 2010-09-11 17:06:14Z Lars $
+# $Id: profit.R 97 2010-12-02 23:27:26Z Lars $
 
 # Calculates optimal input and output to maximize profit for given
 # input and output prices.
@@ -90,9 +90,9 @@ profit.opt <- function(XREF, YREF, W, P, RTS="vrs", TRANSPOSE=FALSE,
    xopt <- matrix(NA,m,K)
    yopt <- matrix(NA,n,K)
    lambda <- matrix(NA,nrow=Kr,ncol=K)
-   profit <- matrix(NA,1,K)
+   profit <- rep(NA,K)
 
-   for ( k in 1:K ) {
+   for ( k in 1:K )  {
       if ( dim(W)[2] != 1 && k > 1 ) { 
          set.objfn(lps, c(-W[,k],P[,k], rep(0,Kr)))
       }
@@ -117,6 +117,7 @@ profit.opt <- function(XREF, YREF, W, P, RTS="vrs", TRANSPOSE=FALSE,
       }
 
    }  # for ( k in 1:K )
+   rm(lps)
 
    rownames(lambda) <- paste("L",1:Kr,sep="")
    rownames(profit) <- rownames(W)
@@ -124,6 +125,7 @@ profit.opt <- function(XREF, YREF, W, P, RTS="vrs", TRANSPOSE=FALSE,
    if (!TRANSPOSE) {
       xopt <- t(xopt)
       yopt <- t(yopt)
+      # profit <- t(profit)
       lambda <- t(lambda)
    }
 

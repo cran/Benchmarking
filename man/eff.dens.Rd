@@ -1,4 +1,4 @@
-% $Id: eff.dens.Rd 81 2010-10-20 15:26:25Z Lars $
+% $Id: eff.dens.Rd 96 2010-11-27 22:47:25Z Lars $
 \name{eff.dens}
 \alias{eff.dens}
 \alias{eff.dens.plot}
@@ -68,8 +68,8 @@ and Data Analysis}, Chapman and Hall, London.  }
 
 \note{ The input efficiency is also bounded below by 0, but for normal
 firms an efficiency at 0 will not happen, i.e. the boundary is not
-effective1, and therefore this boundary is not taken into consideration.
-}
+effective, and therefore this boundary is not taken into
+consideration.  }
 
 
 \examples{

@@ -1,4 +1,4 @@
-% $Id: dea.dual.Rd 85 2010-11-06 22:18:27Z Lars $
+% $Id: dea.dual.Rd 96 2010-11-27 22:47:25Z Lars $
 \name{dea.dual}
 \alias{dea.dual}
 % \alias{dea.dual.mat}
@@ -38,12 +38,11 @@ dea.dual(X, Y, RTS = "vrs", ORIENTATION = "in",
  technology / returns to scale assumption.
 
 \tabular{rcl}{
-0 \tab "fdh" \tab  \emph{Not available.}\cr
+0 \tab "fdh" \tab  \emph{Not available} for \code{dea.dual}.\cr
 1 \tab "vrs" \tab Variable returns to scale, convexity and free disposability \cr
 2 \tab "drs" \tab Decreasing returns to scale, convexity, down-scaling and free disposability \cr
 3 \tab "crs" \tab Constant returns to scale, convexity and free disposability \cr
-4 \tab "irs" \tab Increasing returns to scale, (up-scaling, but not down-scaling), convexity and free disposability \cr
-5 \tab "add" \tab  \emph{Not available.}
+4 \tab "irs" \tab Increasing returns to scale, (up-scaling, but not down-scaling), convexity and free disposability.
 }
 
 }
