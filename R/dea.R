@@ -1,4 +1,4 @@
-# $Id: dea.R 97 2010-12-02 23:27:26Z Lars $
+# $Id: dea.R 102 2011-01-23 18:50:21Z Lars $
 
 # DEA beregning via brug af lp_solveAPI. Fordelene ved lp_solveAPI er
 # færre kald fra R med hele matricer for hver firm og dermed skulle
@@ -30,7 +30,7 @@ dea  <-  function(X,Y, RTS="vrs", ORIENTATION="in", XREF=NULL,YREF=NULL,
       # print("When  FAST then neither DUAL nor SLACK") 
    }
 
-   rts <- c("fdh","vrs","drs","crs","irs","irs","add","fdh+")
+   rts <- c("fdh","vrs","drs","crs","irs","irs2","add","fdh+")
    if ( missing(RTS) ) RTS <- "vrs" 
    if ( is.real(RTS) )  {
       if (LP) print(paste("Number '",RTS,"'",sep=""),quote=F)
@@ -51,14 +51,23 @@ dea  <-  function(X,Y, RTS="vrs", ORIENTATION="in", XREF=NULL,YREF=NULL,
       stop(paste("Unknown value for ORIENTATION:",ORIENTATION),quote=F)
    }
 
-   if ( class(X)!="matrix" )
-      stop("X is not a matrix")
-   if ( class(Y)!="matrix" )
-      stop("Y is not a matrix")
-   if ( !is.null(XREF) && class(XREF)!="matrix" )
-      stop("XREF is not a matrix")
-   if ( !is.null(YREF) && class(YREF)!="matrix" )
-      stop("YREF is not a matrix")
+   if ( class(X)=="data.frame" && data.kontrol(X) || is.numeric(X) ) 
+      { X <- as.matrix(X) }
+   if ( class(Y)=="data.frame" && data.kontrol(Y) || is.numeric(Y) ) 
+      { Y <- as.matrix(Y) }
+   if ( class(XREF)=="data.frame" && data.kontrol(XREF)||is.numeric(XREF))
+      { XREF <- as.matrix(XREF) }
+   if ( class(YREF)=="data.frame" && data.kontrol(YREF)||is.numeric(YREF)) 
+      { YREF <- as.matrix(YREF) }
+
+   if ( class(X)!="matrix" || !is.numeric(X) )
+      stop("X is not a numeric matrix (or data.frame)")
+   if ( class(Y)!="matrix" || !is.numeric(X) )
+      stop("Y is not a numeric matrix (or data.frame)")
+   if ( !is.null(XREF) && (class(XREF)!="matrix" || !is.numeric(XREF)) )
+      stop("XREF is not a numeric matrix (or data.frame)")
+   if ( !is.null(YREF) && (class(YREF)!="matrix" || !is.numeric(YREF)) )
+      stop("YREF is not a numeric matrix (or data.frame)")
 
    .xyref.missing <- FALSE
    if ( missing(XREF) || is.null(XREF) )  {
@@ -165,7 +174,8 @@ dea  <-  function(X,Y, RTS="vrs", ORIENTATION="in", XREF=NULL,YREF=NULL,
    # Initialiser LP objekt
    lps <- make.lp(m+n +rlamb,1+Kr)
    if ( is.null(DIRECT) ) dirStreng<-"" else dirStreng<-"Dir"
-   name.lp(lps, paste("Dea",ORIENTATION,RTS,dirStreng,sep="-"))
+   name.lp(lps, paste(ifelse(DIRECT!="min","Dea","Mea"),
+                            ORIENTATION,RTS,dirStreng,sep="-"))
 
    # saet raekker i matrix med restriktioner, saet 0'er for den foerste
    # soejle for den skal alligevel aendres for hver firm.
@@ -194,8 +204,15 @@ dea  <-  function(X,Y, RTS="vrs", ORIENTATION="in", XREF=NULL,YREF=NULL,
       set.rhs(lps, 1, m+n+2)
       delete.constraint(lps, m+n+1)
       rlamb <- rlamb -1
+   } else if ( RTS == "irs2" )  {
+      set.rhs(lps, 1, m+n+2)
+      delete.constraint(lps, m+n+1)
+      rlamb <- rlamb -1
+      set.semicont(lps, 2:(1+Kr))
+      set.bounds(lps, lower=rep(1,Kr), columns=2:(1+Kr))
    } else if ( RTS == "add" )  {
       set.type(lps,2:(1+Kr),"integer")
+
    }
 
    if ( !is.null(DIRECT) && Kd==0 && DIRECT[1] != "min" )  {
@@ -228,7 +245,7 @@ dea  <-  function(X,Y, RTS="vrs", ORIENTATION="in", XREF=NULL,YREF=NULL,
    } else  
      stop("In 'dea' for ORIENTATION use only 'in', 'out', 'graph', or 'in-out (only for DIRECT)")
 
-   if ( !is.null(DIRECT) && DIRECT[1] != "min" )  {
+   if ( !is.null(DIRECT) )  {
       lp.control(lps, sense="max")
    }
 
@@ -239,7 +256,7 @@ dea  <-  function(X,Y, RTS="vrs", ORIENTATION="in", XREF=NULL,YREF=NULL,
    if ( ORIENTATION == "graph" )  {
       oe <- graphEff(lps, X, Y, XREF, YREF, RTS, FRONT.IDX, rlamb, oKr, 
                           TRANSPOSE, SLACK,FAST,LP) 
-      rm(lps)
+      # delete.lp(lps)
       return(oe)
    }
 
@@ -278,7 +295,7 @@ dea  <-  function(X,Y, RTS="vrs", ORIENTATION="in", XREF=NULL,YREF=NULL,
 
    # The loop for each firm
    for ( k in 1:K)  {
-      if ( LP )  print(paste("Firm",k), quote=FALSE)
+      if ( LP )  print(paste("Firm",k," -------------------"), quote=FALSE)
  
       # Af en eller anden grund saetter set.column ogsaa vaerdi for
       # kriteriefunktion og hvis der ikke er nogen vaerdi bliver den
@@ -289,18 +306,19 @@ dea  <-  function(X,Y, RTS="vrs", ORIENTATION="in", XREF=NULL,YREF=NULL,
       if ( directMin )  {
          # Find retningen og saet foerste soejle til den
          set.rhs(lps, c(-X[k,],Y[k,]), 1:(m+n))
+
+         set.basis(lps, default=TRUE)
+
          if ( ORIENTATION=="in" )  {
-            lp.control(lps, sense="min")
-            DIRECT <- minDirection(lps, X[k,], m, n, ORIENTATION, LP=LP)
-            lp.control(lps, sense="max")
+            DIRECT <- minDirection(lps, m, n, ORIENTATION, LP=LP)
             set.column(lps, 1, c(1,-DIRECT),0:m)
          } else if ( ORIENTATION=="out" )  {
-            DIRECT <- minDirection(lps, Y[k,], m, n, ORIENTATION, LP=LP)
+            DIRECT <- minDirection(lps, m, n, ORIENTATION, LP=LP)
             set.column(lps, 1, c(1,DIRECT), c(0,(m+1):(m+n)) )
          } else if ( ORIENTATION=="in-out" )  {
               stop(paste("ORIENTATION=\"in-out\" does at the moment",
                          "not work with DIRECT=\"min\""))
-            # DIRECT <- minDirection(lps, X[k,], m, n, ORIENTATION, Y[k,])
+            # DIRECT <- minDirection(lps, m, n, ORIENTATION)
             # set.column(lps, 1, c(1,-DIRECT),0:(m+n))
          }
          directMatrix[k,] <- DIRECT
@@ -308,7 +326,19 @@ dea  <-  function(X,Y, RTS="vrs", ORIENTATION="in", XREF=NULL,YREF=NULL,
          # Check om DIRECT er 0, hvis den er nul gaa til naeste firm
          lpcontr <- lp.control(lps)
          eps <- sqrt(lpcontr$epsilon["epsint"])
-         if ( max(DIRECT) < eps | max(DIRECT)/mean(c(X[k,],Y[k,])) < eps )
+         if (LP) print(paste("eps for minDirectin",eps), quote=FALSE)
+
+# Dårligt test for om direction er 0, tager ikke hensyn at X og Y kan
+# være forskellig størrelse
+         if ( ORIENTATION=="in" )  {
+            deltaDir <- DIRECT/( X[k,] + .Machine$double.xmin )
+         } else if ( ORIENTATION=="out" )  {
+            deltaDir <- DIRECT/( Y[k,] + .Machine$double.xmin )
+         } else if ( ORIENTATION=="in-out" )  {
+            deltaDir <- DIRECT/( c(X[k,],Y[k,]) + .Machine$double.xmin )
+         }
+
+         if ( max(DIRECT) < eps && max(abs(deltaDir)) < eps )
          {
             if (LP) print(paste("Direction 0 for firm",k))
             objval[k] <- 0
@@ -338,14 +368,32 @@ dea  <-  function(X,Y, RTS="vrs", ORIENTATION="in", XREF=NULL,YREF=NULL,
             if ( ORIENTATION=="in" )
                set.column(lps, 1, c(1,-DIRECT[k,]),0:m)
             else if ( ORIENTATION=="out" )
-               set.column(lps, 1, c(1,-DIRECT[k,]),0:n)
+               set.column(lps, 1, c(1,-DIRECT[k,]), c(0,(m+1):(m+n)) )
             else if ( ORIENTATION=="in-out" )
                set.column(lps, 1, c(1,-DIRECT[k,]),0:(m+n))
          }
       }
-      if ( LP && k == 1 )  print(lps)
+      if ( !is.null(CONTROL) )  {
+         lp.control(lps,CONTROL)
+      }
+
+      if ( directMin || Kd > 1 )  {
+         # Direction forskellig for hver firm.
+         # Saet firm selv til ny basis da den forrige basis kan vare
+         # for forskellig og derfor give numerisk fejl i lpSolve.
+         bs.status <- set.basis(lps, default=TRUE)
+         # print(paste("Basis sat:",bs.status),quote=FALSE)
+      }
+
+      if ( LP && k <= 10 )  print(lps)
       status <- solve(lps)
-      if ( status != 0 ) {
+      if ( status == 5 )  {
+         # Numerical failure, reset basis og prøv igen
+         set.basis(lps, default=TRUE)
+         status <- solve(lps)
+      }
+      if (LP)  print(paste("Status =",status))
+      if ( status != 0 )  {
         if ( status == 2 || status == 3 ) {
 	        # print(paste("Firm",k,"not in the technology set"), quote=F)
            # print(paste("Status =",status))
@@ -395,6 +443,9 @@ dea  <-  function(X,Y, RTS="vrs", ORIENTATION="in", XREF=NULL,YREF=NULL,
       names(e) <- dimnames(X)[[1]]
    }
 
+   # Færdig med at bruge lps
+   # delete.lp(lps)
+
 #   if ( ORIENTATION == "in" )  {
 #      names(e) <- "E"
 #   } else if ( ORIENTATION == "out" )  {
@@ -404,7 +455,6 @@ dea  <-  function(X,Y, RTS="vrs", ORIENTATION="in", XREF=NULL,YREF=NULL,
 #   }
 
    if ( FAST ) { 
-      rm(lps)
       return(e)
       stop("Her skulle vi ikke kunne komme i 'dea'")
    }
@@ -493,9 +543,25 @@ dea  <-  function(X,Y, RTS="vrs", ORIENTATION="in", XREF=NULL,YREF=NULL,
          print(oe$slack)
       }
    }
-   rm(lps)
 
    return(oe)
 
-}
+}  # dea
+
+
+
+
+data.kontrol <- function(X)  {
+   if ( is.null(X) )  return(TRUE)
+   if ( class(X) == "data.frame" )  {
+      nc <- dim(X)[2]
+      for ( i in 1:nc )  {
+         if ( !is.numeric(X[,i]) )  {
+            return(FALSE)
+            break
+         }
+      }
+   }
+   return(TRUE)
+}  # data.kontrol
 

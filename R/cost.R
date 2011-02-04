@@ -1,4 +1,4 @@
-# $Id: cost.R 97 2010-12-02 23:27:26Z Lars $
+# $Id: cost.R 99 2010-12-23 12:02:58Z Lars $
 
 # Function to calculate minimum cost input.
 
@@ -112,7 +112,7 @@ cost.opt <- function(XREF, YREF, W, YOBS=NULL, RTS="vrs", TRANSPOSE=FALSE,
       }
 
    }  # for ( k in 1:K )
-   rm(lps)
+   # delete.lp(lps)
 
    rownames(lambda) <- paste("L",1:Kr,sep="")
    rownames(cost) <- rownames(YOBS)

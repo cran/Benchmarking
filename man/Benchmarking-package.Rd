@@ -1,4 +1,4 @@
-% $Id: Benchmarking-package.Rd 97 2010-12-02 23:27:26Z Lars $
+% $Id: Benchmarking-package.Rd 101 2011-01-11 20:23:25Z Lars $
 \name{Benchmarking-package}
 \alias{Benchmarking-package}
 \alias{Benchmarking}
@@ -38,17 +38,18 @@ can of course also be used as a stand-alone package.
 \tabular{ll}{
 Package: \tab Benchmarking\cr
 Type: \tab Package\cr
-Version: \tab 0.17 ($Revision: 97 $)\cr
-Date: \tab $Date: 2010-12-03 00:27:26 +0100 (fr, 03 dec 2010) $\cr
+Version: \tab 0.18 ($Revision: 101 $)\cr
+Date: \tab $Date: 2011-01-11 21:23:25 +0100 (ti, 11 jan 2011) $\cr
 License: \tab Copyright\cr
 }
 
 \tabular{ll}{
+
 \code{dea} \tab DEA input or output efficience measures, peers,
-lambdas and slacks \cr
+     lambdas and slacks \cr
 
 \code{dea.dual} \tab Dual weights (prices), including restrictions on
- weights \cr
+      weights \cr
 
 \code{dea.direct} \tab Directional efficiency \cr
 
@@ -65,21 +66,24 @@ lambdas and slacks \cr
 
 \code{slack} \tab Slacks in DEA models \cr
 
-\code{excess} \tab Calculates excess input or output compared to
+\code{excess} \tab Calculates excess input or output compared to DEA
      frontier. \cr
+
+\code{dea.boot} \tab Bootstrap DEA models \cr
+\code{boot.fear}  \cr
 
 \code{cost.opt} \tab Optimal input for given output and prices. \cr
 
 \code{revenue.opt} \tab Optimal output for given input and prices. \cr
 
 \code{profit.opt} \tab Optimal input and output for given input and
- output prices.  \cr
+     output prices.  \cr
 
 \code{dea.plot} \tab Graphs of DEA technologies under alternative
- technology assumptions. \cr
+     technology assumptions. \cr
 
 \code{dea.plot.frontier} \tab Specialized for 1 input and 1
-output. \cr
+     output. \cr
 
 \code{dea.plot.isoquant} \tab Specialized for 2 inputs. \cr
 
@@ -94,17 +98,17 @@ output. \cr
 \code{dea.merge} \tab Decompose efficiency from a merger of firms \cr
 
 \code{sfa} \tab Stochastic frontier analysis, production, distance,
- and cost function (SFA) \cr
+     and cost function (SFA) \cr
 
-\code{outlier.ap} \tab Detection of outliers in benchmarking models  \cr
+\code{outlier.ap} \tab Detection of outliers  \cr
 
 \code{eff.dens} \tab Estimate and plot kernel density of efficiencies \cr
 
-\code{critValue} \tab Critical values calculated from bootstrapped DEA
- models.  \cr
+\code{critValue} \tab Critical values calculated from bootstrap DEA
+     models.  \cr
 
 \code{typeIerror} \tab Probability of a type I error for a test in
- bootstraped DEA models.  \cr
+      bootstrap DEA models.  \cr
 
 }
 }
@@ -123,6 +127,7 @@ Frontier Efficiency Analysis with R,} \emph{Socio-Economic Planning
 Sciences} 42, 247--254
 
 }
+
 
 \note{ 
 
@@ -154,7 +159,7 @@ dea.plot(x,y,RTS="drs",ORIENTATION="in-out",add=TRUE,lty="dashed",lwd=2)
 dea.plot(x,y,RTS="crs",ORIENTATION="in-out",add=TRUE,lty="dotted")
                       
 dea.plot(x,y,RTS="fdh",ORIENTATION="in-out",txt=rownames(x),main="fdh")
-dea.plot(x,y,RTS="irs",ORIENTATION="in-out",txt=rownames(x),main="irs")
+dea.plot(x,y,RTS="irs",ORIENTATION="in-out",txt=TRUE,main="irs")
 dea.plot(x,y,RTS="irs2",ORIENTATION="in-out",txt=rownames(x),main="irs2")
 dea.plot(x,y,RTS="add",ORIENTATION="in-out",txt=rownames(x))
 

@@ -1,8 +1,8 @@
 Package: Benchmarking
 Type: Package
 Title: Benchmark and frontier analysis using DEA and SFA (BeDS)
-Version: 0.17
-Date: 2010-11-21 ($Date: 2010-11-27 23:47:25 +0100 (27 nov 2010) $)
+Version: 0.18
+Date: 2011-02-6 ($Date: 2011-02-04 10:50:57 +0100 (fr, 04 feb 2011) $)
 Author: Peter Bogetoft and Lars Otto
 Maintainer: Lars Otto <lo@foi.dk>
 Depends: lpSolveAPI, ucminf
@@ -25,6 +25,6 @@ Description: The package contains methods to support frontier analysis.
         also be used as a stand-alone package.
 License: GPL (>= 2)
 LazyLoad: yes
-Packaged: 2010-12-02 23:28:20 UTC; Lars
+Packaged: 2011-02-06 11:36:51 UTC; Lars
 Repository: CRAN
-Date/Publication: 2010-12-03 08:31:54
+Date/Publication: 2011-02-06 16:21:08

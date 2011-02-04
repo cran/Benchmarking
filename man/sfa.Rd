@@ -1,4 +1,4 @@
-% $Id: sfa.Rd 84 2010-11-04 12:26:37Z Lars $
+% $Id: sfa.Rd 102 2011-01-23 18:50:21Z Lars $
 \name{sfa}
 \alias{sfa}
 \alias{lambda.sfa}
@@ -32,7 +32,7 @@ likelihood method.
 \usage{
 sfa(x, y, beta0 = NULL, lambda0 = 1, resfun = ebeta, 
     TRANSPOSE = FALSE, DEBUG=FALSE,
-    control=list(maxeval=1000, stepmax=.1), hessian=2)
+    control=list(maxeval=1000, stepmax=1), hessian=2)
 
 % \method{efficiencies}{sfa}(object)
 % \method{eff}{sfa}(object)

@@ -1,4 +1,4 @@
-% $Id: dea.direct.Rd 86 2010-11-11 09:00:13Z Lars $
+% $Id: dea.direct.Rd 101 2011-01-11 20:23:25Z Lars $
 \name{dea.direct}
 \alias{dea.direct}
 
@@ -55,7 +55,7 @@ dea.direct(X, Y, DIRECT, RTS = "vrs", ORIENTATION = "in",
 2 \tab "drs" \tab Decreasing returns to scale (down-scaling, but not up-scaling), convexity, and free disposability \cr
 3 \tab "crs" \tab Constant returns to scale, convexity and free disposability \cr
 4 \tab "irs" \tab Increasing returns to scale (up-scaling, but not down-scaling), convexity, and free disposability \cr
-5 \tab "add" \tab Additivity (scaling up and down, but only with integers), and free disposability
+6 \tab "add" \tab Additivity (scaling up and down, but only with integers), and free disposability
 }
 
 }

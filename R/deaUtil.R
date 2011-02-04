@@ -1,4 +1,4 @@
-# $Id: deaUtil.R 97 2010-12-02 23:27:26Z Lars $
+# $Id: deaUtil.R 101 2011-01-11 20:23:25Z Lars $
 
 
 efficiencies <- function( object, ... )  {
@@ -70,13 +70,15 @@ print.Farrell  <- function(x, digits=4, ...)  {
 summary.Farrell <- function(object, digits=4, ...)  {
    eps <- 1e-6
    eff <- object$eff
-   cat("Summary of efficiencies\n")
-   cat("The technology is", object$RTS,"and",object$ORIENTATION,
-       "orientated efficiency\n")
-   cat("Number of firms with efficiency==1 are",
-      sum(abs(eff-1) < eps), 
-      "\nMean efficiency ", format(mean(object$eff),digit=3), "\n---" )
-   if ( object$ORIENTATION!="out" )  {
+   cat("Summary of ", ifelse(is.null(object$direct),"","directional "), 
+       "efficiencies\n", sep="")
+   cat("The technology is ", object$RTS," and ",object$ORIENTATION,
+       "put orientated efficiency\n", sep="")
+   if ( is.null(object$direct) ) 
+      cat("Number of firms with efficiency==1 are",
+         sum(abs(eff-1) < eps), 
+         "\nMean efficiency:", format(mean(object$eff),digit=3), "\n---" )
+   if ( object$ORIENTATION!="out" && is.null(object$direct) )  {
       minE <- min(eff)
       minE <- floor( 10 * minE ) / 10
       dec <- seq(from=minE, to=1, by=.1)
@@ -92,7 +94,7 @@ summary.Farrell <- function(object, digits=4, ...)  {
       for ( i in 1:(n-1) )
          antal[i] <- sum(dec[i]-eps <= eff & eff < dec[i+1]-eps)
       antal[n] <- sum(abs(eff-1) < eps)
-   } else {
+   } else if ( is.null(object$direct) )  {
       maxF <- max(eff)
       maxF <- ceiling( 10 * maxF ) / 10
       dec <- seq(from=1, to=maxF, by=.1)
@@ -115,12 +117,31 @@ summary.Farrell <- function(object, digits=4, ...)  {
       antal[1] <- sum(abs(eff-1) < eps)
       for ( i in 2:n )
          antal[i] <- sum(dec[i-1]-eps <= eff & eff < dec[i]-eps)
+   } else {
+      # directional er det så
+      cat("Number of firms with directional efficiency==0 are",
+         sum(abs(eff) < eps), 
+         "\nMean efficiency:", format(mean(object$eff),digit=3), "\n---" )
+      his <- hist(object$eff, breaks=7, plot=FALSE)
+      antal <- his$counts
+      antal[1] <- antal[1] - sum( abs(eff) < eps )
+      antal <- c(sum( abs(eff) < eps ), antal)
+      dec <- his$breaks
+      Estr <- "< D =<"
+      Eeff <- "D ==0   "
+      estr <- rep(NA,length(his$counts)+1)
+      estr[1] <- paste("    ",Eeff)
+      for ( i in 1:length(his$counts) )  {
+         estr[1+i] <- paste(format(dec[i],digits=2,width=3),Estr,
+                          format(dec[i+1],digits=3,width=3),"  ",sep="")
+      }
    }
    andel <- antal/sum(!is.na(eff))
 
    a <- cbind(antal , 100*andel)
    dimnames(a) <- list("  Eff range"=estr,c( "#", "%"))
    print(a,digits=c(2,3),quote=F,...)
+   print(summary(eff))
    invisible(object)
 }  ## summary.Farrell
 
@@ -174,6 +195,11 @@ peers <- function(object, NAMES=FALSE)  {
       maxj <- max(maxj,length(pe))
    }
    # Der er hoejst maxj peers for en firm
+   if ( maxj == 0 )  {
+      # Der er ingen peers overhovedet 
+      return(NA)
+   }
+
    bench <- bench[,1:maxj,drop = FALSE]
 
    # Skal der navne i matricen bench med peers i steder for blot numre
@@ -346,7 +372,7 @@ excess <- function(object, X=NULL, Y=NULL)  {
 
 
 
-eladder <- function(n, X, Y, RTS="vrs", ORIENTATION="in")  {
+eladder <- function(n, X, Y, RTS="vrs", ORIENTATION="in", DIRECT=NULL)  {
   idx <- NULL
   elad <- rep(NA, dim(X)[1])
   for ( i in 1:length(elad))  {
@@ -354,9 +380,11 @@ eladder <- function(n, X, Y, RTS="vrs", ORIENTATION="in")  {
     # if (LP) print(idx)
     # Brug FRONT.IDX for at kunne bruge de oprindelige indeks i X og Y
     e <- dea(X[n,,drop=F],Y[n,,drop=F], RTS=RTS, ORIENTATION=ORIENTATION,
-             XREF=X,YREF=Y, FRONT.IDX=idx)
-    # if (LP) print(paste("Eff =",eff(e)))
-    # if (LP) print(paste("Peers =",peers(e)))
+             XREF=X,YREF=Y, FRONT.IDX=idx, DIRECT=DIRECT)
+    # if (LP) print(paste("Eff =",eff(e)), quote=FALSE)
+    # if (LP) print(paste("Peers =",peers(e)), quote=FALSE)
+    # Er der nogen peers overhovedet ellers kan vi bare slutte nu
+    if ( is.na(peers(e)[1]) ) break
     elad[i] <- e$eff
     # Array nr. for den stoerste værdi af lambda
     p <- which(max(e$lambda)==e$lambda)

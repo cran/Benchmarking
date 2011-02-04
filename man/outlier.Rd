@@ -118,9 +118,8 @@ The function \code{ap} in the package \pkg{FEAR}.
 n <- 25
 x <- matrix(rnorm(n))
 y <- .5 + 2.5*x + 2*rnorm(25)
-tap <- outlier.ap(x,y,NDEL=3)
-print(cbind(tap$imat,tap$rmin),na.print="",digit=2)
+tap <- outlier.ap(x,y, NDEL=2)
+print(cbind(tap$imat,tap$rmin), na.print="", digit=2)
 outlier.ap.plot(tap$ratio)
-
 }
 

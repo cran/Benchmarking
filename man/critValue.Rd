@@ -1,4 +1,4 @@
-% $Id: critValue.Rd 81 2010-10-20 15:26:25Z Lars $
+% $Id: critValue.Rd 98 2010-12-14 21:23:13Z Lars $
 \name{critValue}
 \alias{critValue}
 
@@ -8,14 +8,14 @@
 in DEA models; an after method for the method boot.sw98 in the FEAR
 package} 
 
-\usage{ critValue(s,alfa=0.05) }
+\usage{ critValue(s, alpha=0.05) }
 
 \arguments{
 
 \item{s}{Vector with calculated values of the statistic for each of
 the \code{NREP} bootstraps; NREP is from \code{boot.sw98} }
 
-\item{alfa}{The size of the test}
+\item{alpha}{The size of the test}
 
 }
 

@@ -1,11 +1,11 @@
-% $Id: pigdata.Rd 80 2010-10-20 08:58:43Z Lars $
+% $Id: pigdata.Rd 101 2011-01-11 20:23:25Z Lars $
 \name{pigdata}
 \alias{pigdata}
 \docType{data}
 
 \title{ Data: Multi-output pig producers }
 
-\description{ Input and output data for 248 Danish pig producers that
+\description{ Input and output data for 248 pig producers that
 also produces crop, i.e. a multi--output data set.  }
 
 \usage{data(pigdata)}
@@ -20,8 +20,8 @@ also produces crop, i.e. a multi--output data set.  }
     \item{\code{x4}}{Input labour}
     \item{\code{x5}}{Input machinery}
     \item{\code{x6}}{Input other capital}
-    \item{\code{y2}}{Output pig}
-    \item{\code{y4}}{Output crop}
+    \item{\code{y2}}{Output crop}
+    \item{\code{y4}}{Output pig}
     \item{\code{w1}}{Price of fertilizer}
     \item{\code{w2}}{Price of feedstuf}
     \item{\code{w3}}{Price of land}

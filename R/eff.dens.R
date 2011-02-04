@@ -1,4 +1,4 @@
-# $Id: eff.dens.R 85 2010-11-06 22:18:27Z Lars $
+# $Id: eff.dens.R 98 2010-12-14 21:23:13Z Lars $
 
 # Plot af tæthed for efficiencer, bruger spejlingsprcincip
 
@@ -25,7 +25,9 @@ eff.dens <- function(eff, bw="nrd0")  {
    }
    x <- den$x
    y <- 2*den$y
-   return (list(x=x, y=y))
+   eden <- list(x=x, y=y, bw=den$bw, n=den$n, data.name=den$data.name)
+   class(eden) <- "density"
+   return (eden)
 } # eff.dens
 
 

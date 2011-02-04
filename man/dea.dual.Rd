@@ -1,8 +1,8 @@
-% $Id: dea.dual.Rd 96 2010-11-27 22:47:25Z Lars $
+% $Id: dea.dual.Rd 103 2011-02-04 09:50:57Z lo $
 \name{dea.dual}
 \alias{dea.dual}
 % \alias{dea.dual.mat}
-\encoding{UTF-8}
+% \encoding{UTF-8}
 
 \title{ Dual DEA models and assurance regions }
 

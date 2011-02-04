@@ -1,4 +1,4 @@
-# $Id: profit.R 97 2010-12-02 23:27:26Z Lars $
+# $Id: profit.R 99 2010-12-23 12:02:58Z Lars $
 
 # Calculates optimal input and output to maximize profit for given
 # input and output prices.
@@ -117,7 +117,7 @@ profit.opt <- function(XREF, YREF, W, P, RTS="vrs", TRANSPOSE=FALSE,
       }
 
    }  # for ( k in 1:K )
-   rm(lps)
+   # delete.lp(lps)
 
    rownames(lambda) <- paste("L",1:Kr,sep="")
    rownames(profit) <- rownames(W)

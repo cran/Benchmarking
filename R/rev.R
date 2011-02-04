@@ -1,4 +1,4 @@
-# $Id: rev.R 97 2010-12-02 23:27:26Z Lars $
+# $Id: rev.R 99 2010-12-23 12:02:58Z Lars $
 
 # Function to calculate maximun revenue for given input and given
 # output prices.
@@ -122,7 +122,7 @@ revenue.opt <- function(XREF, YREF, P, XOBS=NULL, RTS="vrs",
       }
 
    }  # for ( k in 1:K )
-   rm(lps)
+   # delete.lp(lps)
 
    rownames(lambda) <- paste("L",1:Kr,sep="")
    rownames(rev) <- rownames(XOBS)

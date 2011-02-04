@@ -1,4 +1,4 @@
-% $Id: eladder.Rd 96 2010-11-27 22:47:25Z Lars $
+% $Id: eladder.Rd 98 2010-12-14 21:23:13Z Lars $
 \name{eladder}
 \alias{eladder}
 \alias{eladder.plot}
@@ -9,7 +9,7 @@
 is removed sequentially one at a time }
 
 \usage{
-eladder(n, X, Y, RTS = "vrs", ORIENTATION = "in")
+eladder(n, X, Y, RTS = "vrs", ORIENTATION = "in", DIRECT = NULL)
 eladder.plot(elad, peer, TRIM = NULL)
 }
 
@@ -35,6 +35,10 @@ eladder.plot(elad, peer, TRIM = NULL)
   \item{ORIENTATION}{Input efficiency "in" (1), output efficiency
       "out" (2), and graph efficiency "graph" (3). For use with
       \code{DIRECT}, an additional option is "in-out" (0).}
+
+  \item{DIRECT}{Directional efficiency, \code{DIRECT} is either a
+      scalar, an array, or a matrix with non-negative elements. See
+      \code{\link{dea}} for a further description of this argument.}
 
   \item{elad}{The sequence of efficiencies returned from \code{eladder}. }
 
@@ -95,7 +99,7 @@ eladder.plot(el$eff[1:20], name[el$peer][1:20])
 
 # Truncate the names of the peers and put a title on top
 eladder.plot(el$eff, name[el$peer], TRIM=5)
-title("Eladder")
+title("Eladder for Tacoma")
 }
 
 \keyword{ ~kwd1 }

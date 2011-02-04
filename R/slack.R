@@ -1,4 +1,4 @@
-# $Id: slack.R 97 2010-12-02 23:27:26Z Lars $
+# $Id: slack.R 101 2011-01-11 20:23:25Z Lars $
 
 # Calculate slack at the efficient points.
 
@@ -156,6 +156,8 @@ slack <- function(X, Y, e, XREF=NULL, YREF=NULL, FRONT.IDX=NULL,
       set.rhs(lps, 1, m+n+2)
       delete.constraint(lps, m+n+1)
       rlamb <- rlamb -1
+      set.semicont(lps, 2:(1+Kr))
+      set.bounds(lps, lower=rep(1,Kr), columns=2:(1+Kr))
    } else if ( RTS == "add" )  {
       set.type(lps, (m+n+1):(m+n+Kr),"integer")
    }
@@ -301,10 +303,10 @@ summary.slack <- function(object, digits=4, ...)  {
    cat("Efficiency and slacks:\n")
 
    # if ( object$ORIENTATION != "out" ) 
-   #    a <- cbind(E=round(100*object$eff)/100,
+   #    a <- cbind(E=round(object$eff, digits=2),
    #             "sum"=object$sum, object$sx, object$sy)
    # else
-   #    a <- cbind(F=round(100*object$eff)/100,
+   #    a <- cbind(F=round(object$eff,2),
    #             "sum"=object$sum, object$sx, object$sy)
    # print(a,...)
 

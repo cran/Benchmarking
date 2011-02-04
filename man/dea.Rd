@@ -1,4 +1,4 @@
-% $Id: dea.Rd 96 2010-11-27 22:47:25Z Lars $
+% $Id: dea.Rd 103 2011-02-04 09:50:57Z lo $
 \name{dea}
 \alias{dea}
 % \alias{dea.mat}
@@ -8,12 +8,12 @@
 % \alias{eff.Farrell}
 \alias{print.Farrell}
 \alias{summary.Farrell}
-\encoding{UTF-8}
+% \encoding{UTF-8}
 
 \title{DEA efficiency}
 
-\description{Estimates a DEA frontier and calculates 
-efficiency measures}
+\description{Estimates a DEA frontier and calculates efficiency
+measures a la Farrell.}
 
 \usage{
 dea(X, Y, RTS="vrs", ORIENTATION="in", XREF=NULL, YREF=NULL,
@@ -40,7 +40,7 @@ dea(X, Y, RTS="vrs", ORIENTATION="in", XREF=NULL, YREF=NULL,
   firm. }
 
 \item{RTS}{ Text string or a number defining the underlying DEA
-technology / returns to scale assumption.
+    technology / returns to scale assumption.
 
 \tabular{rcl}{
 
@@ -58,10 +58,13 @@ disposability \cr
 4 \tab "irs" \tab Increasing returns to scale, (up-scaling, but not
 down-scaling), convexity and free disposability \cr
 
-5 \tab "add" \tab Additivity (scaling up and down, but only with
+5 \tab "irs2" \tab Increasing returns to scale (up-scaling, but not
+down-scaling), additivity, and free disposability \cr
+
+6 \tab "add" \tab Additivity (scaling up and down, but only with
 integers), and free disposability \cr
 
-6 \tab "fdh+" \tab A combination of free disposability and restricted
+7 \tab "fdh+" \tab A combination of free disposability and restricted
  or local constant return to scale \cr
 
 }
@@ -237,6 +240,15 @@ DEA, SFA, and R}; Springer 2011 }
 
 \note{ 
 
+The arguments \code{X}, \code{Y}, \code{XREF}, and \code{YREF} are
+supposed to be matrices or numerical data frames that in the functin
+will be converted to matrices. When subsetting a matrix or data frame
+to just one column then the class of the resulting object/variable is
+no longer a matrix or a data frame, but just a numeric (array,
+vector). Therefore, in this case a numeric input that is not a matrix
+nor a data frame is transformed to a 1 column matrix, and here the use
+of the argument \code{TRANSPOSE=TRUE} gives an error.
+
 The dual values are not unique for extreme points and therefore the
 calculated dual values for these firms can depend on the order of
 firms in the reference technology. The same lack of uniqueness also
@@ -283,7 +295,7 @@ Efficiency Analysis with R,} \emph{Socio-Economic Planning Sciences}
 \examples{
 x <- matrix(c(100,200,300,500,100,200,600),ncol=1)
 y <- matrix(c(75,100,300,400,25,50,400),ncol=1)
-dea.plot.frontier(x,y,txt=1:dim(x)[1])
+dea.plot.frontier(x,y,txt=TRUE)
 
 e <- dea(x,y)
 eff(e)

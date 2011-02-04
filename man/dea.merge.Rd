@@ -1,4 +1,4 @@
-% $Id: dea.merge.Rd 85 2010-11-06 22:18:27Z Lars $
+% $Id: dea.merge.Rd 101 2011-01-11 20:23:25Z Lars $
 \name{dea.merge}
 \alias{dea.merge}
 
@@ -21,12 +21,12 @@ dea.merge(X, Y, M, RTS = "vrs", ORIENTATION = "in",
   \item{Y}{ K times n matrix as in \code{dea} }
 
   \item{M}{Kg times K matrix where each row defines a merger by the
-  firms ((collums) included; matrix as returned from method
+  firms (collums) included; matrix as returned from method
   \code{\link{make.merge}}}
 
-  \item{RTS}{as in \code{dea} }
+  \item{RTS}{as in \code{\link{dea}} }
 
-  \item{ORIENTATION}{ as in \code{dea} }
+  \item{ORIENTATION}{ as in \code{\link{dea}} }
 
   \item{XREF}{ as in \code{dea} }
 
@@ -66,7 +66,7 @@ removal of individual learning, Kg vector}
 R}; chapter 9; Springer 2011.
 
 Bogetoft and Wang; \dQuote{Estimating the Potential Gains from
-Mergers}; \emph{Journal of Productivity Analysis}, 23, pp. 145-171,
+Mergers}; \emph{Journal of Productivity Ana-lysis}, 23, pp. 145-171,
 2005. }
 
 

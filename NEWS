@@ -1,4 +1,33 @@
-$Id: NEWS 97 2010-12-02 23:27:26Z Lars $
+$Id: NEWS 102 2011-01-23 18:50:21Z Lars $
+
+
+Changes to Benchmarking version 0.18
+
+ * The function eladder now also accept the argument DIRECT for for
+   use with directional efficiency; a case of a forgotten argument.
+ 
+ * The function peers now just return NA when there are no peers at all.
+
+ * A new function dea.boot to bootstrap without the FEAR
+   package. Changed the name of the wrapper boot.fear for bootstrap
+   using the FEAR package (a wrap of FEAR::boot.sw98).
+
+ * Corrected bug in dea.dual and dea for output directional efficiency.
+
+ * The basis is reset to default basis for each firm in mea efficiency
+   to avoid numerical failures (status code 5).
+
+ * In the function dea RTS=irs2 now bounds the individual lambdas to 0
+   or greater than or equal 1 and not just that their sum is greater
+   than or equal 1 as for RTS=irs.
+
+ * On request, numerical data frames are now accepted as arguments for
+   X and Y. And as a byproduct vectors or arrays are condisered to be
+   1 good (input og output) for many firms.
+
+ * Firms with missing values are removed in the function sfa.
+
+
 
 Changes to Benchmarking version 0.17
 
@@ -7,7 +36,7 @@ Changes to Benchmarking version 0.17
    return to scale.
 
  * Changed internal use of matrices such that the corresponds to
-   stasndard R use, and, therefore, are not transposed in the start of
+   standard R use, and, therefore, are not transposed in the start of
    many functions. For normal use this speeds up the functions
    marginally, but the internal structure of the functions are nicer.
 

@@ -1,4 +1,4 @@
-# $Id: dea.dual.R 96 2010-11-27 22:47:25Z Lars $
+# $Id: dea.dual.R 99 2010-12-23 12:02:58Z Lars $
 
 # In the calculation in the method input/output matrices X and Y are
 # of the order good x firms.  Ie. X, Y etc must be transformed as
@@ -294,7 +294,7 @@ if ( is.null(AD) )  {
              if ( ORIENTATION=="in" )
                 set.row(lps, 1, -DIRECT[k,], 1:m)
              else if ( ORIENTATION=="out" )
-                set.row(lps, 1, -DIRECT[k,], 1:n)
+                set.row(lps, 1, -DIRECT[k,], (m+1):(m+n))
              else if ( ORIENTATION=="in-out" )
                 set.row(lps, 1, -DIRECT[k,])
           }
@@ -383,7 +383,7 @@ if ( is.null(AD) )  {
    eff[abs(eff-1) < eps] <- 1
 
    # Slut med at bruge lps
-   rm(lps)
+   # delete.lp(lps)
 
 
    colnames(u) <- paste("u",1:m,sep="")

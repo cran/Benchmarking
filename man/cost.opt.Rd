@@ -1,4 +1,4 @@
-% $Id: cost.opt.Rd 97 2010-12-02 23:27:26Z Lars $
+% $Id: cost.opt.Rd 101 2011-01-11 20:23:25Z Lars $
 \name{cost.opt}
 \alias{cost.opt}
 \alias{print.cost.opt}
@@ -98,18 +98,20 @@ profit.opt(XREF, YREF, W, P, RTS = "vrs",
 
 
 
-\details{ The optimization is done by the LP method in the package
- \pkg{lpSolveAPI}.  
+\details{ The LP optimization problem is formulated in Bogetoft and
+  Otto (2011, pp 35 and 102) and is solved by the LP method in the
+  package \pkg{lpSolveAPI}.
 
-The methods \code{print} and \code{summary} is working for
- \code{cost.opt}, \code{revenue.opt}, and \code{profit.opt}
+  The methods \code{print} and \code{summary} are working for
+  \code{cost.opt}, \code{revenue.opt}, and \code{profit.opt}
 
-} 
+}
 
 
 
-\value{ The values returned is the optimal input, and/or optimal
-        output. When saved in an object the following is available:
+\value{ The values returned are the optimal input, and/or optimal
+        output. When saved in an object the following components are
+        available:
 
 \item{xopt}{The optimal input, returned as a matrix by
      \code{cost.opt} and \code{profit.cost}.}
@@ -125,7 +127,7 @@ The methods \code{print} and \code{summary} is working for
 
 \item{lambda}{The peer weights that determines the technology, a
     matrix. Each row is the lambdas for the firm corresponding to that
-    row; for the vrs technology the rows sum to 1. A columns shows for
+    row; for the vrs technology the rows sum to 1. A column shows for
     a given firm how other firms are compared to this firm; i.e. peers
     are firms with a positive element in their columns.}
 

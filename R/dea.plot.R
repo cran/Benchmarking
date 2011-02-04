@@ -1,4 +1,4 @@
-# $Id: dea.plot.R 93 2010-11-21 15:29:03Z Lars $
+# $Id: dea.plot.R 101 2011-01-11 20:23:25Z Lars $
 "dea.plot" <-
 function(x, y, RTS="vrs", ORIENTATION="in-out", txt=NULL, add=FALSE, 
             wx=NULL, wy=NULL, TRANSPOSE = FALSE, fex=1, GRID=FALSE,
@@ -249,7 +249,7 @@ function(x, y, RTS="vrs", ORIENTATION="in-out", txt=NULL, add=FALSE,
          }
       }
       if ( RTS == "irs2" )  {
-         # Lines for increasing returns to scale, irs
+         # Lines for increasing returns to scale, irs2
          # Plot first vertical part
          lines(c(min(x),min(x)), c(0,max(y[x==min(x)],na.rm=T)),...)
 

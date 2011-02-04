@@ -1,4 +1,4 @@
-% $Id: dea.plot.Rd 96 2010-11-27 22:47:25Z Lars $
+% $Id: dea.plot.Rd 102 2011-01-23 18:50:21Z Lars $
 \name{dea.plot}
 \alias{dea.plot}
 \alias{dea.plot.frontier}
@@ -30,9 +30,14 @@ dea.plot.transform(y1, y2, RTS="vrs",...)
 
 \arguments{
 
-  \item{x}{The good illustrated on the first axis}
+  \item{x}{The good illustrated on the first axis. If there are more
+      than 1 input then inputs are just summed or, if \code{wx} is
+      present, a weighted sum of inputs is used.}
 
-  \item{y}{The good illustrated on the second axis}
+  \item{y}{The good illustrated on the second axis. If there are more
+      than 1 output then outputs are just summed or, if \code{wy} is
+      present, a weighted sum of outputs is used.}
+
   \item{x1, y1}{The good illustrated on the first axis}
   \item{x2, y2}{The good illustrated on the  second axis}
 
@@ -96,7 +101,8 @@ dea.plot.transform(y1, y2, RTS="vrs",...)
 \details{ The method \code{dea.plot} is the general plotting
    method. The the 3 others are specialized versions for frontiers (1
    input and 1 output), isoquant curves (2 inputs for given outputs),
-   and transformation curves (2 outputs for given inputs).  
+   and transformation curves (2 outputs for given inputs) obtained by
+   using the argument \code{ORIENTATION}.
 
    The crs factor in RTS="fdh+" that sets the lower and upper bound
    can be changed by the argument \code{param} that will set the lower
@@ -105,6 +111,12 @@ dea.plot.transform(y1, y2, RTS="vrs",...)
    strictly less than 1. A value of 0 corresponds to RTS="fdh". The
    FDH+ technology set is described in Bogetoft and Otto (2011) pages
    72--73.}
+
+\note{If there are more than 1 good for the arguments \code{x} and
+    \code{y} then the goods are just summed or, if \code{wx} or
+    \code{wy} are present, weighted sum of goods are used. In this
+    case the use of the command \code{identify} must be calles as
+    \code{dea.plot(rowSums(x),rowSums(y))}. }
 
 
 \value{No return, uses the original graphing system.  }

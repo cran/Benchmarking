@@ -1,12 +1,13 @@
-# $Id: sfa.R 84 2010-11-04 12:26:37Z Lars $
+# $Id: sfa.R 102 2011-01-23 18:50:21Z Lars $
 # \encoding{latin1}
 
 
 sfa <- function(x, y, beta0=NULL, lambda0=1, resfun=ebeta, 
                 TRANSPOSE = FALSE, DEBUG=FALSE, 
-                control=list(maxeval=1000, stepmax=.1), hessian=2)  
+                control=list(maxeval=1000, stepmax=1), hessian=2)  
 {
    require(ucminf)
+
 
 # Funktion: beregner minus loglikelihood
 loglik <- function(parm) {
@@ -27,15 +28,32 @@ loglik <- function(parm) {
    return(l)
 } # loglik
 
+   if ( class(x) == "data.frame" )  {
+      x <- as.matrix(x)
+   }
+
    if ( !is.matrix(x) )  {
       print("Input 'x' must be a matrix",quote=F)
       return(print("Function 'sfa' stops",quote=F))
    }
+   if ( is.matrix(y) && ncol(y) > 1 )  {
+      stop("Only one column (one variale) allowed for argument y in sfa")
+   }
+   # Fjern observationer hvor der er NA'er
+   cpc <- complete.cases(cbind(x,y))
+   if ( sum(!cpc) > 0 )  {
+      x <- x[cpc,,drop=FALSE]
+      y <- y[cpc]
+   }
+
    if ( TRANSPOSE ) {
       x <- t(x)
       y <- t(y)
    }
    K <- dim(x)[2] + 1
+   if ( nrow(x) != length(y) )  {
+      stop("Number of observations on x and y differ")
+   }
 
 if ( missing(beta0) )  {
    # 1. OLS estimate
@@ -56,6 +74,7 @@ if ( missing(beta0) )  {
    o <- ucminf(parm, loglik, control=control, hessian=hessian)
    if (DEBUG) {
       print("ucminf er slut")
+      print(paste("Antal funktionskald",dist$info["neval"]))
       print(o$info)
       print(o$hessian)
       print(o$invhessian)
@@ -69,7 +88,9 @@ if ( missing(beta0) )  {
       warning("Converged, $convergence = ", o$convergence,"\n",o$message)
    }
    if (o$par[K+1] < 0)  {
-      warning("lambda negativ in first try");
+      warning("lambda is negative.\n",
+         "  This could indicate that there is no inefficiency,\n",
+         "  or that the model is misspecified." )
    }
    sf <- o
    class(sf) <- "sfa"
@@ -87,7 +108,7 @@ if ( missing(beta0) )  {
    sf$N <- dim(x)[1] 
    sf$df <- dim(x)[2] +3
    sf$loglik <- -o$val
-   if ( hessian == 2 ) 
+   if ( hessian == 2 || hessian == 3 ) 
       sf$vcov <- o$invhessian
    else
       sf$vcov <- genInv(o$hessian)
@@ -189,10 +210,6 @@ residuals.sfa <- function(object, ...)  {
    return(val)
 } ## residuals.sfa
 
-
-fitted.sfa <- function(object, ...)  {
-   return(object$fitted.values)
-}
 
 vcov.sfa <- function(object, ...)  {
    return(object$vcov)

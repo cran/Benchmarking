@@ -1,8 +1,8 @@
-# $Id: NAMESPACE 96 2010-11-27 22:47:25Z Lars $
+# $Id: NAMESPACE 101 2011-01-11 20:23:25Z Lars $
 export(dea, sdea,   # efficiency, eff,
 excess, eladder, eladder.plot,
 dea.dual,
-dea.direct, dea.boot,
+dea.direct, dea.boot, boot.fear, 
 #  dea.mat, dea.dual.mat,
 dea.add,
 # print.Farrell, summary.Farrell,

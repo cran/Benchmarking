@@ -1,36 +1,30 @@
-# $Id: minDirection.R 93 2010-11-21 15:29:03Z Lars $
+# $Id: minDirection.R 99 2010-12-23 12:02:58Z Lars $
 
 # Function to calculate the min step for each input or max step for
 # each output to the frontier, retninger i MEA. A series of LP problems
 
-minDirection <- function(lps, Z, m, n, ORIENTATION, LP=FALSE)  {
-   md <- length(Z)
-   if ( ORIENTATION=="in" && md != m )
-      stop("Input dimensions wrong in minDirection, internal bug")
-   if ( ORIENTATION=="out" && md != n )
-      stop("Output dimensions wrong in minDirection, internal bug")
+minDirection <- function(lps, m, n, ORIENTATION, LP=FALSE)  {
+   if ( ORIENTATION=="in" )  md <- m
+   if ( ORIENTATION=="out" )  md <- n
+   if ( ORIENTATION=="in-out" )  md <- m+n
 
-   if (LP) print(lps)
    # Saet taeller for fooerste vare
    mn0 <- switch(ORIENTATION, "in"=0, "out"=m, "in-out"=0)
-   zSign <- 1 - 2*(ORIENTATION=="in")
   
-   lpcontr <- lp.control(lps)
-   eps <- sqrt(lpcontr$epsilon["epsint"])
-   if (LP) print(paste("eps =",eps))
    Direct <- rep(NA,md)
    for ( h in 1:md )  {
       if (LP) print(paste(" -->  Vare",h),quote=FALSE)
-      if ( h>1) set.rhs(lps, zSign*Z[h-1], mn0+h-1)       
-      set.rhs(lps, 0, mn0+h)       
-      set.column(lps, 1, c(1,1),c(0,mn0+h))
+      set.column(lps, 1, c(1,-1), c(0,mn0+h))
       if (LP) print(lps)
-      solve(lps)
+      status <- solve(lps)
+      if (LP) print(paste("Status =",status),quote=FALSE)
       if (LP) print(get.objective(lps))
       Direct[h] <- get.objective(lps)
    }
-   Direct <- Z - Direct
-   Direct[ abs(Direct) < eps ] <- 0
+   lpcontr <- lp.control(lps)
+   eps <- sqrt(lpcontr$epsilon["epsint"])
+   if (LP) print(paste("eps =",eps))
+   ## Direct[ abs(Direct) < eps ] <- 0
    if (LP) { print("Min direction:"); print(Direct) }
    return(Direct)
 }
