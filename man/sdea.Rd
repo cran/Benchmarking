@@ -11,7 +11,7 @@
 
 
 \usage{
-sdea(X, Y, RTS = "vrs", ORIENTATION = "in", DIRECT = NULL, 
+sdea(X, Y, RTS = "vrs", ORIENTATION = "in", DIRECT = NULL, param = NULL,
      TRANSPOSE = FALSE, LP = FALSE)
 }
 
@@ -29,29 +29,33 @@ sdea(X, Y, RTS = "vrs", ORIENTATION = "in", DIRECT = NULL,
   firm. }
 
   \item{RTS}{ Text string or a number defining the underlying DEA
-      technology / returns to scale assumption.
+      technology / returns to scale assumption; the same values as for
+      \code{\link{dea}}.
 
-\tabular{rcl}{
+\tabular{rll}{
 
-0 \tab "fdh" \tab Free disposability hull, no convexity assumption \cr
+0 \tab fdh \tab Free disposability hull, no convexity assumption \cr
 
-1 \tab "vrs" \tab Variable returns to scale, convexity and free
+1 \tab vrs \tab Variable returns to scale, convexity and free
 disposability \cr
 
-2 \tab "drs" \tab Decreasing returns to scale, convexity, down-scaling
+2 \tab drs \tab Decreasing returns to scale, convexity, down-scaling
 and free disposability \cr
 
-3 \tab "crs" \tab Constant returns to scale, convexity and free
+3 \tab crs \tab Constant returns to scale, convexity and free
 disposability \cr
 
-4 \tab "irs" \tab Increasing returns to scale, (up-scaling, but not
+4 \tab irs \tab Increasing returns to scale, (up-scaling, but not
 down-scaling), convexity and free disposability \cr
 
-5 \tab "add" \tab Additivity (scaling up and down, but only with
+5 \tab irs2 \tab Increasing returns to scale (up-scaling, but not
+down-scaling), additivity, and free disposability \cr
+
+6 \tab add \tab Additivity (scaling up and down, but only with
 integers), and free disposability \cr
 
-6 \tab "fdh+" \tab A combination of free disposability and restricted
- or local constant return to scale \cr
+7 \tab fdh+ \tab A combination of free disposability and restricted
+ or local constant return to scale
 
 }
 
@@ -82,6 +86,9 @@ integers), and free disposability \cr
       \code{DIRECTION="graph"}.
 
  }
+
+  \item{param}{Argument is at present only used when
+      \code{RTS="fdh+"}, see \code{\link{dea}} for a description.}
 
   \item{TRANSPOSE}{See the description in \code{\link{dea}}. }
 

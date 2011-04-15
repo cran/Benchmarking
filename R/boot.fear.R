@@ -1,4 +1,4 @@
-# $Id: boot.fear.R 101 2011-01-11 20:23:25Z Lars $
+# $Id: boot.fear.R 115 2011-04-15 08:59:29Z Lars $
 
 # Bootstrap DEA functions, a wrapper for FEAR::boot.sw98
 
@@ -58,8 +58,8 @@ boot.fear <- function(X,Y, NREP=200, EFF=NULL, RTS="vrs", ORIENTATION="in",
                     OUTPUT.FARREL=farrell) , 
       warning = function(w) print(w),
       error = function(e) {
-                print(e)
-                stop("boot.fear aborted:  Could be that FEAR not installed")
+         print(e)
+         stop("boot.fear aborted:  Could be that FEAR is not installed")
       } # ,
       # finaly=print("FEAR::boot.sw98 finished with bootstrap",quote=FALSE)
    )

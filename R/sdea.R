@@ -1,11 +1,22 @@
-# $Id: sdea.R 95 2010-11-22 22:39:59Z Lars $
+# $Id: sdea.R 110 2011-03-31 13:24:18Z Lars $
 
 
 # Calculates super efficiency
-sdea <- function(X,Y, RTS="vrs", ORIENTATION="in", DIRECT=NULL,
+sdea <- function(X,Y, RTS="vrs", ORIENTATION="in", DIRECT=NULL, param=NULL,
                  TRANSPOSE=FALSE, LP=FALSE)
 {
    # Input is as for the method eff
+
+   if ( class(X)=="data.frame" && data.kontrol(X) || is.numeric(X) ) 
+      { X <- as.matrix(X) }
+   if ( class(Y)=="data.frame" && data.kontrol(Y) || is.numeric(Y) ) 
+      { Y <- as.matrix(Y) }
+
+   if ( class(X)!="matrix" || !is.numeric(X) )
+      stop("X is not a numeric matrix (or data.frame)")
+   if ( class(Y)!="matrix" || !is.numeric(X) )
+      stop("Y is not a numeric matrix (or data.frame)")
+
    # Antal firmaer i data er K
    if ( TRANSPOSE )  {
       X <- t(X)
@@ -26,7 +37,7 @@ sdea <- function(X,Y, RTS="vrs", ORIENTATION="in", DIRECT=NULL,
    if ( !is.null(dimnames(X)[[1]]) )  {
       names(supereff) <- dimnames(X)[[1]]
    }
-   rts <- c("fdh","vrs","drs","crs","irs","irs","add","fdh+")
+   rts <- c("fdh","vrs","drs","crs","irs","irs","add","fdh+","fdh++","fdh0")
    if ( missing(RTS) ) RTS <- "vrs" 
    if ( is.real(RTS) )  {
       RTS_ <- rts[1+RTS] # the first fdh is number 0
@@ -69,7 +80,7 @@ sdea <- function(X,Y, RTS="vrs", ORIENTATION="in", DIRECT=NULL,
       if ( directMatrix ) direct <- DIRECT[i,]
       e <- dea(X[i,,drop=FALSE], Y[i,,drop=FALSE],
          RTS,ORIENTATION, XREF=X[-i,,drop=FALSE], YREF=Y[-i,,drop=FALSE],
-         TRANSPOSE=FALSE, DIRECT=direct, LP=LP)
+         TRANSPOSE=FALSE, DIRECT=direct, param=param, LP=LP)
       supereff[i] <- e$eff
       # print(dim(lambda))
       if (LP) print(dim(e$lambda))

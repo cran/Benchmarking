@@ -19,7 +19,7 @@ Find peer firms and units
 
 \usage{
   peers(object, NAMES = FALSE)
-  get.number.peers(object)
+  get.number.peers(object, NAMES = FALSE)
   get.which.peers(object, N = 1:length(object$eff))
   % peerslambda(object)
 }
@@ -28,10 +28,10 @@ Find peer firms and units
 \arguments{
 
   \item{object}{An object of class Farrell (returned by the function
-      \code{\link{dea}}), \code{link{dea.direct}} et al.}
+      \code{\link{dea}}), \code{\link{dea.direct}} et al.}
 
   \item{NAMES}{If true then names for the peers are returned if names
-      are available otherwise the unit numbers are used }
+      are available otherwise the unit index numbers are used }
 
   \item{N}{The peer(s) for which  }
 

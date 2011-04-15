@@ -1,4 +1,4 @@
-% $Id: dea.direct.Rd 101 2011-01-11 20:23:25Z Lars $
+% $Id: dea.direct.Rd 115 2011-04-15 08:59:29Z Lars $
 \name{dea.direct}
 \alias{dea.direct}
 
@@ -12,7 +12,7 @@
 \usage{
 dea.direct(X, Y, DIRECT, RTS = "vrs", ORIENTATION = "in", 
           XREF = NULL, YREF = NULL, FRONT.IDX = NULL, 
-          SLACK = FALSE, TRANSPOSE = FALSE)
+          SLACK = FALSE, param=NULL, TRANSPOSE = FALSE)
 }
 
 
@@ -49,13 +49,15 @@ dea.direct(X, Y, DIRECT, RTS = "vrs", ORIENTATION = "in",
   \item{RTS}{Text string or a number defining the underlying DEA
       technology / returns to scale assumption.
 
-\tabular{rcl}{
-0 \tab "fdh" \tab Free disposability hull, no convexity assumption \cr
-1 \tab "vrs" \tab Variable returns to scale, convexity and free disposability \cr
-2 \tab "drs" \tab Decreasing returns to scale (down-scaling, but not up-scaling), convexity, and free disposability \cr
-3 \tab "crs" \tab Constant returns to scale, convexity and free disposability \cr
-4 \tab "irs" \tab Increasing returns to scale (up-scaling, but not down-scaling), convexity, and free disposability \cr
-6 \tab "add" \tab Additivity (scaling up and down, but only with integers), and free disposability
+\tabular{rll}{
+0 \tab fdh \tab Free disposability hull, no convexity assumption \cr
+1 \tab vrs \tab Variable returns to scale, convexity and free disposability \cr
+2 \tab drs \tab Decreasing returns to scale (down-scaling, but not up-scaling), convexity, and free disposability \cr
+3 \tab crs \tab Constant returns to scale, convexity and free disposability \cr
+4 \tab irs \tab Increasing returns to scale (up-scaling, but not down-scaling), convexity, and free disposability \cr
+6 \tab add \tab Additivity (scaling up and down, but only with integers), and free disposability\cr
+7 \tab fdh+ \tab A combination of free disposability and restricted
+ or local constant return to scale
 }
 
 }
@@ -73,6 +75,12 @@ dea.direct(X, Y, DIRECT, RTS = "vrs", ORIENTATION = "in",
   \item{FRONT.IDX}{Index for firms determining the technology. }
 
   \item{SLACK}{See \code{\link{dea}} and \code{\link{slack}}. }
+
+  \item{param}{Possible parameters. At the moment only used for
+    RTS="fdh+" to set low and high values for restrictions on lambda;
+    see the section details and examples in \code{\link{dea}} for its
+    use. Future versions might also use \code{param} for other
+    purposes.}
 
   \item{TRANSPOSE}{ see \code{\link{dea}}}
 

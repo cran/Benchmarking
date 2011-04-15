@@ -1,4 +1,4 @@
-% $Id: pigdata.Rd 101 2011-01-11 20:23:25Z Lars $
+% $Id: pigdata.Rd 104 2011-02-06 11:56:03Z Lars $
 \name{pigdata}
 \alias{pigdata}
 \docType{data}

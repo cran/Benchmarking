@@ -1,4 +1,4 @@
-# $Id: slack.R 101 2011-01-11 20:23:25Z Lars $
+# $Id: slack.R 113 2011-04-04 22:21:05Z Lars $
 
 # Calculate slack at the efficient points.
 
@@ -13,6 +13,7 @@ slack <- function(X, Y, e, XREF=NULL, YREF=NULL, FRONT.IDX=NULL,
    }
 
    RTS <- e$RTS
+   if ( RTS == "fdh0" ) RTS <- "fdh"
    if (LP) print(paste("slack:  RTS =",RTS),quote=F)
    if ( missing(XREF) || is.null(XREF) )  {
       XREF <- X
@@ -75,7 +76,7 @@ slack <- function(X, Y, e, XREF=NULL, YREF=NULL, FRONT.IDX=NULL,
 
    if ( RTS != "crs" && RTS != "add" )  {
       rlamb <- 2
-   } else {
+   } else { 
       rlamb <- 0
    }
 
@@ -98,8 +99,6 @@ slack <- function(X, Y, e, XREF=NULL, YREF=NULL, FRONT.IDX=NULL,
         stop(paste("Unknown orientation in slack:", e$ORIENTATION))
       }
    } else {
-      warning("Slack for directional efficiency not yet finished")
-
       mmd <- switch(e$ORIENTATION, "in"=m, "out"=n, "in-out"=m+n) 
       ob <- matrix(e$objval,nrow=K, ncol=mmd)
       if ( class(e$direct)=="matrix" && dim(e$direct)[1] > 1 )  {
@@ -116,35 +115,38 @@ slack <- function(X, Y, e, XREF=NULL, YREF=NULL, FRONT.IDX=NULL,
          dirRhs <- cbind(X -ob[,1:m,drop=FALSE]*dir[,1:m,drop=FALSE], 
            -Y -ob[,(m+1):(m+n),drop=FALSE]*dir[,(m+1):(m+n),drop=FALSE])
       } else {
-         warning("Illegal ORIENTATION for argument DIRECT in slacks") 
+         warning("Illegal ORIENTATION for argument DIRECT in slacks",
+                 immediate. = TRUE) 
       }
 
    }  # if ( is.null(e$direct) )
 
-      # Initialiser LP objekt
-      lps <- make.lp(m+n +rlamb, m+n+Kr)
-      name.lp(lps, paste("DEA--slack",RTS,",",e$ORIENTATION,"orientated"))
+
+   # Initialiser LP objekt
+   lps <- make.lp(m+n +rlamb, m+n+Kr)
+   name.lp(lps, 
+          paste("DEA-slack",RTS,",",e$ORIENTATION,"orientated",sep="-"))
    
-      # saet raekker i matrix med restriktioner
-      for ( h in 1:m )
+   # saet raekker i matrix med restriktioner
+   for ( h in 1:m )
        set.row(lps,h, XREF[,h], (m+n+1):(m+n+Kr) )
-      for ( h in 1:n)
+   for ( h in 1:n)
        set.row(lps,m+h, -YREF[,h], (m+n+1):(m+n+Kr) )
-      for ( h in 1:(m+n) )
+   for ( h in 1:(m+n) )
        set.mat(lps,h,h,1)
    # restriktioner paa lambda
-      if ( RTS != "crs" && RTS != "add" )  {
+   if ( RTS != "crs" && RTS != "add" )  {
       set.row(lps, m+n+1, c(rep(0,m+n),rep(-1,Kr)))
       set.row(lps, m+n+2, c(rep(0,m+n),rep( 1,Kr)))
-      }
-   set.constr.type(lps, c(rep("=",m+n), rep(">=",rlamb)))
+   }
+   set.constr.type(lps, c(rep("=",m+n), rep("<=",rlamb)))
    set.objfn(lps, rep(1, m+n), 1:(m+n))
    lp.control(lps, sense="max")
 
    if ( RTS == "fdh" ) {
       set.type(lps,(m+n+1):(m+n+Kr),"binary")
-      set.rhs(lps,-1, m+n+1)
-      delete.constraint(lps, m+n+2)
+      delete.constraint(lps, m+n+1)
+      set.rhs(lps,1, m+n+1)
       rlamb <- rlamb -1
    } else if ( RTS == "vrs" )  {
       set.rhs(lps, c(-1,1), (m+n+1):(m+n+2))
@@ -152,14 +154,27 @@ slack <- function(X, Y, e, XREF=NULL, YREF=NULL, FRONT.IDX=NULL,
       set.rhs(lps, -1, m+n+1)
       delete.constraint(lps, m+n+2)
       rlamb <- rlamb -1
+      set.constr.type(lps, ">=", m+n+1)
    } else if ( RTS == "irs" )  {
       set.rhs(lps, 1, m+n+2)
       delete.constraint(lps, m+n+1)
       rlamb <- rlamb -1
+      set.constr.type(lps, ">=", m+n+1)
+   } else if ( RTS == "irs2" )  {
+      set.rhs(lps, 1, m+n+2)
+      delete.constraint(lps, m+n+1)
+      rlamb <- rlamb -1
+      set.constr.type(lps, ">=", m+n+1)
       set.semicont(lps, 2:(1+Kr))
-      set.bounds(lps, lower=rep(1,Kr), columns=2:(1+Kr))
+      set.bounds(lps, lower=rep(1,Kr), columns=(m+n+1):(m+n+Kr))
    } else if ( RTS == "add" )  {
       set.type(lps, (m+n+1):(m+n+Kr),"integer")
+   } else if ( RTS == "fdh+" )  {
+      param <- e$param
+      low <- param["low"]
+      high <- param["high"]
+      set.rhs(lps, c(-low,high), (m+n+1):(m+n+2))
+      add.SOS(lps,"lambda", 1,1, (m+n+1):(m+n+Kr), rep(1, Kr))
    }
  
    if (LP) {
@@ -204,12 +219,21 @@ slack <- function(X, Y, e, XREF=NULL, YREF=NULL, FRONT.IDX=NULL,
                 type="mps",use.names=TRUE)
       }
 
+      set.basis(lps, default=TRUE)
       status <- solve(lps)
       if ( status != 0 ) {
-	      print(paste("Error in solving for firm",k,":  Status =",status), 
-           quote=F)
-         objval[k] <- NA
-         sol <- NA
+         if ( status == 2 || status == 3 ) {
+	        # print(paste("Firm",k,"not in the technology set"), quote=F)
+           # print(paste("Status =",status))
+           objval[k] <- 0
+           sol <- rep(0,m+n+Kr)
+           sol[m+n+k] <- 1
+         } else {
+	        print(paste("Error in solving for firm",k,":  Status =",status), 
+              quote=F)
+           objval[k] <- NA
+           sol <- NA
+         }
       }  else {
          objval[k] <- get.objective(lps)
          sol <- get.variables(lps)
@@ -218,7 +242,7 @@ slack <- function(X, Y, e, XREF=NULL, YREF=NULL, FRONT.IDX=NULL,
       sy[k,] <- sol[(m+1):(m+n)]
       lambda[k,] <- sol[(m+n+1):(m+n+Kr)]
 
-      if (FALSE && LP && k==1)  {
+      if (LP)  {
          print(paste("Obj.value =",get.objective(lps)))
          cat(paste("Solutions for",k,": "))
          print(sol)

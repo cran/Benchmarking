@@ -1,4 +1,4 @@
-# $Id: rev.R 99 2010-12-23 12:02:58Z Lars $
+# $Id: rev.R 114 2011-04-10 20:55:50Z Lars $
 
 # Function to calculate maximun revenue for given input and given
 # output prices.
@@ -9,7 +9,7 @@
 # The function cannot be called rev.opt because then print.rev.opt is
 # confused with the method rev from base R.
 
-revenue.opt <- function(XREF, YREF, P, XOBS=NULL, RTS="vrs", 
+revenue.opt <- function(XREF, YREF, P, XOBS=NULL, RTS="vrs", param=NULL,
             TRANSPOSE=FALSE, LP=FALSE, LPK=NULL)  {
    if ( missing(XOBS) )  {
    	XOBS <- XREF
@@ -34,7 +34,7 @@ revenue.opt <- function(XREF, YREF, P, XOBS=NULL, RTS="vrs",
    if ( m != dim(XOBS)[1] )
       stop("Number of outputs in XREF and XOBS differ")
 
-   rts <- c("fdh","vrs","drs","crs","irs","irs","add")
+   rts <- c("fdh","vrs","drs","crs","irs","irs","add","fdh+")
    if ( missing(RTS) ) RTS <- "vrs" 
    if ( is.real(RTS) )  {
       if (LP) cat(paste("Number '",RTS,"'",sep=""),quote=F)
@@ -71,7 +71,7 @@ revenue.opt <- function(XREF, YREF, P, XOBS=NULL, RTS="vrs",
    }
 
    if ( RTS == "fdh" ) {
-      set.type(lps,2:(1+K),"binary")
+      set.type(lps,(n+1):(n+Kr),"binary")
       set.rhs(lps,1, m+n+1)
       delete.constraint(lps, m+n+2)
       rlamb <- rlamb -1
@@ -86,7 +86,22 @@ revenue.opt <- function(XREF, YREF, P, XOBS=NULL, RTS="vrs",
       delete.constraint(lps, m+n+1)
       rlamb <- rlamb -1
    } else if ( RTS == "add" )  {
-      set.type(lps,2:(1+Kr),"integer")
+      set.type(lps,(n+1):(n+Kr),"integer")
+   } else if ( RTS == "fdh+" )  {
+      # Saet parametrene low og high
+      if ( is.null(param) )  {
+         param <- .15
+      }
+      if ( length(param) == 1 )  {
+         low <- 1-param
+         high <- 1+param
+      } else {
+         low <- param[1]
+         high <- param[2]
+      }
+      param <- c(low=low, high=high)
+      set.rhs(lps, c(high, -low), (m+n+1):(m+n+2))
+      add.SOS(lps,"lambda", 1,1, (n+1):(n+Kr), rep(1, Kr))
    }
 
    set.objfn(lps, c(P[,1],rep(0,Kr)))
@@ -98,6 +113,7 @@ revenue.opt <- function(XREF, YREF, P, XOBS=NULL, RTS="vrs",
    rev <- rep(NA,K)
 
    for ( k in 1:K )  {
+      if (LP) print(paste("===> firm",k),quote=FALSE)
       if ( dim(P)[2] != 1 && k > 1 ) { 
          set.objfn(lps, c(P[,k],rep(0,K)))
 	   }
@@ -105,10 +121,11 @@ revenue.opt <- function(XREF, YREF, P, XOBS=NULL, RTS="vrs",
 
       if (LP) print(lps)
 
+      set.basis(lps, default=TRUE)
       status <- solve(lps)
       if ( status != 0 ) {
-	      print(paste("Error in solving for firm",k,":  Status =",status), 
-           quote=F)
+	      print(paste("Error in solving for firm",k,":  Status =",status),
+               quote=FALSE)
       }  else {
          rev[k] <- get.objective(lps)
          sol <- get.variables(lps)
@@ -123,9 +140,9 @@ revenue.opt <- function(XREF, YREF, P, XOBS=NULL, RTS="vrs",
 
    }  # for ( k in 1:K )
    # delete.lp(lps)
-
+   
    rownames(lambda) <- paste("L",1:Kr,sep="")
-   rownames(rev) <- rownames(XOBS)
+   names(rev) <- colnames(XOBS)
 
    if (!TRANSPOSE) {
       yopt <- t(yopt)

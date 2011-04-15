@@ -1,4 +1,4 @@
-% $Id: eladder.Rd 98 2010-12-14 21:23:13Z Lars $
+% $Id: eladder.Rd 115 2011-04-15 08:59:29Z Lars $
 \name{eladder}
 \alias{eladder}
 \alias{eladder.plot}
@@ -9,7 +9,8 @@
 is removed sequentially one at a time }
 
 \usage{
-eladder(n, X, Y, RTS = "vrs", ORIENTATION = "in", DIRECT = NULL)
+eladder(n, X, Y, RTS = "vrs", ORIENTATION = "in", 
+        XREF=NULL, YREF=NULL, DIRECT = NULL)
 eladder.plot(elad, peer, TRIM = NULL)
 }
 
@@ -30,11 +31,17 @@ eladder.plot(elad, peer, TRIM = NULL)
 
   \item{RTS}{ Text string or a number defining the underlying DEA
       technology / returns to scale assumption, se the possible values
-      for \link{dea}. }
+      for \code{\link{dea}}. }
 
   \item{ORIENTATION}{Input efficiency "in" (1), output efficiency
       "out" (2), and graph efficiency "graph" (3). For use with
       \code{DIRECT}, an additional option is "in-out" (0).}
+
+  \item{XREF}{Inputs of the firms determining the technology, defaults
+      to \code{X}}
+
+  \item{YREF}{Outputs of the firms determining the technology, defaults
+      to \code{Y}}
 
   \item{DIRECT}{Directional efficiency, \code{DIRECT} is either a
       scalar, an array, or a matrix with non-negative elements. See
@@ -83,22 +90,21 @@ eladder.plot(elad, peer, TRIM = NULL)
 
 \examples{
 data(charnes1981)
-attach(charnes1981)
-x <- cbind(x1,x2,x3,x4,x5)
-y <- cbind(y1,y2,y3)
+x <- with(charnes1981, cbind(x1,x2,x3,x4,x5))
+y <- with(charnes1981, cbind(y1,y2,y3))
 
 # Choose the firm for analysis, we choose 'Tacoma'
-n <- which(name=="Tacoma")[1]
+n <- which(charnes1981$name=="Tacoma")[1]
 
 el <- eladder(n, x, y, RTS="crs")
 eladder.plot(el$eff, el$peer)
-eladder.plot(el$eff, name[el$peer])
+eladder.plot(el$eff, charnes1981$name[el$peer])
 
 # Restrict to 20 most influential peers for 'Tacoma'
-eladder.plot(el$eff[1:20], name[el$peer][1:20])
+eladder.plot(el$eff[1:20], charnes1981$name[el$peer][1:20])
 
 # Truncate the names of the peers and put a title on top
-eladder.plot(el$eff, name[el$peer], TRIM=5)
+eladder.plot(el$eff, charnes1981$name[el$peer], TRIM=5)
 title("Eladder for Tacoma")
 }
 

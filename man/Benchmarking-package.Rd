@@ -1,4 +1,4 @@
-% $Id: Benchmarking-package.Rd 101 2011-01-11 20:23:25Z Lars $
+% $Id: Benchmarking-package.Rd 115 2011-04-15 08:59:29Z Lars $
 \name{Benchmarking-package}
 \alias{Benchmarking-package}
 \alias{Benchmarking}
@@ -38,14 +38,12 @@ can of course also be used as a stand-alone package.
 \tabular{ll}{
 Package: \tab Benchmarking\cr
 Type: \tab Package\cr
-Version: \tab 0.18 ($Revision: 101 $)\cr
-Date: \tab $Date: 2011-01-11 21:23:25 +0100 (ti, 11 jan 2011) $\cr
+Version: \tab 0.19 ($Revision: 115 $)\cr
+Date: \tab $Date: 2011-04-15 10:59:29 +0200 (fr, 15 apr 2011) $\cr
 License: \tab Copyright\cr
 }
 
-\tabular{ll}{
-
-\code{dea} \tab DEA input or output efficience measures, peers,
+\tabular{ll}{\code{dea} \tab DEA input or output efficience measures, peers,
      lambdas and slacks \cr
 
 \code{dea.dual} \tab Dual weights (prices), including restrictions on

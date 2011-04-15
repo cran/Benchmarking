@@ -1,4 +1,4 @@
-% $Id: addModel.Rd 96 2010-11-27 22:47:25Z Lars $
+% $Id: addModel.Rd 115 2011-04-15 08:59:29Z Lars $
 \name{dea.add}
 \alias{dea.add}
 
@@ -11,8 +11,8 @@ output slacks within different DEA models }
 
 \usage{
 
-dea.add(X, Y, RTS="vrs", TRANSPOSE=FALSE, XREF=NULL, YREF=NULL, 
-        FRONT.IDX=NULL, LP=FALSE)
+dea.add(X, Y, RTS="vrs", XREF=NULL, YREF=NULL, 
+        FRONT.IDX=NULL, param=NULL, TRANSPOSE=FALSE, LP=FALSE)
 
 }
 
@@ -32,32 +32,35 @@ dea.add(X, Y, RTS="vrs", TRANSPOSE=FALSE, XREF=NULL, YREF=NULL,
 \item{RTS}{ Text string or a number defining the underlying DEA
 technology / returns to scale assumption.
 
-\tabular{rcl}{
-0 \tab "fdh" \tab Free disposability hull, no convexity assumption \cr
-1 \tab "vrs" \tab Variable returns to scale, convexity and free disposability \cr
-2 \tab "drs" \tab Decreasing returns to scale, convexity, down-scaling and free disposability \cr
-3 \tab "crs" \tab Constant returns to scale, convexity and free disposability \cr
-4 \tab "irs" \tab Increasing returns to scale, (up-scaling, but not down-scaling), convexity and free disposability \cr
-5 \tab "add" \tab Additivity (scaling up and down, but only with integers), and free disposability
+\tabular{rll}{
+0 \tab fdh \tab Free disposability hull, no convexity assumption \cr
+1 \tab vrs \tab Variable returns to scale, convexity and free disposability \cr
+2 \tab drs \tab Decreasing returns to scale, convexity, down-scaling and free disposability \cr
+3 \tab crs \tab Constant returns to scale, convexity and free disposability \cr
+4 \tab irs \tab Increasing returns to scale, (up-scaling, but not down-scaling), convexity and free disposability \cr
+5 \tab add \tab Additivity (scaling up and down, but only with integers), and free disposability
 }
 
 }
+
+\item{XREF}{Inputs of the firms determining the technology, defaults
+    to \code{X}}
+
+\item{YREF}{Outputs of the firms determining the technology, defaults
+    to \code{Y}}
+
+\item{FRONT.IDX}{Index for firms determining the technology}
+
+\item{param}{Possible parameters. At the moment only used for
+    RTS="fdh+" to set low and high values for restrictions on lambda;
+    see the section details and examples for its use. Future versions
+    might also use \code{param} for other purposes.}
 
 \item{TRANSPOSE}{Input and output matrices are treated as firms
       times goods matrices for the default value \code{TRANSPOSE=FALSE}
       corresponding to the standard in R for statistical models.  When
       \code{TRUE} data matrices are transposed to good times firms
       matrices as is normally used in LP formulation of the problem.}
-
-
-\item{XREF}{Inputs of the firms determining the technology, defaults
-to \code{X}}
-
-\item{YREF}{Outputs of the firms determining the technology, defaults
-to \code{Y}}
-
-\item{FRONT.IDX}{Index for firms determining the technology}
-
 
 \item{LP}{Only for debugging. If \code{LP=TRUE} then input and output
    for the LP program are written to standard output for each unit.}

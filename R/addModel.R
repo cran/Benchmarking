@@ -1,10 +1,10 @@
-# $Id: addModel.R 82 2010-10-24 20:00:48Z Lars $
+# $Id: addModel.R 114 2011-04-10 20:55:50Z Lars $
 
 # Additive model, corresponds to eqs. 4.34-4.38 in Cooper et al., 2007 
-dea.add <- function(X, Y, RTS="vrs", TRANSPOSE=FALSE,
-        XREF=NULL, YREF=NULL, FRONT.IDX=NULL, LP=FALSE)  {
+dea.add <- function(X, Y, RTS="vrs", XREF=NULL, YREF=NULL, 
+             FRONT.IDX=NULL, param=NULL, TRANSPOSE=FALSE, LP=FALSE)  {
 
-   rts <- c("fdh","vrs","drs","crs","irs","irs","add")
+   rts <- c("fdh","vrs","drs","crs","irs","irs","add","fdh+")
    if ( is.real(RTS) )  {
       if (LP) print(paste("Number '",RTS,"'",sep=""),quote=F)
       RTStemp <- rts[1+RTS] # the first fdh is number 0
@@ -19,8 +19,24 @@ dea.add <- function(X, Y, RTS="vrs", TRANSPOSE=FALSE,
 	} else {
 		K <- dim(X)[1]
 	}
+
+   if ( RTS == "fdh+" )  {
+      # Saet parametrene low og high
+      if ( is.null(param) )  {
+         param <- .15
+      }
+      if ( length(param) == 1 )  {
+         low <- 1-param
+         high <- 1+param
+      } else {
+         low <- param[1]
+         high <- param[2]
+      }
+      param <- c(low=low, high=high)
+   }
+
 	e <- list(eff=rep(1,K), objval=NULL, RTS=RTS, 
-        ORIENTATION="in", TRANSPOSE=TRANSPOSE)
+        ORIENTATION="in", TRANSPOSE=TRANSPOSE, param=param)
    class(e) <- "Farrell"
 	sl <- slack(X,Y,e, XREF=XREF, YREF=YREF, FRONT.IDX=FRONT.IDX, LP=LP)
 

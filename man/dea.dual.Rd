@@ -1,4 +1,4 @@
-% $Id: dea.dual.Rd 103 2011-02-04 09:50:57Z lo $
+% $Id: dea.dual.Rd 115 2011-04-15 08:59:29Z Lars $
 \name{dea.dual}
 \alias{dea.dual}
 % \alias{dea.dual.mat}
@@ -37,12 +37,12 @@ dea.dual(X, Y, RTS = "vrs", ORIENTATION = "in",
 \item{RTS}{ A text string or a number defining the underlying DEA
  technology / returns to scale assumption.
 
-\tabular{rcl}{
-0 \tab "fdh" \tab  \emph{Not available} for \code{dea.dual}.\cr
-1 \tab "vrs" \tab Variable returns to scale, convexity and free disposability \cr
-2 \tab "drs" \tab Decreasing returns to scale, convexity, down-scaling and free disposability \cr
-3 \tab "crs" \tab Constant returns to scale, convexity and free disposability \cr
-4 \tab "irs" \tab Increasing returns to scale, (up-scaling, but not down-scaling), convexity and free disposability.
+\tabular{rll}{
+% 0 \tab fdh \tab  \emph{Not available} for \code{dea.dual}.\cr
+1 \tab vrs \tab Variable returns to scale, convexity and free disposability \cr
+2 \tab drs \tab Decreasing returns to scale, convexity, down-scaling and free disposability \cr
+3 \tab crs \tab Constant returns to scale, convexity and free disposability \cr
+4 \tab irs \tab Increasing returns to scale, (up-scaling, but not down-scaling), convexity and free disposability.
 }
 
 }

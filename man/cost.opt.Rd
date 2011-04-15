@@ -1,4 +1,4 @@
-% $Id: cost.opt.Rd 101 2011-01-11 20:23:25Z Lars $
+% $Id: cost.opt.Rd 115 2011-04-15 08:59:29Z Lars $
 \name{cost.opt}
 \alias{cost.opt}
 \alias{print.cost.opt}
@@ -21,13 +21,13 @@ technology}
 
 
 \usage{
-cost.opt(XREF, YREF, W, YOBS=NULL, RTS="vrs", 
+cost.opt(XREF, YREF, W, YOBS=NULL, RTS="vrs", param=NULL,
          TRANSPOSE=FALSE, LP=FALSE, LPK = NULL)  
 
-revenue.opt(XREF, YREF, P, XOBS=NULL, RTS="vrs", 
+revenue.opt(XREF, YREF, P, XOBS=NULL, RTS="vrs",  param=NULL,
             TRANSPOSE = FALSE, LP = FALSE, LPK = NULL)
 
-profit.opt(XREF, YREF, W, P, RTS = "vrs", 
+profit.opt(XREF, YREF, W, P, RTS = "vrs",  param=NULL,
            TRANSPOSE = FALSE, LP = FALSE, LPK = NULL)
 
 }
@@ -68,16 +68,24 @@ profit.opt(XREF, YREF, W, P, RTS = "vrs",
   A text string or a number defining the underlying DEA technology /
   returns to scale assumption.
 
-\tabular{rcl}{
-0 \tab "fdh" \tab Free disposability hull, no convexity assumption \cr
-1 \tab "vrs" \tab Variable returns to scale, convexity and free disposability \cr
-2 \tab "drs" \tab Decreasing returns to scale, convexity, down-scaling and free disposability \cr
-3 \tab "crs" \tab Constant returns to scale, convexity and free disposability \cr
-4 \tab "irs" \tab Increasing returns to scale, (up-scaling, but not down-scaling), convexity and free disposability \cr
-5 \tab "add" \tab Additivity (scaling up and down, but only with integers), and free disposability
+\tabular{rll}{
+0 \tab fdh \tab Free disposability hull, no convexity assumption \cr
+1 \tab vrs \tab Variable returns to scale, convexity and free disposability \cr
+2 \tab drs \tab Decreasing returns to scale, convexity, down-scaling and free disposability \cr
+3 \tab crs \tab Constant returns to scale, convexity and free disposability \cr
+4 \tab irs \tab Increasing returns to scale, (up-scaling, but not down-scaling), convexity and free disposability \cr
+5 \tab add \tab Additivity (scaling up and down, but only with integers), and free disposability \cr
+6 \tab fdh+ \tab A combination of free disposability and restricted
+ or local constant return to scale
 }
 
 }
+
+\item{param}{Possible parameters. At the moment only used for
+    RTS="fdh+" to set low and high values for restrictions on lambda;
+    see the section details and examples in \code{\link{dea}} for its
+    use. Future versions might also use \code{param} for other
+    purposes.}
 
 
 \item{TRANSPOSE}{Input and output matrices are treated as firms times

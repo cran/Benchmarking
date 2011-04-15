@@ -1,4 +1,4 @@
-# $Id: dea.dual.R 99 2010-12-23 12:02:58Z Lars $
+# $Id: dea.dual.R 114 2011-04-10 20:55:50Z Lars $
 
 # In the calculation in the method input/output matrices X and Y are
 # of the order good x firms.  Ie. X, Y etc must be transformed as
@@ -18,7 +18,7 @@ dea.dual <- function(X,Y, RTS="vrs", ORIENTATION="in",
    # XREF, YREF determines the technology
    # FRONT.IDX index for units that determine the technology
 
-   rts <- c("fdh","vrs","drs","crs","irs","irs","add")
+   rts <- c("fdh","vrs","drs","crs","irs","irs","add","fdh+")
    if ( missing(RTS) ) RTS <- "vrs" 
    if (LP)  print(paste("Vaerdi af 'RTS' er ",RTS),quote=FALSE)
    if ( is.real(RTS) )  {
@@ -40,19 +40,16 @@ dea.dual <- function(X,Y, RTS="vrs", ORIENTATION="in",
       stop(paste("Unknown value for ORIENTATION:",ORIENTATION),quote=F)
    }
 
-   if ( RTS %in% c("fdh","add") )
-      stop("dea.dual does not work for \"fdh\" or \"add\"")
+   if ( RTS %in% c("fdh","add", "fdh+") )
+      stop("dea.dual does not work for \"fdh\", \"fdh+\" or \"add\"")
    if ( !ORIENTATION %in% c("in","out","in-out") )
       stop("dea.dual does not work for \"graph\"")
 
 
-   .xyref.missing <- FALSE
-   if ( missing(XREF) )  {
-      .xyref.missing <- TRUE
+   if ( missing(XREF) || is.null(XREF) )  {
       XREF <- X
    }
-   if ( missing(YREF) )  {
-      .xyref.missing <- TRUE && .xyref.missing
+   if ( missing(YREF) || is.null(YREF) )  {
       YREF <- Y
    }
    
@@ -296,7 +293,7 @@ if ( is.null(AD) )  {
              else if ( ORIENTATION=="out" )
                 set.row(lps, 1, -DIRECT[k,], (m+1):(m+n))
              else if ( ORIENTATION=="in-out" )
-                set.row(lps, 1, -DIRECT[k,])
+                set.row(lps, 1, -DIRECT[k,], 1:(m+n))
           }
        }
 
@@ -306,13 +303,14 @@ if ( is.null(AD) )  {
       status <- solve(lps)
 
       if ( status != 0 ) {
-        if (status == 2) {
-	        print(paste("Firm",k,"not in the technology set"), quote=F)
+        if (status == 2 || status == 3) {
+	        # print(paste("Firm",k,"not in the technology set"), quote=F)
+           objval[k] <- ifelse(ORIENTATION=="in",Inf,-Inf)
         } else {
 	        print(paste("Error in solving for firm",k,":  Status =",status), 
              quote=F)
+           objval[k] <- NA
         }
-        objval[k] <- NA
       }  else {
          objval[k] <- get.objective(lps)
 
@@ -399,7 +397,7 @@ if ( is.null(AD) )  {
    oe <- list(eff=eff, objval=objval, RTS=RTS,
               ORIENTATION=ORIENTATION, TRANSPOSE=TRANSPOSE,
               u=u, v=v, gamma=gamma, sol=sol)
-   # class(oe) <- "Farrell"
+   class(oe) <- "Farrell"
 
 
    return (oe)

@@ -1,10 +1,10 @@
-# $Id: profit.R 99 2010-12-23 12:02:58Z Lars $
+# $Id: profit.R 114 2011-04-10 20:55:50Z Lars $
 
 # Calculates optimal input and output to maximize profit for given
 # input and output prices.
 
-profit.opt <- function(XREF, YREF, W, P, RTS="vrs", TRANSPOSE=FALSE,
-                       LP=FALSE, LPK=NULL)
+profit.opt <- function(XREF, YREF, W, P, RTS="vrs", param=NULL,
+                  TRANSPOSE=FALSE, LP=FALSE, LPK=NULL)
 {
    if (!TRANSPOSE) {
       XREF <- t(XREF)
@@ -26,7 +26,7 @@ profit.opt <- function(XREF, YREF, W, P, RTS="vrs", TRANSPOSE=FALSE,
    if ( n != dim(P)[1] )
       stop("Number of outputs in P and YREF differ")
 
-   rts <- c("fdh","vrs","drs","crs","irs","irs","add")
+   rts <- c("fdh","vrs","drs","crs","irs","irs","add","fdh+")
    if ( missing(RTS) ) RTS <- "vrs" 
    if ( is.real(RTS) )  {
       if (LP) cat(paste("Number '",RTS,"'",sep=""),quote=F)
@@ -66,25 +66,43 @@ profit.opt <- function(XREF, YREF, W, P, RTS="vrs", TRANSPOSE=FALSE,
    }
 
    if ( RTS == "fdh" ) {
-      set.type(lps,2:(1+K),"binary")
-      set.rhs(lps,-1, m+n+1)
-      delete.constraint(lps, m+n+2)
+      set.type(lps,(m+n+1):(m+n+Kr),"binary")
+      set.rhs(lps,1, m+n+2)
+      delete.constraint(lps, m+n+1)
       rlamb <- rlamb -1
    } else if ( RTS == "vrs" )  {
       set.rhs(lps, c(-1,1), (m+n+1):(m+n+2))
    } else if ( RTS == "drs" )  {
-      set.rhs(lps, -1, m+n+1)
-      delete.constraint(lps, m+n+2)
-      rlamb <- rlamb -1
-   } else if ( RTS == "irs" )  {
       set.rhs(lps, 1, m+n+2)
       delete.constraint(lps, m+n+1)
       rlamb <- rlamb -1
+#   } else if ( RTS == "crs" )  {
+#     # En mystisk restriktion for at tvinge løsning til eksisterende firm
+#     add.constraint(lps, rep(1,Kr),">=", 1, (m+n+1):(m+n+Kr))
+   } else if ( RTS == "irs" )  {
+      set.rhs(lps, -1, m+n+1)
+      delete.constraint(lps, m+n+2)
+      rlamb <- rlamb -1
    } else if ( RTS == "add" )  {
-      set.type(lps,2:(1+Kr),"integer")
+      set.type(lps,(m+n+1):(m+n+Kr),"integer")
+   } else if ( RTS == "fdh+" )  {
+      # Saet parametrene low og high
+      if ( is.null(param) )  {
+         param <- .15
+      }
+      if ( length(param) == 1 )  {
+         low <- 1-param
+         high <- 1+param
+      } else {
+         low <- param[1]
+         high <- param[2]
+      }
+      param <- c(low=low, high=high)
+      set.rhs(lps, c(-low,high), (m+n+1):(m+n+2))
+      add.SOS(lps,"lambda", 1,1, (m+n+1):(m+n+Kr), rep(1, Kr))
    }
 
-   set.constr.type(lps, rep("<=",m+n+rlamb))
+   set.constr.type(lps, rep("<=",m+n+rlamb),  1:(m+n+rlamb))
    lp.control(lps, sense="max")
 
    xopt <- matrix(NA,m,K)
@@ -99,10 +117,18 @@ profit.opt <- function(XREF, YREF, W, P, RTS="vrs", TRANSPOSE=FALSE,
 
       if (LP) print(lps)
 
+      set.basis(lps, default=TRUE)
       status <- solve(lps)
-      if ( status != 0 ) {
-	      print(paste("Error in solving for firm",k,":  Status =",status), 
-           quote=F)
+      if ( status == 3 )  {
+         print(paste("Profit is unbounded for firm ",k), quote=FALSE)
+         profit[k] <- Inf
+         sol <- get.variables(lps)
+         xopt[,k] <- sol[1:m]
+         yopt[,k] <- sol[(m+1):(m+n)]
+         lambda[,k] <- sol[(m+n+1):(m+n+Kr)]
+      } else if ( status != 0 ) {
+	      print(paste("Error in solving for firm ",k,":  Status =",status),
+               quote=FALSE)
       }  else {
          profit[k] <- get.objective(lps)
          sol <- get.variables(lps)
@@ -120,7 +146,7 @@ profit.opt <- function(XREF, YREF, W, P, RTS="vrs", TRANSPOSE=FALSE,
    # delete.lp(lps)
 
    rownames(lambda) <- paste("L",1:Kr,sep="")
-   rownames(profit) <- rownames(W)
+   names(profit) <- colnames(W)
 
    if (!TRANSPOSE) {
       xopt <- t(xopt)

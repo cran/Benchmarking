@@ -1,4 +1,4 @@
-% $Id: dea.boot.Rd 103 2011-02-04 09:50:57Z lo $
+% $Id: dea.boot.Rd 115 2011-04-15 08:59:29Z Lars $
 \name{dea.boot}
 \alias{dea.boot}
 \alias{boot.fear}
@@ -34,7 +34,7 @@ boot.fear(X, Y, NREP = 200, EFF = NULL, RTS = "vrs", ORIENTATION = "in",
   \item{EFF}{Efficiencies for (X,Y) relative to the technology
       generated from (XREF,YREF).}
 
-  \item{RTS}{The returns to scale assumptions as in \code{link{dea}},
+  \item{RTS}{The returns to scale assumptions as in \code{\link{dea}},
       only works for "vrs", "drs", and "crs"; more to come.}
 
   \item{ORIENTATION}{Input efficiency "in" (1), output
@@ -136,9 +136,9 @@ boot.fear(X, Y, NREP = 200, EFF = NULL, RTS = "vrs", ORIENTATION = "in",
    by \code{FEAR::boot.sw98}. Unfortunately, this means that the
    columns of the component \code{boot} is not the efficiencies for
    the same bootstrap replica, but could easily be from differencts
-   bootstrap replicas. This also means that this function can not be
-   used bootstrap tests for statistical hypotheses where the
-   statistics involves summing af firms efficiencies.}
+   bootstrap replicas. This also means that this function can
+   \emph{not} be used to bootstrap tests for statistical hypotheses
+   where the statistics involves summing of firms efficiencies.}
 
 \seealso{ The documentation for \code{boot.sw98} in the package
    \pkg{FEAR}. }
@@ -191,8 +191,7 @@ S <- sum(Ec)/sum(Ev)
 
 # To get the an initial value for the random number generating process
 # we save its state (seed)
-sample(1)
-save.seed <- .Random.seed
+save.seed <- sample.int(1e9,1)
 
 # The bootstrap and calculate CRS and VRS under the assumption that
 # the true technology is CRS (the null hypothesis) and such that the

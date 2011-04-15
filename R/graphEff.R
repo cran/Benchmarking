@@ -1,4 +1,4 @@
-# $Id: graphEff.R 93 2010-11-21 15:29:03Z Lars $
+# $Id: graphEff.R 112 2011-04-04 01:10:33Z Lars $
 
 # Funktion til beregning af graf efficiens.  Beregning sker via
 # bisection hvor der itereres mellem mulige og ikke-mulige løsninger
@@ -10,7 +10,7 @@
 # der tilpasses for at se om der er en mulig løsning.
 
 graphEff <- function(lps, X, Y, XREF, YREF, RTS, FRONT.IDX, rlamb, oKr, 
-                     TRANSPOSE=FALSE, SLACK=FALSE, FAST=FALSE, LP=FALSE) 
+         param=param, TRANSPOSE=FALSE, SLACK=FALSE, FAST=FALSE, LP=FALSE) 
 {
    m = dim(X)[2]  # number of inputs
    n = dim(Y)[2]  # number of outputs
@@ -32,9 +32,85 @@ graphEff <- function(lps, X, Y, XREF, YREF, RTS, FRONT.IDX, rlamb, oKr,
       a <- 0
       b <- 2  # medfører start med G=1
       nIter <- 0
-      while ( b-a > tol && nIter < 50 )  {
+      gFundet <- FALSE
+      xIset <- TRUE
+
+      # Er G==1?
+      G <- 1
+      set.rhs(lps, c(-G*X[k,],Y[k,]/G), 1:(m+n))
+      set.basis(lps, default=TRUE)
+      status <- solve(lps)
+      if (LP) print(paste("For G=1, status =",status))
+      nIter <- nIter + 1
+      if ( status == 0 )  {
+         G <- 1 - sqrt(tol)
+         set.rhs(lps, c(-G*X[k,],Y[k,]/G), 1:(m+n))
+         if (RTS=="add") set.basis(lps, default=TRUE)
+         status <- solve(lps)
+         if (LP) print(paste("For G=1-eps, status =",status))
+         nIter <- nIter + 1
+         if ( status != 0 )  {
+            # G=1 er mulig og G=1-eps er ikke-mulig ==> G==1
+            G <- b <- 1
+            gFundet <- TRUE
+         }
+      } else {
+         # warning("Firm outside technology set, firm =",k)
+         # G=1 er ikke mulig; firm uden for teknology set saa G > 1
+         xIset <- FALSE
+         # Bestem oevre graense
+         b <- 2
+         while (status != 0 && nIter < 50)  {
+            set.rhs(lps, c(-b*X[k,], Y[k,]/b), 1:(m+n))
+            status <- solve(lps)
+            if ( status==5 )  {
+               set.basis(lps, default=TRUE)
+               status <- solve(lps)
+            }
+            nIter <- nIter + 1
+            b <- b^2
+         }
+         # nedre graense
+         if ( b > 2 )  { a <- sqrt(b) 
+	      }  else  { a <- 1 }
+      }
+
+      status <- 0 # status kunne godt have en anden vaerdi og saa 
+                  # ville naeste loekke ikke blive gennemloebet
+      if ( !gFundet && xIset && status == 0 )  {
+         # G==1 er mulig er G er ikke fundet endnu
+         dif <- .1
+         i <- 1
+         while ( status==0 && i < 10 )  {
+            G <- 1 - i*dif
+            set.rhs(lps, c(-G*X[k,],Y[k,]/G), 1:(m+n))
+            if (RTS=="add") set.basis(lps, default=TRUE)
+            status <- solve(lps)
+            if ( status==5 )  {
+               set.basis(lps, default=TRUE)
+               status <- solve(lps)
+            }
+            if (LP) print(paste("G = ",G,"; status = ",status))
+            nIter <- nIter + 1
+            i <- i+1
+         }
+         # enten er i==10 eller også er status!=0
+         if ( i==10 )  {
+            a <- 0
+            b <- dif
+         } else {
+            a <- 1 - (i-1)*dif
+            b <- 1 - (i-2)*dif
+         }
+      }
+
+
+      # bisection løkke
+      if (LP) print(paste("Bisection interval: [",a,",",b,"]"))
+      while ( !gFundet && b-a > tol && nIter < 50 )  {
          G <- (a+b)/2
          set.rhs(lps, c(-G*X[k,],Y[k,]/G), 1:(m+n))
+         if (RTS=="add") set.basis(lps, default=TRUE)
          # if ( k==1 ) print(lps)
          status <- solve(lps)
          if (LP) print(paste("G = ",G,"(",k,"); status =",status))
@@ -46,6 +122,8 @@ graphEff <- function(lps, X, Y, XREF, YREF, RTS, FRONT.IDX, rlamb, oKr,
          }
          nIter <- nIter + 1
       }
+      if (LP) print(paste("nIter =",nIter,"; status =",status))
+
       if ( status != 0 )  {
          # Hvis den sidste værdi af G ikke var mulig bruger vi den
          # øvre grænse. Det er nødvendigt med en mulig løsning for at
@@ -63,7 +141,6 @@ graphEff <- function(lps, X, Y, XREF, YREF, RTS, FRONT.IDX, rlamb, oKr,
       }
       objval[k] <- G
       if ( LP && k == 1 )  print(lps)
-      if ( !FAST ) 
       if ( !FAST )  {
          sol <- get.variables(lps)
          lambda[k,] <- sol[2:(1+Kr)]
@@ -105,6 +182,7 @@ graphEff <- function(lps, X, Y, XREF, YREF, RTS, FRONT.IDX, rlamb, oKr,
               primal=primal, dual=dual, ux=ux, vy=vy, gamma=gamma,
               ORIENTATION="graph", TRANSPOSE=TRANSPOSE
               # ,slack=slack_, sx=sx, sy=sy
+              , param=param 
               )
    class(oe) <- "Farrell"
 

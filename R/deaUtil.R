@@ -1,4 +1,4 @@
-# $Id: deaUtil.R 101 2011-01-11 20:23:25Z Lars $
+# $Id: deaUtil.R 114 2011-04-10 20:55:50Z Lars $
 
 
 efficiencies <- function( object, ... )  {
@@ -142,6 +142,11 @@ summary.Farrell <- function(object, digits=4, ...)  {
    dimnames(a) <- list("  Eff range"=estr,c( "#", "%"))
    print(a,digits=c(2,3),quote=F,...)
    print(summary(eff))
+   if ( !is.null(object$slack) )  {
+      sl <- object
+      class(sl) <- "slack"
+      summary(sl)
+   }
    invisible(object)
 }  ## summary.Farrell
 
@@ -168,10 +173,10 @@ peers <- function(object, NAMES=FALSE)  {
    }
 
    # Fjern foranstillet L_ eller L i søjlenavne for lambda
-   if ( "L_" %in% substr(colnames(lam),1,2) )  {
+   if ( all("L_" == substr(colnames(lam),1,2)) )  {
       colnames(lam) <- substring(colnames(lam),3)
    }
-   if ( "L" %in% substr(rownames(lam),1,1) )  {
+   if ( all("L" == substr(colnames(lam),1,1)) )  {
       colnames(lam) <- substring(colnames(lam),2)
    }
 
@@ -203,9 +208,8 @@ peers <- function(object, NAMES=FALSE)  {
    bench <- bench[,1:maxj,drop = FALSE]
 
    # Skal der navne i matricen bench med peers i steder for blot numre
-   if (NAMES & (!is.null(rownames(lam)) || !is.null(names(object$eff))))  {
-      bench_ <- matrix(rownames(lam)[bench], nrow=dim(bench)[1])
-      # print(bench_)
+   if ( NAMES & (!is.null(colnames(lam)) || !is.null(names(object$eff))) ) {
+      bench_ <- matrix(colnames(lam)[bench], nrow=dim(bench)[1])
       rownames(bench_) <- rownames(bench)
       bench <- bench_
    }
@@ -220,7 +224,7 @@ peers <- function(object, NAMES=FALSE)  {
    #    bench <- matrix(nv[bench],nrow=dim(bench)[1])
    # }
 
-   ## colnames(bench) <- navne.firms
+   colnames(bench) <- paste("peer",1:dim(bench)[2],sep="")
    return(bench)
 } ## peers
 
@@ -258,20 +262,28 @@ print.peers  <- function(x, ...)  {
 
 
 
-get.number.peers  <-  function(object)  {
+get.number.peers  <-  function(object, NAMES=FALSE)  {
    if ( object$TRANSPOSE ) {
 	   lam <- object$lambda
    } else {
       lam <- t(object$lambda)
    }
+
    # Fjern foranstillet L i søjlenavne for lambda
-   if ( "L" %in% substr(rownames(lam),1,1) )  {
-      rownames(lam) <- substring(rownames(lam),2)
-   }
+   # if ( "L" %in% substr(rownames(lam),1,1) )  {
+   #    rownames(lam) <- substring(rownames(lam),2)
+   # }
+   # rownames er overflødige da de fremgår af første søjle, index er
+   # ofte lettere for at kunne udpege rækker
+   rownames(lam) <- NULL
+
    peer <- which(rowSums(lam, na.rm=TRUE)>0)
-   names(peer) <- NULL
+   # names(peer) <- NULL
+
    number <- rowSums(lam[peer,]>0, na.rm=TRUE)
-   cbind(peer,"#"=number)
+   np <- cbind(peer,"#"=number)
+   if (NAMES) rownames(np) <- names(object$eff)[peer]
+   return(np)
 }  # get.number.peers
 
 
@@ -372,43 +384,66 @@ excess <- function(object, X=NULL, Y=NULL)  {
 
 
 
-eladder <- function(n, X, Y, RTS="vrs", ORIENTATION="in", DIRECT=NULL)  {
+eladder <- function(n, X, Y, RTS="vrs", ORIENTATION="in", 
+                    XREF=NULL, YREF=NULL, DIRECT=NULL)  {
+
+   if ( is.null(XREF) )  {
+      XREF <- X
+   }
+   if ( is.null(YREF) )  {
+      YREF <- Y
+   }
+
   idx <- NULL
-  elad <- rep(NA, dim(X)[1])
+  elad <- rep(NA, dim(XREF)[1])
   for ( i in 1:length(elad))  {
+    # if (LP) print(paste("===> ",i),quote=FALSE)
     # if (LP) print("FRONT.IDX")
     # if (LP) print(idx)
+    # print( length(idx) == dim(X)[1] )  
+    if ( length(idx) == dim(X)[1] )  {
+       break  
+    }
     # Brug FRONT.IDX for at kunne bruge de oprindelige indeks i X og Y
     e <- dea(X[n,,drop=F],Y[n,,drop=F], RTS=RTS, ORIENTATION=ORIENTATION,
-             XREF=X,YREF=Y, FRONT.IDX=idx, DIRECT=DIRECT)
+             XREF=XREF, YREF=YREF, FRONT.IDX=idx, DIRECT=DIRECT, LP=FALSE)
     # if (LP) print(paste("Eff =",eff(e)), quote=FALSE)
     # if (LP) print(paste("Peers =",peers(e)), quote=FALSE)
+    # if (LP) print(lambda(e))
     # Er der nogen peers overhovedet ellers kan vi bare slutte nu
     if ( is.na(peers(e)[1]) ) break
     elad[i] <- e$eff
     # Array nr. for den stoerste værdi af lambda
-    p <- which(max(e$lambda)==e$lambda)
+    # Brug kun den første hvis der er flere
+    p <- which(max(e$lambda)==e$lambda)[1]
+    # if (LP) print(paste("p =",p))
     # firm number for array number p, firm numbers follow L in the colnames
     str <- substring(colnames(e$lambda)[p],2)
+    # if (LP) print(str)
     suppressWarnings(ip <- as.integer(str))
+    # if (LP) print(paste("    ", ip),quote=FALSE)
     # nok en firm der ikke laengere skal indgaa i referenceteknologien
     if ( is.na(ip) )  {
        # det er et navn/en streng saa den skal laves om til nr.
        str0 <- substring(str,2)
-       navne <- rownames(X)
+       # if (LP) print(str0)
+       navne <- rownames(XREF)
+       # if (LP) print(navne)
        if ( is.null(navne) )
-           navne <- rownames(Y) 
+           navne <- rownames(YREF) 
        ip <- which( navne %in% str0 )
     }
     # saa er ip et tal
     idx <- c(idx,-ip)
   }
-  return(list(eff=elad,peer=-idx))
+  return(list(eff=elad,peer=ifelse(is.null(idx),NA,-idx)))
 }
 
 
 
 eladder.plot <- function(elad, peer, TRIM=NULL)  {
+   if ( all(is.na(elad)) )
+      stop("All values of first argument are NA")
    if ( !is.null(TRIM) & !is.numeric(TRIM) )
        stop("TRIM must be an integer")
    if ( is.null(TRIM) )  {

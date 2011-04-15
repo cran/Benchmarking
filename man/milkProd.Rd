@@ -1,4 +1,4 @@
-% $Id: milkProd.Rd 80 2010-10-20 08:58:43Z Lars $
+% $Id: milkProd.Rd 114 2011-04-10 20:55:50Z Lars $
 \name{milkProd}
 \alias{milkProd}
 \docType{data}
@@ -35,6 +35,7 @@ Accounting and buissiness check data
 
 \examples{
 data(milkProd)
-pairs(milkProd,gap=0)
+y <- with(milkProd, cbind(milk))
+x <- with(milkProd, cbind(energy, vet, cows))
 }
 \keyword{datasets}

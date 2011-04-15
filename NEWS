@@ -1,4 +1,22 @@
-$Id: NEWS 102 2011-01-23 18:50:21Z Lars $
+$Id: NEWS 114 2011-04-10 20:55:50Z Lars $
+
+
+Changes to Benchmarking version 0.19
+
+ * Speed of dea with ORIENTATION="graph" has been almost doubled do to
+   splicing in the bisection algorithmen; and now it gives the right
+   efficiency for firms outside the technology set (before the highest
+   possible value was 2)
+
+ * The function eladder now accepts the arguments XREF and YREF as
+   well as RTS="fdh" anf RTS="fdh+"
+
+ * The function dea with DIRECT and dea.direct now accepts RTS="fdh+"
+
+ * Corrected bug for missing names of peers when using NAMES=TRUE in
+   peers for RTS="fdh".
+
+ * Slack is now ok for directinal efficiency
 
 
 Changes to Benchmarking version 0.18

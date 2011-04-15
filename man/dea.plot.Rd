@@ -1,4 +1,4 @@
-% $Id: dea.plot.Rd 102 2011-01-23 18:50:21Z Lars $
+% $Id: dea.plot.Rd 109 2011-03-29 18:36:31Z Lars $
 \name{dea.plot}
 \alias{dea.plot}
 \alias{dea.plot.frontier}
@@ -116,7 +116,12 @@ dea.plot.transform(y1, y2, RTS="vrs",...)
     \code{y} then the goods are just summed or, if \code{wx} or
     \code{wy} are present, weighted sum of goods are used. In this
     case the use of the command \code{identify} must be calles as
-    \code{dea.plot(rowSums(x),rowSums(y))}. }
+    \code{dea.plot(rowSums(x),rowSums(y))}. 
+
+    \emph{Warning} If you use this facility to plot multi input and
+    multi output then the plot may deceive you as fully multi
+    efficient firms are not necessarely placed on the two dimensional
+    frontier. }
 
 
 \value{No return, uses the original graphing system.  }

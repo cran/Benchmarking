@@ -1,12 +1,12 @@
-# $Id: cost.R 99 2010-12-23 12:02:58Z Lars $
+# $Id: cost.R 114 2011-04-10 20:55:50Z Lars $
 
 # Function to calculate minimum cost input.
 
 # Calculatins are done with trasnposed matrices compared to R
 # standards, but according to LP practice
 
-cost.opt <- function(XREF, YREF, W, YOBS=NULL, RTS="vrs", TRANSPOSE=FALSE, 
-                     LP=FALSE, LPK=NULL)  {
+cost.opt <- function(XREF, YREF, W, YOBS=NULL, RTS="vrs", param=NULL,
+                     TRANSPOSE=FALSE, LP=FALSE, LPK=NULL)  {
    if ( missing(YOBS) )  {
    	YOBS <- YREF
    }
@@ -30,7 +30,7 @@ cost.opt <- function(XREF, YREF, W, YOBS=NULL, RTS="vrs", TRANSPOSE=FALSE,
    if ( n != dim(YOBS)[1] )
       stop("Number of outputs in YREF and YOBS differ")
 
-   rts <- c("fdh","vrs","drs","crs","irs","irs","add")
+   rts <- c("fdh","vrs","drs","crs","irs","irs","add","fdh+")
    if ( is.real(RTS) )  {
       if (LP) cat(paste("Number '",RTS,"'",sep=""),quote=F)
       RTStemp <- rts[1+RTS] # the first fdh is number 0
@@ -61,7 +61,7 @@ cost.opt <- function(XREF, YREF, W, YOBS=NULL, RTS="vrs", TRANSPOSE=FALSE,
    }
 
    if ( RTS == "fdh" ) {
-      set.type(lps,2:(1+K),"binary")
+      set.type(lps,(m+1):(m+Kr),"binary")
       set.rhs(lps,-1, m+n+1)
       delete.constraint(lps, m+n+2)
       rlamb <- rlamb -1
@@ -77,6 +77,21 @@ cost.opt <- function(XREF, YREF, W, YOBS=NULL, RTS="vrs", TRANSPOSE=FALSE,
       rlamb <- rlamb -1
    } else if ( RTS == "add" )  {
       set.type(lps,2:(1+Kr),"integer")
+   } else if ( RTS == "fdh+" )  {
+      # Saet parametrene low og high
+      if ( is.null(param) )  {
+         param <- .15
+      }
+      if ( length(param) == 1 )  {
+         low <- 1-param
+         high <- 1+param
+      } else {
+         low <- param[1]
+         high <- param[2]
+      }
+      param <- c(low=low, high=high)
+      set.rhs(lps, c(-high, low), (m+n+1):(m+n+2))
+      add.SOS(lps,"lambda", 1,1, (m+1):(m+Kr), rep(1, Kr))
    }
 
    set.objfn(lps, c(W[,1],rep(0,K)))
@@ -95,10 +110,11 @@ cost.opt <- function(XREF, YREF, W, YOBS=NULL, RTS="vrs", TRANSPOSE=FALSE,
 
       if (LP) print(lps)
 
+      set.basis(lps, default=TRUE)
       status <- solve(lps)
       if ( status != 0 ) {
-	      print(paste("Error in solving for firm",k,":  Status =",status), 
-           quote=F)
+	      print(paste("Error in solving for firm",k,":  Status =",status),
+               quote=FALSE)
       }  else {
          cost[k] <- get.objective(lps)
          sol <- get.variables(lps)
@@ -115,7 +131,7 @@ cost.opt <- function(XREF, YREF, W, YOBS=NULL, RTS="vrs", TRANSPOSE=FALSE,
    # delete.lp(lps)
 
    rownames(lambda) <- paste("L",1:Kr,sep="")
-   rownames(cost) <- rownames(YOBS)
+   names(cost) <- colnames(YOBS)
 
    if (!TRANSPOSE) {
       xopt <- t(xopt)

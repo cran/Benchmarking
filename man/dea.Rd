@@ -1,4 +1,4 @@
-% $Id: dea.Rd 103 2011-02-04 09:50:57Z lo $
+% $Id: dea.Rd 115 2011-04-15 08:59:29Z Lars $
 \name{dea}
 \alias{dea}
 % \alias{dea.mat}
@@ -42,30 +42,30 @@ dea(X, Y, RTS="vrs", ORIENTATION="in", XREF=NULL, YREF=NULL,
 \item{RTS}{ Text string or a number defining the underlying DEA
     technology / returns to scale assumption.
 
-\tabular{rcl}{
+\tabular{rll}{
 
-0 \tab "fdh" \tab Free disposability hull, no convexity assumption \cr
+0 \tab fdh \tab Free disposability hull, no convexity assumption \cr
 
-1 \tab "vrs" \tab Variable returns to scale, convexity and free
+1 \tab vrs \tab Variable returns to scale, convexity and free
 disposability \cr
 
-2 \tab "drs" \tab Decreasing returns to scale, convexity, down-scaling
+2 \tab drs \tab Decreasing returns to scale, convexity, down-scaling
 and free disposability \cr
 
-3 \tab "crs" \tab Constant returns to scale, convexity and free
+3 \tab crs \tab Constant returns to scale, convexity and free
 disposability \cr
 
-4 \tab "irs" \tab Increasing returns to scale, (up-scaling, but not
+4 \tab irs \tab Increasing returns to scale, (up-scaling, but not
 down-scaling), convexity and free disposability \cr
 
-5 \tab "irs2" \tab Increasing returns to scale (up-scaling, but not
+5 \tab irs2 \tab Increasing returns to scale (up-scaling, but not
 down-scaling), additivity, and free disposability \cr
 
-6 \tab "add" \tab Additivity (scaling up and down, but only with
+6 \tab add \tab Additivity (scaling up and down, but only with
 integers), and free disposability \cr
 
-7 \tab "fdh+" \tab A combination of free disposability and restricted
- or local constant return to scale \cr
+7 \tab fdh+ \tab A combination of free disposability and restricted
+ or local constant return to scale
 
 }
 
@@ -223,10 +223,10 @@ discussed on pages 31--25 and 121--127 in Bogetoft and Otto (2011).
 
 \item{sy}{A matrix for output slack, see \code{sx}}
 
-\item{vx}{Dual variable for input, only calculated if \code{DUAL} is
+\item{ux}{Dual variable for input, only calculated if \code{DUAL} is
      \code{TRUE}.}
 
-\item{uy}{Dual variable for output, only calculated if \code{DUAL} is
+\item{vy}{Dual variable for output, only calculated if \code{DUAL} is
     \code{TRUE}.}
 
 }

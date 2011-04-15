@@ -1,4 +1,4 @@
-# $Id: dea.R 102 2011-01-23 18:50:21Z Lars $
+# $Id: dea.R 112 2011-04-04 01:10:33Z Lars $
 
 # DEA beregning via brug af lp_solveAPI. Fordelene ved lp_solveAPI er
 # færre kald fra R med hele matricer for hver firm og dermed skulle
@@ -30,7 +30,7 @@ dea  <-  function(X,Y, RTS="vrs", ORIENTATION="in", XREF=NULL,YREF=NULL,
       # print("When  FAST then neither DUAL nor SLACK") 
    }
 
-   rts <- c("fdh","vrs","drs","crs","irs","irs2","add","fdh+")
+   rts <- c("fdh","vrs","drs","crs","irs","irs2","add","fdh+","fdh++","fdh0")
    if ( missing(RTS) ) RTS <- "vrs" 
    if ( is.real(RTS) )  {
       if (LP) print(paste("Number '",RTS,"'",sep=""),quote=F)
@@ -48,7 +48,7 @@ dea  <-  function(X,Y, RTS="vrs", ORIENTATION="in", XREF=NULL,YREF=NULL,
    }
    ORIENTATION <- tolower(ORIENTATION)
    if ( !(ORIENTATION %in% orientation) ) {
-      stop(paste("Unknown value for ORIENTATION:",ORIENTATION),quote=F)
+      stop(paste("Unknown value for ORIENTATION:",ORIENTATION))
    }
 
    if ( class(X)=="data.frame" && data.kontrol(X) || is.numeric(X) ) 
@@ -87,8 +87,9 @@ dea  <-  function(X,Y, RTS="vrs", ORIENTATION="in", XREF=NULL,YREF=NULL,
       if ( !is.null(DIRECT) & class(DIRECT)=="matrix" )
          DIRECT <- t(DIRECT)
    }
-   orgKr <- dim(XREF)
 
+
+   orgKr <- dim(XREF)
    if ( length(FRONT.IDX) > 0 )  {
       if (LP) print("FRONT.IDX")
       if (LP) print(FRONT.IDX)
@@ -152,24 +153,31 @@ dea  <-  function(X,Y, RTS="vrs", ORIENTATION="in", XREF=NULL,YREF=NULL,
          DIRECT <- rep(DIRECT,m+n)
    }
 
+
    if ( RTS=="fdh" && ORIENTATION!="graph" && !FAST && DUAL==FALSE )  {
       e <- fdh(X,Y, ORIENTATION=ORIENTATION, XREF=XREF, YREF=YREF, 
-               FRONT.IDX=FRONT.IDX, DIRECT=DIRECT, TRANSPOSE=FALSE)
+               FRONT.IDX=FRONT.IDX, DIRECT=DIRECT, TRANSPOSE=FALSE, oKr)
+      if ( SLACK )  {
+         warning("Run 'slack(X, Y, e)' to get slacks")
+      }
       return(e)
    }
-   if ( RTS=="fdh+" )  {
+   if ( RTS=="fdh++" )  {
       e <- dea.fdhPlus(X, Y, ORIENTATION=ORIENTATION,
           XREF=XREF, YREF=YREF, FRONT.IDX=FRONT.IDX, DIRECT=DIRECT, 
-          param=param, TRANSPOSE=FALSE)
+          param=param, TRANSPOSE=FALSE, oKr)
+      if ( SLACK )  {
+         warning("Run 'slack(X, Y, e)' to get slacks")
+      }
       return(e)
    }
 
  
    if ( RTS != "crs" && RTS != "add" )  {
       rlamb <- 2
-   } else 
+   } else {
       rlamb <- 0
-
+   }
 
    # Initialiser LP objekt
    lps <- make.lp(m+n +rlamb,1+Kr)
@@ -189,7 +197,7 @@ dea  <-  function(X,Y, RTS="vrs", ORIENTATION="in", XREF=NULL,YREF=NULL,
       set.row(lps, m+n+2, c(0,rep( 1,Kr)))
    }
 
-   if ( RTS == "fdh" ) {
+   if ( RTS == "fdh" || RTS == "fdh0" ) {
       set.type(lps,2:(1+Kr),"binary")
       set.rhs(lps,-1, m+n+1)
       delete.constraint(lps, m+n+2)
@@ -212,10 +220,24 @@ dea  <-  function(X,Y, RTS="vrs", ORIENTATION="in", XREF=NULL,YREF=NULL,
       set.bounds(lps, lower=rep(1,Kr), columns=2:(1+Kr))
    } else if ( RTS == "add" )  {
       set.type(lps,2:(1+Kr),"integer")
-
+   } else if ( RTS == "fdh+" )  {
+      # Saet parametrene low og high
+      if ( is.null(param) )  {
+         param <- .15
+      }
+      if ( length(param) == 1 )  {
+         low <- 1-param
+         high <- 1+param
+      } else {
+         low <- param[1]
+         high <- param[2]
+      }
+      param <- c(low=low, high=high)
+      set.rhs(lps, c(-high, low), (m+n+1):(m+n+2))
+      add.SOS(lps,"lambda", 1,1, 2:(1+Kr), rep(1, Kr))
    }
 
-   if ( !is.null(DIRECT) && Kd==0 && DIRECT[1] != "min" )  {
+   if ( !is.null(DIRECT) && Kd<=1 && DIRECT[1] != "min" )  {
       # print(Kd)
       # print(DIRECT)
       # Samme retning for alle enheder
@@ -255,7 +277,7 @@ dea  <-  function(X,Y, RTS="vrs", ORIENTATION="in", XREF=NULL,YREF=NULL,
 
    if ( ORIENTATION == "graph" )  {
       oe <- graphEff(lps, X, Y, XREF, YREF, RTS, FRONT.IDX, rlamb, oKr, 
-                          TRANSPOSE, SLACK,FAST,LP) 
+                          param=param, TRANSPOSE, SLACK,FAST,LP) 
       # delete.lp(lps)
       return(oe)
    }
@@ -383,8 +405,9 @@ dea  <-  function(X,Y, RTS="vrs", ORIENTATION="in", XREF=NULL,YREF=NULL,
          # for forskellig og derfor give numerisk fejl i lpSolve.
          bs.status <- set.basis(lps, default=TRUE)
          # print(paste("Basis sat:",bs.status),quote=FALSE)
+      } else if ( RTS %in% c("add","fdh","fdh+" ) )  {
+         bs.status <- set.basis(lps, default=TRUE)
       }
-
       if ( LP && k <= 10 )  print(lps)
       status <- solve(lps)
       if ( status == 5 )  {
@@ -510,6 +533,7 @@ dea  <-  function(X,Y, RTS="vrs", ORIENTATION="in", XREF=NULL,YREF=NULL,
               primal=primal, dual=dual, ux=ux, vy=vy, gamma=gamma,
               ORIENTATION=ORIENTATION, TRANSPOSE=TRANSPOSE
               # ,slack=slack_, sx=sx, sy=sy 
+              , param=param 
               )
 
    if (!is.null(DIRECT))  {

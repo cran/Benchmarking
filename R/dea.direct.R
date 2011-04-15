@@ -1,9 +1,9 @@
-# $Id: dea.direct.R 94 2010-11-21 23:50:53Z Lars $
+# $Id: dea.direct.R 107 2011-03-25 13:27:26Z Lars $
 
 
 dea.direct <- function(X,Y, DIRECT, RTS="vrs", ORIENTATION="in", 
                   XREF=NULL, YREF=NULL, FRONT.IDX=NULL, SLACK=FALSE, 
-                  TRANSPOSE=FALSE)  {
+                  param=NULL, TRANSPOSE=FALSE)  {
 
    if ( missing(XREF) || is.null(XREF) )  {
       XREF <- X
@@ -30,7 +30,7 @@ dea.direct <- function(X,Y, DIRECT, RTS="vrs", ORIENTATION="in",
 
    ee <- dea(X,Y, RTS=RTS, ORIENTATION=ORIENTATION, XREF=XREF, YREF=YREF,
              FRONT.IDX=FRONT.IDX, SLACK=SLACK, DUAL=FALSE, 
-             DIRECT=DIRECT, TRANSPOSE=FALSE)  
+             DIRECT=DIRECT, param=param, TRANSPOSE=FALSE)  
 
    mmd <- switch(ORIENTATION, "in"=m, "out"=n, "in-out"=m+n) 
    if ( is.null(ee$objval) )  ee$objval <- ee$eff
