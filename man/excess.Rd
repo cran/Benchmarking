@@ -1,4 +1,4 @@
-% $Id: excess.Rd 89 2010-11-14 13:01:40Z lo $
+% $Id: excess.Rd 118 2011-07-22 23:28:53Z Lars $
 \name{excess}
 \alias{excess}
 
@@ -50,7 +50,7 @@ Return a matrix with exces input and/or less output.
 DEA, SFA, and R}; Springer 2011 }
 
 \author{
-Peter Bogeroft and Lars Otto \email{lo@foi.dk}
+Peter Bogeroft and Lars Otto \email{larsot23@gmail.com}
 }
 
 

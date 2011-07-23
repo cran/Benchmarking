@@ -1,4 +1,4 @@
-# $Id: deaUtil.R 114 2011-04-10 20:55:50Z Lars $
+# $Id: deaUtil.R 117 2011-05-17 10:17:07Z Lars $
 
 
 efficiencies <- function( object, ... )  {
@@ -385,7 +385,7 @@ excess <- function(object, X=NULL, Y=NULL)  {
 
 
 eladder <- function(n, X, Y, RTS="vrs", ORIENTATION="in", 
-                    XREF=NULL, YREF=NULL, DIRECT=NULL)  {
+                    XREF=NULL, YREF=NULL, DIRECT=NULL, param=NULL)  {
 
    if ( is.null(XREF) )  {
       XREF <- X
@@ -406,7 +406,8 @@ eladder <- function(n, X, Y, RTS="vrs", ORIENTATION="in",
     }
     # Brug FRONT.IDX for at kunne bruge de oprindelige indeks i X og Y
     e <- dea(X[n,,drop=F],Y[n,,drop=F], RTS=RTS, ORIENTATION=ORIENTATION,
-             XREF=XREF, YREF=YREF, FRONT.IDX=idx, DIRECT=DIRECT, LP=FALSE)
+             XREF=XREF, YREF=YREF, FRONT.IDX=idx, DIRECT=DIRECT, 
+             param=param, LP=FALSE)
     # if (LP) print(paste("Eff =",eff(e)), quote=FALSE)
     # if (LP) print(paste("Peers =",peers(e)), quote=FALSE)
     # if (LP) print(lambda(e))
@@ -436,7 +437,14 @@ eladder <- function(n, X, Y, RTS="vrs", ORIENTATION="in",
     # saa er ip et tal
     idx <- c(idx,-ip)
   }
-  return(list(eff=elad,peer=ifelse(is.null(idx),NA,-idx)))
+  elad <- na.omit(elad)
+  elad <- elad[1:length(elad)]
+  if ( is.null(idx) )  {
+     idx <- NA
+  } else {
+     idx <- -idx
+  }
+  return(list(eff=elad,peer=idx))
 }
 
 

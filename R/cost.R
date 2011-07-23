@@ -1,8 +1,8 @@
-# $Id: cost.R 114 2011-04-10 20:55:50Z Lars $
+# $Id: cost.R 120 2011-09-12 12:51:43Z Lars $
 
 # Function to calculate minimum cost input.
 
-# Calculatins are done with trasnposed matrices compared to R
+# Calculations are done with transposed matrices compared to R
 # standards, but according to LP practice
 
 cost.opt <- function(XREF, YREF, W, YOBS=NULL, RTS="vrs", param=NULL,
@@ -94,7 +94,7 @@ cost.opt <- function(XREF, YREF, W, YOBS=NULL, RTS="vrs", param=NULL,
       add.SOS(lps,"lambda", 1,1, (m+1):(m+Kr), rep(1, Kr))
    }
 
-   set.objfn(lps, c(W[,1],rep(0,K)))
+   set.objfn(lps, c(W[,1],rep(0,Kr)))
    set.constr.type(lps, rep(">=",m+n+rlamb))
    lp.control(lps, sense="min")
 

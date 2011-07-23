@@ -1,4 +1,4 @@
-% $Id: eff.dens.Rd 96 2010-11-27 22:47:25Z Lars $
+% $Id: eff.dens.Rd 118 2011-07-22 23:28:53Z Lars $
 \name{eff.dens}
 \alias{eff.dens}
 \alias{eff.dens.plot}
@@ -63,7 +63,7 @@ with efficiencies and the corresponding density values.  }
 and Data Analysis}, Chapman and Hall, London.  }
 
 
-\author{ Peter Bogetoft and Lars Otto \email{lo@foi.dk}}
+\author{ Peter Bogetoft and Lars Otto \email{larsot23@gmail.com}}
 
 
 \note{ The input efficiency is also bounded below by 0, but for normal

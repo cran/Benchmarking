@@ -1,4 +1,4 @@
-% $Id: cost.opt.Rd 115 2011-04-15 08:59:29Z Lars $
+% $Id: cost.opt.Rd 118 2011-07-22 23:28:53Z Lars $
 \name{cost.opt}
 \alias{cost.opt}
 \alias{print.cost.opt}
@@ -148,7 +148,7 @@ Bogetoft and Otto; \emph{Benchmarking with DEA, SFA, and R}; Springer
 }
 
 
-\author{ Peter Bogetoft and Lars Otto \email{lo@foi.dk}}
+\author{ Peter Bogetoft and Lars Otto \email{larsot23@gmail.com}}
 
 
 \note{

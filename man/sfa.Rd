@@ -1,4 +1,4 @@
-% $Id: sfa.Rd 102 2011-01-23 18:50:21Z Lars $
+% $Id: sfa.Rd 118 2011-07-22 23:28:53Z Lars $
 \name{sfa}
 \alias{sfa}
 \alias{lambda.sfa}
@@ -179,7 +179,7 @@ Bogetoft and Otto; \emph{Benchmarking with DEA, SFA, and R}, Springer
 }
 
 
-\author{ Peter Bogetoft and Lars Otto \email{lo@foi.dk}}
+\author{ Peter Bogetoft and Lars Otto \email{larsot23@gmail.com}}
 
 
 \note{ Calculation of technical efficiencies for each unit can be done

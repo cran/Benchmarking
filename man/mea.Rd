@@ -1,4 +1,4 @@
-% $Id: mea.Rd 115 2011-04-15 08:59:29Z Lars $
+% $Id: mea.Rd 118 2011-07-22 23:28:53Z Lars $
 \name{mea}
 \alias{mea}
 \alias{mea.lines}
@@ -17,7 +17,7 @@ changed one at a time.  }
 
 \usage{
 mea(X, Y, RTS = "vrs", ORIENTATION = "in", XREF = NULL, YREF = NULL, 
-    FRONT.IDX = NULL, TRANSPOSE = FALSE, 
+    FRONT.IDX = NULL, param=NULL, TRANSPOSE = FALSE, 
     LP = FALSE, CONTROL = NULL, LPK = NULL)
 mea.lines(N, X, Y)  
 }
@@ -40,7 +40,9 @@ mea.lines(N, X, Y)
 2 \tab drs \tab Decreasing returns to scale, convexity, down-scaling and free disposability \cr
 3 \tab crs \tab Constant returns to scale, convexity and free disposability \cr
 4 \tab irs \tab Increasing returns to scale, (up-scaling, but not down-scaling), convexity and free disposability \cr
-5 \tab add \tab Additivity (scaling up and down, but only with integers), and free disposability
+6 \tab add \tab Additivity (scaling up and down, but only with integers), and free disposability \cr
+7 \tab fdh+ \tab A combination of free disposability and restricted
+ or local constant return to scale
 }
 
 }
@@ -58,6 +60,11 @@ mea.lines(N, X, Y)
 
   \item{FRONT.IDX}{Index for firms determining the technology}
 
+  \item{param}{Possible parameters. At the moment only used for
+    RTS="fdh+" to set low and high values for restrictions on lambda;
+    see the section details and examples in \code{\link{dea}} for its
+    use. Future versions might also use \code{param} for other
+    purposes.}
 
   \item{TRANSPOSE}{ as in \code{dea} }
 
@@ -110,7 +117,7 @@ more outputs.  }
    DEA, SFA, and R}; Springer 2011 }
 
 
-\author{ Peter Bogetoft and Lars Otto \email{lo@foi.dk} }
+\author{ Peter Bogetoft and Lars Otto \email{larsot23@gmail.com} }
 
 
 \note{ The calculation is done in \code{\link{dea}} after a

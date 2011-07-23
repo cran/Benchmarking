@@ -1,4 +1,4 @@
-% $Id: make.merge.Rd 86 2010-11-11 09:00:13Z Lars $
+% $Id: make.merge.Rd 118 2011-07-22 23:28:53Z Lars $
 \name{make.merge}
 \alias{make.merge}
 
@@ -63,7 +63,7 @@ arguments.  }
 
 
 
-\author{ Peter Bogetoft and Lars Otto \email{lo@foi.dk}}
+\author{ Peter Bogetoft and Lars Otto \email{larsot23@gmail.com}}
 
 
 \seealso{ \code{\link{dea.merge}} }

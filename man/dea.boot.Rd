@@ -1,4 +1,4 @@
-% $Id: dea.boot.Rd 115 2011-04-15 08:59:29Z Lars $
+% $Id: dea.boot.Rd 118 2011-07-22 23:28:53Z Lars $
 \name{dea.boot}
 \alias{dea.boot}
 \alias{boot.fear}
@@ -116,7 +116,7 @@ boot.fear(X, Y, NREP = 200, EFF = NULL, RTS = "vrs", ORIENTATION = "in",
 }
 
 
-\author{ Peter Bogetoft and Lars Otto \email{lo@foi.dk}}
+\author{ Peter Bogetoft and Lars Otto \email{larsot23@gmail.com}}
 
 
 \note{ \emph{The function \code{boot.fear} only works if the package

@@ -1,4 +1,4 @@
-% $Id: dea.plot.Rd 109 2011-03-29 18:36:31Z Lars $
+% $Id: dea.plot.Rd 118 2011-07-22 23:28:53Z Lars $
 \name{dea.plot}
 \alias{dea.plot}
 \alias{dea.plot.frontier}
@@ -133,7 +133,7 @@ dea.plot.transform(y1, y2, RTS="vrs",...)
 Paul Murrell; \emph{R Graphics}; Chapman & Hall 2006}
 
 
-\author{ Peter Bogetoft and Lars Otto \email{lo@foi.dk}}
+\author{ Peter Bogetoft and Lars Otto \email{larsot23@gmail.com}}
 
 
 \seealso{The documentation for the function \code{plot} and Murrell

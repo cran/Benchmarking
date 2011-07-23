@@ -94,7 +94,7 @@ Efficiency Analysis with R,} \emph{Socio-Economic Planning Sciences}
 }
 
 
-\author{ Peter Bogetoft and Lars Otto \email{lo@foi.dk}}
+\author{ Peter Bogetoft and Lars Otto \email{larsot23@gmail.com}}
 
 
 \note{ 

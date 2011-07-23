@@ -1,4 +1,4 @@
-% $Id: typeIerror.Rd 81 2010-10-20 15:26:25Z Lars $
+% $Id: typeIerror.Rd 118 2011-07-22 23:28:53Z Lars $
 \name{typeIerror}
 \alias{typeIerror}
 
@@ -31,7 +31,7 @@
 
 
 
-\author{ Peter Bogetoft and Lars Otto \email{lo@foi.dk}}
+\author{ Peter Bogetoft and Lars Otto \email{larsot23@gmail.com}}
 
 
 \examples{

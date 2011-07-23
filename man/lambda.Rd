@@ -1,4 +1,4 @@
-% $Id: lambda.Rd 96 2010-11-27 22:47:25Z Lars $
+% $Id: lambda.Rd 118 2011-07-22 23:28:53Z Lars $
 \name{lambda}
 \alias{lambda}
 \alias{lambda.print}
@@ -45,7 +45,7 @@ lambda is positive.  }
 columns.  }
 
 
-\author{ Peter Bogetoft and Lars Otto \email{lo@foi.dk}}
+\author{ Peter Bogetoft and Lars Otto \email{larsot23@gmail.com}}
 
 
 

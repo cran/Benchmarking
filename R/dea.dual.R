@@ -1,4 +1,4 @@
-# $Id: dea.dual.R 114 2011-04-10 20:55:50Z Lars $
+# $Id: dea.dual.R 118 2011-07-22 23:28:53Z Lars $
 
 # In the calculation in the method input/output matrices X and Y are
 # of the order good x firms.  Ie. X, Y etc must be transformed as
@@ -300,6 +300,7 @@ if ( is.null(AD) )  {
 
       if ( LP )  print(paste("Firm",k), quote=FALSE)
       if ( LP && k == 1 )  print(lps)
+      set.basis(lps, default=TRUE)
       status <- solve(lps)
 
       if ( status != 0 ) {

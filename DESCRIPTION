@@ -1,10 +1,10 @@
 Package: Benchmarking
 Type: Package
 Title: Benchmark and frontier analysis using DEA and SFA
-Version: 0.19
-Date: 2011-04-15 ($Date: 2011-04-15 10:59:29 +0200 (fr, 15 apr 2011) $)
+Version: 0.20
+Date: 2011-04-15 ($Date: 2011-07-23 01:28:53 +0200 (23 jul 2011) $)
 Author: Peter Bogetoft and Lars Otto
-Maintainer: Lars Otto <lo@foi.dk>
+Maintainer: Lars Otto <larsot23@gmail.com>
 Depends: lpSolveAPI, ucminf
 Suggests: FEAR
 Description: The package contains methods to support frontier analysis.
@@ -25,6 +25,6 @@ Description: The package contains methods to support frontier analysis.
         also be used as a stand-alone package.
 License: GPL (>= 2)
 LazyLoad: yes
-Packaged: 2011-04-15 09:16:02 UTC; Lars
+Packaged: 2011-09-12 12:53:39 UTC; Lars
 Repository: CRAN
-Date/Publication: 2011-04-15 10:29:26
+Date/Publication: 2011-09-12 16:03:32

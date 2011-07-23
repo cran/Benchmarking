@@ -1,4 +1,4 @@
-# $Id: minDirection.R 99 2010-12-23 12:02:58Z Lars $
+# $Id: minDirection.R 116 2011-04-19 14:52:14Z Lars $
 
 # Function to calculate the min step for each input or max step for
 # each output to the frontier, retninger i MEA. A series of LP problems
@@ -16,6 +16,7 @@ minDirection <- function(lps, m, n, ORIENTATION, LP=FALSE)  {
       if (LP) print(paste(" -->  Vare",h),quote=FALSE)
       set.column(lps, 1, c(1,-1), c(0,mn0+h))
       if (LP) print(lps)
+      set.basis(lps, default=TRUE)
       status <- solve(lps)
       if (LP) print(paste("Status =",status),quote=FALSE)
       if (LP) print(get.objective(lps))
@@ -34,11 +35,11 @@ minDirection <- function(lps, m, n, ORIENTATION, LP=FALSE)  {
 # mea er en wrapper for dea med special vaerdi af DIRECT
 
 mea <-  function(X,Y, RTS="vrs", ORIENTATION="in", XREF=NULL, YREF=NULL,
-         FRONT.IDX=NULL,
+         FRONT.IDX=NULL, param=NULL,
          TRANSPOSE=FALSE, LP=FALSE, CONTROL=NULL, LPK=NULL)  {
 
    e <- dea(X,Y, RTS, ORIENTATION, XREF, YREF,
-            FRONT.IDX, SLACK=FALSE, DUAL=FALSE, DIRECT="min", 
+            FRONT.IDX, SLACK=FALSE, DUAL=FALSE, DIRECT="min", param=param, 
             TRANSPOSE=FALSE, LP=LP, CONTROL=CONTROL, LPK=LPK)
 
    return(e)

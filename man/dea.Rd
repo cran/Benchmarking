@@ -1,4 +1,4 @@
-% $Id: dea.Rd 115 2011-04-15 08:59:29Z Lars $
+% $Id: dea.Rd 119 2011-07-23 22:15:48Z Lars $
 \name{dea}
 \alias{dea}
 % \alias{dea.mat}
@@ -235,7 +235,7 @@ discussed on pages 31--25 and 121--127 in Bogetoft and Otto (2011).
 \references{ Peter Bogetoft and Lars Otto; \emph{Benchmarking with
 DEA, SFA, and R}; Springer 2011 }
 
-\author{ Peter Bogetoft and Lars Otto \email{lo@foi.dk}}
+\author{ Peter Bogetoft and Lars Otto \email{larsot23@gmail.com}}
 
 
 \note{ 
@@ -249,11 +249,12 @@ vector). Therefore, in this case a numeric input that is not a matrix
 nor a data frame is transformed to a 1 column matrix, and here the use
 of the argument \code{TRANSPOSE=TRUE} gives an error.
 
-The dual values are not unique for extreme points and therefore the
-calculated dual values for these firms can depend on the order of
-firms in the reference technology. The same lack of uniqueness also
-make the peers for some firms depend on the order of firms in the
-reference technology.
+The dual values are not unique for extreme points (firms on the
+boundary with an efficiency of 1) and therefore the calculated dual
+values for these firms can depend on the order of firms in the
+reference technology. The same lack of uniqueness also make the peers
+for some firms depend on the order of firms in the reference
+technology.
 
 To calucalte slack use the argument \code{SLACK=TRUE} or use the
 function \code{\link{slack}} directly.

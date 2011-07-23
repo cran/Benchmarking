@@ -1,4 +1,4 @@
-% $Id: eladder.Rd 115 2011-04-15 08:59:29Z Lars $
+% $Id: eladder.Rd 119 2011-07-23 22:15:48Z Lars $
 \name{eladder}
 \alias{eladder}
 \alias{eladder.plot}
@@ -10,7 +10,7 @@ is removed sequentially one at a time }
 
 \usage{
 eladder(n, X, Y, RTS = "vrs", ORIENTATION = "in", 
-        XREF=NULL, YREF=NULL, DIRECT = NULL)
+        XREF=NULL, YREF=NULL, DIRECT = NULL, param=NULL)
 eladder.plot(elad, peer, TRIM = NULL)
 }
 
@@ -47,6 +47,13 @@ eladder.plot(elad, peer, TRIM = NULL)
       scalar, an array, or a matrix with non-negative elements. See
       \code{\link{dea}} for a further description of this argument.}
 
+
+  \item{param}{Possible parameters. At the moment only used for
+    RTS="fdh+" to set low and high values for restrictions on lambda;
+    see the section details and examples in \code{\link{dea}} for its
+    use. Future versions might also use \code{param} for other
+    purposes.}
+
   \item{elad}{The sequence of efficiencies returned from \code{eladder}. }
 
   \item{peer}{The sequence of peers returned from \code{eladder}. }
@@ -66,8 +73,13 @@ eladder.plot(elad, peer, TRIM = NULL)
 
 
 \value{The object returned from \code{eladder} is a list with components
-\item{eff}{The sequence of efficiencies}
-\item{peer}{The peers as index in the \code{X} rows.}
+
+\item{eff}{The sequence of efficiencies when the peer with the largest
+    value of lambda has been removed.}
+
+\item{peer}{The sequence of removed peers corresponding to the largest
+    values of lambda as index in the \code{X} rows.}
+
 } 
 
 
@@ -77,7 +89,7 @@ eladder.plot(elad, peer, TRIM = NULL)
    restrict the number of influential peers to be removed.
 
    The efficiency step ladder is discussed in Essay 4 of Dag Fjeld
-   Edvardsens's phd thesis from 2004.}
+   Edvardsens's Ph.D. thesis from 2004.}
 
 
 \references{ Dag Fjeld Edvardsen; \emph{Four Essays on the Measurement
@@ -85,7 +97,7 @@ eladder.plot(elad, peer, TRIM = NULL)
    \url{http://hdl.handle.net/2077/2923}}
 
 
-\author{ Peter Bogetoft and Lars Otto \email{lo@foi.dk} }
+\author{ Peter Bogetoft and Lars Otto \email{larsot23@gmail.com} }
 
 
 \examples{
@@ -98,15 +110,16 @@ n <- which(charnes1981$name=="Tacoma")[1]
 
 el <- eladder(n, x, y, RTS="crs")
 eladder.plot(el$eff, el$peer)
-eladder.plot(el$eff, charnes1981$name[el$peer])
 
-# Restrict to 20 most influential peers for 'Tacoma'
+# Restrict to 20 most influential peers for 'Tacoma' and use names
+# instead of number
 eladder.plot(el$eff[1:20], charnes1981$name[el$peer][1:20])
 
 # Truncate the names of the peers and put a title on top
-eladder.plot(el$eff, charnes1981$name[el$peer], TRIM=5)
+eladder.plot(el$eff[1:20], charnes1981$name[el$peer][1:20], TRIM=5)
 title("Eladder for Tacoma")
 }
 
-\keyword{ ~kwd1 }
-\keyword{ ~kwd2 }% __ONLY ONE__ keyword per line
+\keyword{models}
+\keyword{ efficiency }
+\keyword{plot}

@@ -1,4 +1,4 @@
-% $Id: dea.dual.Rd 115 2011-04-15 08:59:29Z Lars $
+% $Id: dea.dual.Rd 118 2011-07-22 23:28:53Z Lars $
 \name{dea.dual}
 \alias{dea.dual}
 % \alias{dea.dual.mat}
@@ -133,7 +133,7 @@ scale restriction }
  R}; Springer 2011. Sect.  5.10: Partial value information }
 
 
-\author{ Peter Bogetoft and Lars Otto \email{lo@foi.dk}}
+\author{ Peter Bogetoft and Lars Otto \email{larsot23@gmail.com}}
 
 
 \note{ 

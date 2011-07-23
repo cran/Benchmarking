@@ -1,4 +1,4 @@
-# $Id: dea.R 112 2011-04-04 01:10:33Z Lars $
+# $Id: dea.R 117 2011-05-17 10:17:07Z Lars $
 
 # DEA beregning via brug af lp_solveAPI. Fordelene ved lp_solveAPI er
 # færre kald fra R med hele matricer for hver firm og dermed skulle
@@ -131,7 +131,7 @@ dea  <-  function(X,Y, RTS="vrs", ORIENTATION="in", XREF=NULL,YREF=NULL,
    if ( Kr != dim(YREF)[1] )
       stop("Number of units must be the same in XREF and YREF")
 
-   if ( !is.null(DIRECT) & ORIENTATION=="graph" )
+   if ( !is.null(DIRECT) & isTRUE(DIRECT!="min") & ORIENTATION=="graph" )
          stop("DIRECT cannot not be used with ORIENTATION=\"graph\"")
  
    if ( !is.null(DIRECT) & length(DIRECT) > 1 )  {
@@ -154,7 +154,8 @@ dea  <-  function(X,Y, RTS="vrs", ORIENTATION="in", XREF=NULL,YREF=NULL,
    }
 
 
-   if ( RTS=="fdh" && ORIENTATION!="graph" && !FAST && DUAL==FALSE )  {
+   if ( RTS=="fdh" && ORIENTATION!="graph" && !FAST && DUAL==FALSE
+        && isTRUE(DIRECT!="min") )  {
       e <- fdh(X,Y, ORIENTATION=ORIENTATION, XREF=XREF, YREF=YREF, 
                FRONT.IDX=FRONT.IDX, DIRECT=DIRECT, TRANSPOSE=FALSE, oKr)
       if ( SLACK )  {
@@ -182,7 +183,7 @@ dea  <-  function(X,Y, RTS="vrs", ORIENTATION="in", XREF=NULL,YREF=NULL,
    # Initialiser LP objekt
    lps <- make.lp(m+n +rlamb,1+Kr)
    if ( is.null(DIRECT) ) dirStreng<-"" else dirStreng<-"Dir"
-   name.lp(lps, paste(ifelse(DIRECT!="min","Dea","Mea"),
+   name.lp(lps, paste(ifelse(is.null(DIRECT)||DIRECT!="min","Dea","Mea"),
                             ORIENTATION,RTS,dirStreng,sep="-"))
 
    # saet raekker i matrix med restriktioner, saet 0'er for den foerste
@@ -329,8 +330,6 @@ dea  <-  function(X,Y, RTS="vrs", ORIENTATION="in", XREF=NULL,YREF=NULL,
          # Find retningen og saet foerste soejle til den
          set.rhs(lps, c(-X[k,],Y[k,]), 1:(m+n))
 
-         set.basis(lps, default=TRUE)
-
          if ( ORIENTATION=="in" )  {
             DIRECT <- minDirection(lps, m, n, ORIENTATION, LP=LP)
             set.column(lps, 1, c(1,-DIRECT),0:m)
@@ -398,17 +397,8 @@ dea  <-  function(X,Y, RTS="vrs", ORIENTATION="in", XREF=NULL,YREF=NULL,
       if ( !is.null(CONTROL) )  {
          lp.control(lps,CONTROL)
       }
-
-      if ( directMin || Kd > 1 )  {
-         # Direction forskellig for hver firm.
-         # Saet firm selv til ny basis da den forrige basis kan vare
-         # for forskellig og derfor give numerisk fejl i lpSolve.
-         bs.status <- set.basis(lps, default=TRUE)
-         # print(paste("Basis sat:",bs.status),quote=FALSE)
-      } else if ( RTS %in% c("add","fdh","fdh+" ) )  {
-         bs.status <- set.basis(lps, default=TRUE)
-      }
       if ( LP && k <= 10 )  print(lps)
+      set.basis(lps, default=TRUE)
       status <- solve(lps)
       if ( status == 5 )  {
          # Numerical failure, reset basis og prøv igen

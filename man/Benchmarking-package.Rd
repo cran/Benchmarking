@@ -1,4 +1,4 @@
-% $Id: Benchmarking-package.Rd 115 2011-04-15 08:59:29Z Lars $
+% $Id: Benchmarking-package.Rd 118 2011-07-22 23:28:53Z Lars $
 \name{Benchmarking-package}
 \alias{Benchmarking-package}
 \alias{Benchmarking}
@@ -38,8 +38,8 @@ can of course also be used as a stand-alone package.
 \tabular{ll}{
 Package: \tab Benchmarking\cr
 Type: \tab Package\cr
-Version: \tab 0.19 ($Revision: 115 $)\cr
-Date: \tab $Date: 2011-04-15 10:59:29 +0200 (fr, 15 apr 2011) $\cr
+Version: \tab 0.20 ($Revision: 118 $)\cr
+Date: \tab $Date: 2011-07-23 01:28:53 +0200 (23 jul 2011) $\cr
 License: \tab Copyright\cr
 }
 
@@ -112,7 +112,7 @@ License: \tab Copyright\cr
 }
 
 
-\author{ Peter Bogetoft and Lars Otto \email{lo@foi.dk}}
+\author{ Peter Bogetoft and Lars Otto \email{larsot23@gmail.com}}
 
 
 \references{

@@ -1,4 +1,4 @@
-% $Id: addModel.Rd 115 2011-04-15 08:59:29Z Lars $
+% $Id: addModel.Rd 118 2011-07-22 23:28:53Z Lars $
 \name{dea.add}
 \alias{dea.add}
 
@@ -109,7 +109,7 @@ inputs and outputs.  Therefore the values are not independent of how
 the input and output are measured.}
 
 
-\author{ Peter Bogetoft and Lars Otto \email{lo@foi.dk}}
+\author{ Peter Bogetoft and Lars Otto \email{larsot23@gmail.com}}
 
 
 \source{

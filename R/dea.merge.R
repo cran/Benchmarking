@@ -1,4 +1,4 @@
-# $Id: dea.merge.R 85 2010-11-06 22:18:27Z Lars $
+# $Id: dea.merge.R 117 2011-05-17 10:17:07Z Lars $
 
 
 dea.merge <- function(X, Y, M, RTS = "vrs", ORIENTATION = "in", 
@@ -83,8 +83,8 @@ Estar <- dea(Xmerger_proj, Ymerger_proj, RTS=RTS, ORIENTATION=ORIENTATION,
 LE <- E/Estar 
 
 # Inputs and outputs for merged firms in harmony calculation
-Xharm <- diag(1/rowSums(M)) %*% Xmerger_proj
-Yharm <- diag(1/rowSums(M)) %*% Ymerger_proj
+Xharm <- diag(1/rowSums(M), nrow=dim(M)[1]) %*% Xmerger_proj
+Yharm <- diag(1/rowSums(M), nrow=dim(M)[1]) %*% Ymerger_proj
 
 # Harmony effect
 HA <- dea(Xharm,Yharm, RTS=RTS, ORIENTATION=ORIENTATION, 

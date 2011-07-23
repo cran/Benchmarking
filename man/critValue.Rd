@@ -1,4 +1,4 @@
-% $Id: critValue.Rd 98 2010-12-14 21:23:13Z Lars $
+% $Id: critValue.Rd 118 2011-07-22 23:28:53Z Lars $
 \name{critValue}
 \alias{critValue}
 
@@ -24,7 +24,7 @@ the \code{NREP} bootstraps; NREP is from \code{boot.sw98} }
 \value{Returns the critical value}
 
 
-\author{ Peter Bogetoft and Lars Otto \email{lo@foi.dk}}
+\author{ Peter Bogetoft and Lars Otto \email{larsot23@gmail.com}}
 
 
 \seealso{\code{boot.sw98} in \pkg{FEAR}, Paul W. Wilson (2008),

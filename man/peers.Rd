@@ -27,8 +27,8 @@ Find peer firms and units
 
 \arguments{
 
-  \item{object}{An object of class Farrell (returned by the function
-      \code{\link{dea}}), \code{\link{dea.direct}} et al.}
+  \item{object}{An object of class Farrell as returned by the functions
+      \code{\link{dea}}, \code{\link{dea.direct}} et al.}
 
   \item{NAMES}{If true then names for the peers are returned if names
       are available otherwise the unit index numbers are used }
@@ -67,7 +67,7 @@ Find peer firms and units
    DEA, SFA, and R}; Springer 2011. Sect. 4.6 page 93 }
 
 
-\author{ Peter Bogetoft and Lars Otto \email{lo@foi.dk} }
+\author{ Peter Bogetoft and Lars Otto \email{larsot23@gmail.com} }
 
 
 \note{ Peers are defines as firms where the coresponding lambdas are

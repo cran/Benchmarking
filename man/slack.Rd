@@ -71,7 +71,7 @@ Comprehensive Text with Models, Applications, References and
 DEA-Solver Software}, 2nd edn. Springer 2007 .  }
 
 
-\author{ Peter Bogetoft and Lars Otto \email{lo@foi.dk}}
+\author{ Peter Bogetoft and Lars Otto \email{larsot23@gmail.com}}
 
 
 

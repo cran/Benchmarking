@@ -1,4 +1,18 @@
-$Id: NEWS 114 2011-04-10 20:55:50Z Lars $
+$Id: NEWS 120 2011-09-12 12:51:43Z Lars $
+
+
+Changes to Benchmarking version 0.20
+
+ * Changed email for the author/maintainer
+
+ * The arguments RTS=fdh+ and param now also works for eladder and mea.
+
+ * Solved a bug in cost.opt when number of firms defining the
+   technology differ from the number of firms for for which optimal
+   input is to be calculated. This makes it possible to calculate cost
+   efficiency for a group of firms that differ for the group that
+   defines the technology.
+
 
 
 Changes to Benchmarking version 0.19

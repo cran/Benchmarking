@@ -1,4 +1,4 @@
-% $Id: dea.direct.Rd 115 2011-04-15 08:59:29Z Lars $
+% $Id: dea.direct.Rd 118 2011-07-22 23:28:53Z Lars $
 \name{dea.direct}
 \alias{dea.direct}
 
@@ -155,7 +155,7 @@ Peter Bogetoft and Lars Otto; \emph{Benchmarking with DEA, SFA, and
 R}; Springer 2011 }
 
 
-\author{ Peter Bogetoft and Lars Otto \email{lo@foi.dk} }
+\author{ Peter Bogetoft and Lars Otto \email{larsot23@gmail.com} }
 
 
 \note{ To handle fixed, non-discretionary inputs, one can let it

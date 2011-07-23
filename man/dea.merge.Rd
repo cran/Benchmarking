@@ -1,4 +1,4 @@
-% $Id: dea.merge.Rd 101 2011-01-11 20:23:25Z Lars $
+% $Id: dea.merge.Rd 118 2011-07-22 23:28:53Z Lars $
 \name{dea.merge}
 \alias{dea.merge}
 
@@ -70,7 +70,7 @@ Mergers}; \emph{Journal of Productivity Ana-lysis}, 23, pp. 145-171,
 2005. }
 
 
-\author{ Peter Bogetoft and Lars Otto \email{lo@foi.dk}}
+\author{ Peter Bogetoft and Lars Otto \email{larsot23@gmail.com}}
 
 
 % \note{

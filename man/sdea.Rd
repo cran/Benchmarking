@@ -135,7 +135,7 @@ integers), and free disposability \cr
   39(10):1261--1264}
 
 
-\author{ Peter Bogetoft and Lars Otto \email{lo@foi.dk}}
+\author{ Peter Bogetoft and Lars Otto \email{larsot23@gmail.com}}
 
 
 
