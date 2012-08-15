@@ -1,4 +1,4 @@
-# $Id: dea.dual.R 118 2011-07-22 23:28:53Z Lars $
+# $Id: dea.dual.R 122 2012-06-02 20:25:48Z Lars $
 
 # In the calculation in the method input/output matrices X and Y are
 # of the order good x firms.  Ie. X, Y etc must be transformed as
@@ -44,6 +44,24 @@ dea.dual <- function(X,Y, RTS="vrs", ORIENTATION="in",
       stop("dea.dual does not work for \"fdh\", \"fdh+\" or \"add\"")
    if ( !ORIENTATION %in% c("in","out","in-out") )
       stop("dea.dual does not work for \"graph\"")
+
+   if ( class(X)=="data.frame" && data.kontrol(X) || is.numeric(X) ) 
+      { X <- as.matrix(X) }
+   if ( class(Y)=="data.frame" && data.kontrol(Y) || is.numeric(Y) ) 
+      { Y <- as.matrix(Y) }
+   if ( class(XREF)=="data.frame" && data.kontrol(XREF)||is.numeric(XREF))
+      { XREF <- as.matrix(XREF) }
+   if ( class(YREF)=="data.frame" && data.kontrol(YREF)||is.numeric(YREF)) 
+      { YREF <- as.matrix(YREF) }
+
+   if ( class(X)!="matrix" || !is.numeric(X) )
+      stop("X is not a numeric matrix (or data.frame)")
+   if ( class(Y)!="matrix" || !is.numeric(X) )
+      stop("Y is not a numeric matrix (or data.frame)")
+   if ( !is.null(XREF) && (class(XREF)!="matrix" || !is.numeric(XREF)) )
+      stop("XREF is not a numeric matrix (or data.frame)")
+   if ( !is.null(YREF) && (class(YREF)!="matrix" || !is.numeric(YREF)) )
+      stop("YREF is not a numeric matrix (or data.frame)")
 
 
    if ( missing(XREF) || is.null(XREF) )  {

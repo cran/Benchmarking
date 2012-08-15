@@ -1,4 +1,4 @@
-% $Id: dea.Rd 119 2011-07-23 22:15:48Z Lars $
+% $Id: dea.Rd 121 2011-10-10 21:12:44Z Lars $
 \name{dea}
 \alias{dea}
 % \alias{dea.mat}
@@ -214,7 +214,11 @@ discussed on pages 31--25 and 121--127 in Bogetoft and Otto (2011).
 
 \item{TRANSPOSE}{As in the call}
 
-\item{slack}{A vector with sums of the slacks for each firm. Only
+\item{slack}{A logical vector where the component for a firm is
+     \code{TRUE} if the sums of slacks for the corresponding firm is
+     positive. Only calculated in dea when option \code{SLACK=TRUE}}
+
+\item{sum}{A vector with sums of the slacks for each firm. Only
      calculated in dea when option \code{SLACK=TRUE}}
 
 \item{sx}{A matrix for input slacks for each firm, only calculated if

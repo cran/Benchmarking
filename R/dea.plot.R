@@ -1,4 +1,4 @@
-# $Id: dea.plot.R 101 2011-01-11 20:23:25Z Lars $
+# $Id: dea.plot.R 121 2011-10-10 21:12:44Z Lars $
 "dea.plot" <-
 function(x, y, RTS="vrs", ORIENTATION="in-out", txt=NULL, add=FALSE, 
             wx=NULL, wy=NULL, TRANSPOSE = FALSE, fex=1, GRID=FALSE,
@@ -25,11 +25,14 @@ function(x, y, RTS="vrs", ORIENTATION="in-out", txt=NULL, add=FALSE,
    }
    ORIENTATION <- tolower(ORIENTATION)
    if ( !(ORIENTATION %in% orientation) ) {
-      stop(paste("Unknown value for ORIENTATION:",ORIENTATION),quote=F)
+      stop(paste("Unknown value for ORIENTATION:",ORIENTATION))
    }
 
    if ( RTS=="fdh+" && ORIENTATION!="in-out" )
       stop("RTS=\"fdh+\" only works for ORIENTATION=\"in-out\"")
+
+   if ( RTS=="add" && ORIENTATION!="in-out" )
+      stop("RTS=\"add\" only works for ORIENTATION=\"in-out\"")
 
    if (TRANSPOSE) {
       x <- t(x)
@@ -116,7 +119,7 @@ function(x, y, RTS="vrs", ORIENTATION="in-out", txt=NULL, add=FALSE,
       # Lav alle mulige additive kombinatinoner af data
       # Find foerst randen i en fdh
       idx <- sort(x, index.return=TRUE)
-      effektive <- rep(NA, dim(x)[1])
+      effektive <- rep(NA, length(x))
       j <- 1
       prev <- idx$ix[1]
       effektive[j] <- prev
@@ -135,16 +138,18 @@ function(x, y, RTS="vrs", ORIENTATION="in-out", txt=NULL, add=FALSE,
       nx <- round(xlim[2]/x[rand])
 
       # lav aggregerings matrix til alle kombinationer af data
+      # Højst 5 gentagelser hvis nx er uendelig fordi x[rand] er 0
+      if ( is.infinite(nx) )  nx <- 5
       M <- matrix(NA, nrow=prod(1+nx), ncol=nr)
       M[,1] <- rep(0:nx[1], prod(1+nx[-1]))
-      for ( j in 2:nr )  {
+      if ( nr>1) for ( j in 2:nr )  {
          M[,j] <- as.integer(gl(1+nx[j], prod(1+nx[1:(j-1)]))) -1
       }
       # Drop foerste række med bar nuller
       M <- M[-1,]
       # Lav saa alle kombinationerne
-      x <- M %*% x[rand,,drop=FALSE]
-      y <- M %*% y[rand,,drop=FALSE]
+      x <- M %*% as.matrix(x[rand])
+      y <- M %*% as.matrix(y[rand])
       # Herefter kan plottet laves som var det fdh, bemaerk at firms
       # er allerede afsat som punkter saa kombinationerne kommer ikke
       # til at optraede som punkter
@@ -186,15 +191,19 @@ function(x, y, RTS="vrs", ORIENTATION="in-out", txt=NULL, add=FALSE,
       hpts=chull( c(x,0,0,max(x)) , c(y,0,max(y),0) )
       if ( RTS != "fdh" ) {
          lines(x[hpts],y[hpts],...)
-         lines(c(0, min(x[hpts],na.rm=T) ), c(max(y),max(y) ),...)
+         # Problem hvis mindste x er 0 ved max(y) for så bliver
+         # min(x(hpts)) ikke 0 da det omtalte punkt ikke er i hpts som
+         # del af x, men det ekstra punkt (0,max(y)).
+         lines(c(0, min(x[hpts],na.rm=T) ), 
+               c(max(y),max(y[hpts],na.rm=T) ),...)
          lines( c(max(x),max(x)), c(0,min(y[hpts],na.rm=T)),...)
       }
       if ( RTS == "fdh" )  {
          # tegn linjer for fdh
          idy <- sort(y,index.return=T,decreasing=T)
-         lines(c(0,x[idy$ix[1]]),c(idy$x[1],idy$x[1]))
+         lines(c(0,x[idy$ix[1]]),c(idy$x[1],idy$x[1]),...)
          prev <- match(max(x),x)
-         lines(c(max(x),max(x)),c(0,y[prev]))
+         lines(c(max(x),max(x)),c(0,y[prev]),...)
          prev <- idy$ix[1];
          for ( i in idy$ix[-1] )  {
             if ( x[i] > x[prev] ) {

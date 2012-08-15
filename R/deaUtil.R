@@ -1,4 +1,4 @@
-# $Id: deaUtil.R 117 2011-05-17 10:17:07Z Lars $
+# $Id: deaUtil.R 122 2012-06-02 20:25:48Z Lars $
 
 
 efficiencies <- function( object, ... )  {
@@ -312,7 +312,7 @@ lambda.print  <- function(x, KEEPREF=FALSE, ...)  {
    if (!KEEPREF && dim(lam)[2]>1 ) {
       lam <- lam[rowSums(as.matrix(lam))>0,]
    }
-   xx <- format(unclass(lam), digits=4)
+   xx <- round(unclass(lam)*1000)/1000
    if (any(ina <- is.na(lam))) 
       xx[ina] <- ""
    if ( any(i0 <- !ina & abs(lam) < 1e-9) ) 

@@ -1,4 +1,4 @@
-% $Id: dea.plot.Rd 118 2011-07-22 23:28:53Z Lars $
+% $Id: dea.plot.Rd 121 2011-10-10 21:12:44Z Lars $
 \name{dea.plot}
 \alias{dea.plot}
 \alias{dea.plot.frontier}
@@ -8,10 +8,11 @@
 
 \title{Plot of DEA technologies}
 
-\description{Draw a graph of a DEA technology. Designed for two goods illustrations, either isoquant
-(2 inputs), transformation curve (2 outputs), or a production function
-(1 input and 1 output).  If the number of good is larger than 2 then
-aggregation occur, either simple or weighted.}
+\description{Draw a graph of a DEA technology. Designed for two goods
+   illustrations, either isoquant (2 inputs), transformation curve (2
+   outputs), or a production function (1 input and 1 output).  If the
+   number of good is larger than 2 then aggregation occur, either
+   simple or weighted.}
 
 \usage{
 
@@ -121,7 +122,10 @@ dea.plot.transform(y1, y2, RTS="vrs",...)
     \emph{Warning} If you use this facility to plot multi input and
     multi output then the plot may deceive you as fully multi
     efficient firms are not necessarely placed on the two dimensional
-    frontier. }
+    frontier. 
+
+    Note that \code{RTS="add"} and \code{RTS="fdh+"} only works for
+    \code{ORIENTATION="in-out"} (0).  }
 
 
 \value{No return, uses the original graphing system.  }

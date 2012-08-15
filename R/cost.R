@@ -1,4 +1,4 @@
-# $Id: cost.R 120 2011-09-12 12:51:43Z Lars $
+# $Id: cost.R 122 2012-06-02 20:25:48Z Lars $
 
 # Function to calculate minimum cost input.
 
@@ -160,8 +160,8 @@ summary.cost.opt <- function(object, ...)  {
    cat("Cost:\n")
    print(object$cost,...)
    cat("Weights (lambda):\n")
-   x <- object$lambda
-   xx <- format(unclass(x), digits=4)
+   x <- lambda(object)
+   xx <- round(unclass(x)*1000)/1000
    if (any(ina <- is.na(x))) 
       xx[ina] <- ""
    if ( any(i0 <- !ina & abs(x) < 1e-9) ) 

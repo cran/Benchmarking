@@ -1,4 +1,4 @@
-% $Id: Benchmarking-package.Rd 118 2011-07-22 23:28:53Z Lars $
+% $Id: Benchmarking-package.Rd 121 2011-10-10 21:12:44Z Lars $
 \name{Benchmarking-package}
 \alias{Benchmarking-package}
 \alias{Benchmarking}
@@ -38,8 +38,8 @@ can of course also be used as a stand-alone package.
 \tabular{ll}{
 Package: \tab Benchmarking\cr
 Type: \tab Package\cr
-Version: \tab 0.20 ($Revision: 118 $)\cr
-Date: \tab $Date: 2011-07-23 01:28:53 +0200 (23 jul 2011) $\cr
+Version: \tab 0.21 ($Revision: 121 $)\cr
+Date: \tab $Date: 2011-10-10 23:12:44 +0200 (ma, 10 okt 2011) $\cr
 License: \tab Copyright\cr
 }
 
@@ -159,7 +159,7 @@ dea.plot(x,y,RTS="crs",ORIENTATION="in-out",add=TRUE,lty="dotted")
 dea.plot(x,y,RTS="fdh",ORIENTATION="in-out",txt=rownames(x),main="fdh")
 dea.plot(x,y,RTS="irs",ORIENTATION="in-out",txt=TRUE,main="irs")
 dea.plot(x,y,RTS="irs2",ORIENTATION="in-out",txt=rownames(x),main="irs2")
-dea.plot(x,y,RTS="add",ORIENTATION="in-out",txt=rownames(x))
+dea.plot(x,y,RTS="add",ORIENTATION="in-out",txt=rownames(x),main="add")
 
 #  A quick frontier with 1 input and 1 output
 dea.plot(x,y, main="Basic plot of frontier")

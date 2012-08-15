@@ -1,4 +1,4 @@
-# $Id: dea.R 117 2011-05-17 10:17:07Z Lars $
+# $Id: dea.R 121 2011-10-10 21:12:44Z Lars $
 
 # DEA beregning via brug af lp_solveAPI. Fordelene ved lp_solveAPI er
 # færre kald fra R med hele matricer for hver firm og dermed skulle
@@ -547,6 +547,7 @@ dea  <-  function(X,Y, RTS="vrs", ORIENTATION="in", XREF=NULL,YREF=NULL,
       }
       sl <- slack(X, Y, oe, XREF, YREF, FRONT.IDX, LP=LP)
       oe$slack <- sl$slack
+      oe$sum <- sl$sum
       oe$sx <- sl$sx
       oe$sy <- sl$sy
       oe$lambda <- sl$lambda

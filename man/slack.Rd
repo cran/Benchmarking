@@ -51,8 +51,13 @@ slack(X, Y, e, XREF = NULL, YREF = NULL, FRONT.IDX = NULL, LP = FALSE)
    argument in the call of the function with the following added
    components:
 
-  \item{slack}{A vector with sums of the slacks for each firm. Only
+  \item{slack}{A logical vector where the component for a firm is
+      \code{TRUE} if the sums of slacks for the corresponding firm is
+      positive. Only calculated in dea when option \code{SLACK=TRUE}}
+
+  \item{sum}{A vector with sums of the slacks for each firm. Only
       calculated in dea when option \code{SLACK=TRUE}}
+
 
   \item{sx}{A matrix for input slacks for each firm, only calculated
       if the option \code{SLACK} is \code{TRUE} or returned from the

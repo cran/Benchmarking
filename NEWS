@@ -1,4 +1,16 @@
-$Id: NEWS 120 2011-09-12 12:51:43Z Lars $
+$Id: NEWS 122 2012-06-02 20:25:48Z Lars $
+
+
+Changes to Benchmarking version 0.21
+
+ * Corrected bug in dea.plot(.transform) when y1 contains a 0 (bug
+   reported by John P Burkett) and also corrected a few other odd
+   problems in the method.
+
+ * data.frames now possible instead of matrices in dea.dual as it have
+   been for long in dea (bug reported by Marco Giuliano)
+
+ * Better formatting af lambda in several output functions. 
 
 
 Changes to Benchmarking version 0.20

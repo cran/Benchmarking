@@ -1,8 +1,8 @@
 Package: Benchmarking
 Type: Package
 Title: Benchmark and frontier analysis using DEA and SFA
-Version: 0.20
-Date: 2011-04-15 ($Date: 2011-07-23 01:28:53 +0200 (23 jul 2011) $)
+Version: 0.21
+Date: 2011-04-15 ($Date: 2012-08-15 11:47:51 +0200 (on, 15 aug 2012) $)
 Author: Peter Bogetoft and Lars Otto
 Maintainer: Lars Otto <larsot23@gmail.com>
 Depends: lpSolveAPI, ucminf
@@ -12,7 +12,7 @@ Description: The package contains methods to support frontier analysis.
         under different technology assumptions (fdh, vrs, drs, crs,
         irs, add/frh, and fdh+), and using different efficiency
         measures (input based, output based, hyperbolic graph,
-        additive, super, and directional efficency). Peers and slacks
+        additive, super, and directional efficiency). Peers and slacks
         are available, partial price information can be included, and
         optimal cost, revenue and profit can be calculated. Evaluation
         of mergers is also supported.  Methods for graphing the
@@ -25,6 +25,6 @@ Description: The package contains methods to support frontier analysis.
         also be used as a stand-alone package.
 License: GPL (>= 2)
 LazyLoad: yes
-Packaged: 2011-09-12 12:53:39 UTC; Lars
+Packaged: 2012-08-15 09:47:59 UTC; Lars
 Repository: CRAN
-Date/Publication: 2011-09-12 16:03:32
+Date/Publication: 2012-08-15 11:06:06
