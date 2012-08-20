@@ -1,4 +1,10 @@
-$Id: NEWS 122 2012-06-02 20:25:48Z Lars $
+$Id: NEWS 124 2012-08-20 21:26:26Z Lars $
+
+
+Changes to Benchmarking version 0.22
+
+* Corrected bug in dea.direct when the option DIRECTION was given by a
+  number (reported by Tomas Balezentis).
 
 
 Changes to Benchmarking version 0.21

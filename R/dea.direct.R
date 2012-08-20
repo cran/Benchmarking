@@ -1,9 +1,18 @@
-# $Id: dea.direct.R 107 2011-03-25 13:27:26Z Lars $
+# $Id: dea.direct.R 124 2012-08-20 21:26:26Z Lars $
 
 
 dea.direct <- function(X,Y, DIRECT, RTS="vrs", ORIENTATION="in", 
                   XREF=NULL, YREF=NULL, FRONT.IDX=NULL, SLACK=FALSE, 
                   param=NULL, TRANSPOSE=FALSE)  {
+
+
+   orientation <- c("in-out","in","out","graph")
+   if ( is.real(ORIENTATION) )  {
+      ORIENTATION_ <- orientation[ORIENTATION+1]  # "in-out" er nr. 0
+      ORIENTATION <- ORIENTATION_
+   }
+   ORIENTATION <- tolower(ORIENTATION)
+
 
    if ( missing(XREF) || is.null(XREF) )  {
       XREF <- X

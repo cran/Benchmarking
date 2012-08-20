@@ -1,4 +1,4 @@
-% $Id: Benchmarking-package.Rd 121 2011-10-10 21:12:44Z Lars $
+% $Id: Benchmarking-package.Rd 124 2012-08-20 21:26:26Z Lars $
 \name{Benchmarking-package}
 \alias{Benchmarking-package}
 \alias{Benchmarking}
@@ -38,8 +38,8 @@ can of course also be used as a stand-alone package.
 \tabular{ll}{
 Package: \tab Benchmarking\cr
 Type: \tab Package\cr
-Version: \tab 0.21 ($Revision: 121 $)\cr
-Date: \tab $Date: 2011-10-10 23:12:44 +0200 (ma, 10 okt 2011) $\cr
+Version: \tab 0.22 ($Revision: 124 $)\cr
+Date: \tab $Date: 2012-08-20 23:26:26 +0200 (ma, 20 aug 2012) $\cr
 License: \tab Copyright\cr
 }
 
@@ -66,6 +66,8 @@ License: \tab Copyright\cr
 
 \code{excess} \tab Calculates excess input or output compared to DEA
      frontier. \cr
+
+\code{peers} \tab  get the peers for each firm. \cr
 
 \code{dea.boot} \tab Bootstrap DEA models \cr
 \code{boot.fear}  \cr
