@@ -1,4 +1,4 @@
-# $Id: dea.plot.R 121 2011-10-10 21:12:44Z Lars $
+# $Id: dea.plot.R 125 2013-01-20 16:54:54Z Lars $
 "dea.plot" <-
 function(x, y, RTS="vrs", ORIENTATION="in-out", txt=NULL, add=FALSE, 
             wx=NULL, wy=NULL, TRANSPOSE = FALSE, fex=1, GRID=FALSE,
@@ -9,7 +9,7 @@ function(x, y, RTS="vrs", ORIENTATION="in-out", txt=NULL, add=FALSE,
 #
 {
    rts <- c("fdh","vrs","drs","crs","irs","irs2","add","fdh+")
-   if ( is.real(RTS) )  {
+   if ( is.numeric(RTS) )  {
       cat("Number '",RTS,sep="")
       RTStemp <- rts[1+RTS] # the first fdh is number 0
       RTS <- RTStemp
@@ -19,7 +19,7 @@ function(x, y, RTS="vrs", ORIENTATION="in-out", txt=NULL, add=FALSE,
    if ( !(RTS %in% rts) ) stop(paste("Unknown value for RTS:",RTS),quote=F)
 
    orientation <- c("in-out","in","out","graph")
-   if ( is.real(ORIENTATION) )  {
+   if ( is.numeric(ORIENTATION) )  {
       ORIENTATION_ <- orientation[ORIENTATION+1]  # "in-out" er nr. 0
       ORIENTATION <- ORIENTATION_
    }

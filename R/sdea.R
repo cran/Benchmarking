@@ -1,4 +1,4 @@
-# $Id: sdea.R 110 2011-03-31 13:24:18Z Lars $
+# $Id: sdea.R 125 2013-01-20 16:54:54Z Lars $
 
 
 # Calculates super efficiency
@@ -39,7 +39,7 @@ sdea <- function(X,Y, RTS="vrs", ORIENTATION="in", DIRECT=NULL, param=NULL,
    }
    rts <- c("fdh","vrs","drs","crs","irs","irs","add","fdh+","fdh++","fdh0")
    if ( missing(RTS) ) RTS <- "vrs" 
-   if ( is.real(RTS) )  {
+   if ( is.numeric(RTS) )  {
       RTS_ <- rts[1+RTS] # the first fdh is number 0
       RTS <- RTS_
    }
@@ -50,7 +50,7 @@ sdea <- function(X,Y, RTS="vrs", ORIENTATION="in", DIRECT=NULL, param=NULL,
       print(paste("Continues with RTS =",RTS),quote=F)
    }
    orientation <- c("in-out","in","out","graph")
-   if ( is.real(ORIENTATION) )  {
+   if ( is.numeric(ORIENTATION) )  {
       ORIENTATION_ <- orientation[ORIENTATION+1]  # "in-out" er nr. 0
       ORIENTATION <- ORIENTATION_
    }

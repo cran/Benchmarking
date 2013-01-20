@@ -1,4 +1,4 @@
-# $Id: rev.R 114 2011-04-10 20:55:50Z Lars $
+# $Id: rev.R 125 2013-01-20 16:54:54Z Lars $
 
 # Function to calculate maximun revenue for given input and given
 # output prices.
@@ -36,7 +36,7 @@ revenue.opt <- function(XREF, YREF, P, XOBS=NULL, RTS="vrs", param=NULL,
 
    rts <- c("fdh","vrs","drs","crs","irs","irs","add","fdh+")
    if ( missing(RTS) ) RTS <- "vrs" 
-   if ( is.real(RTS) )  {
+   if ( is.numeric(RTS) )  {
       if (LP) cat(paste("Number '",RTS,"'",sep=""),quote=F)
       RTStemp <- rts[1+RTS] # the first fdh is number 0
       RTS <- RTStemp

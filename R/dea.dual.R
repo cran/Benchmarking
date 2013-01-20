@@ -1,4 +1,4 @@
-# $Id: dea.dual.R 122 2012-06-02 20:25:48Z Lars $
+# $Id: dea.dual.R 125 2013-01-20 16:54:54Z Lars $
 
 # In the calculation in the method input/output matrices X and Y are
 # of the order good x firms.  Ie. X, Y etc must be transformed as
@@ -21,7 +21,7 @@ dea.dual <- function(X,Y, RTS="vrs", ORIENTATION="in",
    rts <- c("fdh","vrs","drs","crs","irs","irs","add","fdh+")
    if ( missing(RTS) ) RTS <- "vrs" 
    if (LP)  print(paste("Vaerdi af 'RTS' er ",RTS),quote=FALSE)
-   if ( is.real(RTS) )  {
+   if ( is.numeric(RTS) )  {
       if (LP) print(paste("Number '",RTS,"'",sep=""),quote=FALSE)
       RTStemp <- rts[1+RTS] # the first fdh is number 0
       RTS <- RTStemp
@@ -31,7 +31,7 @@ dea.dual <- function(X,Y, RTS="vrs", ORIENTATION="in",
    if ( !(RTS %in% rts) )  stop(paste("Unknown scale of returns:", RTS))
 
    orientation <- c("in-out","in","out","graph")
-   if ( is.real(ORIENTATION) )  {
+   if ( is.numeric(ORIENTATION) )  {
       ORIENTATION_ <- orientation[ORIENTATION+1]  # "in-out" er nr. 0
       ORIENTATION <- ORIENTATION_
    }
@@ -261,10 +261,11 @@ if ( is.null(AD) )  {
    }
 
    if ( !is.null(CONTROL) )  {
-      lp.control(lps,CONTROL)
+      if( !is.list(CONTROL)) {
+         stop( "argument 'control' must be a 'list' object")
+      }
+      do.call( lp.control, c( list( lprec = lps ), CONTROL ) )
    }
-#    lp.control(lps,scaling=c("geometric","equilibrate","dynupdate"),
-#                 simplextype=c("primal") )
 
 
 # if ( LP || !is.null(LPK) ) print(lps)

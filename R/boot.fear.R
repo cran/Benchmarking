@@ -1,4 +1,4 @@
-# $Id: boot.fear.R 115 2011-04-15 08:59:29Z Lars $
+# $Id: boot.fear.R 125 2013-01-20 16:54:54Z Lars $
 
 # Bootstrap DEA functions, a wrapper for FEAR::boot.sw98
 
@@ -21,7 +21,7 @@ boot.fear <- function(X,Y, NREP=200, EFF=NULL, RTS="vrs", ORIENTATION="in",
 
 
    rts_ <- c("fdh","vrs","drs","crs","irs","irs","add")
-   if ( is.real(RTS) )  {
+   if ( is.numeric(RTS) )  {
       RTStemp <- rts_[1+RTS] # the first fdh is number 0
       RTS <- RTStemp
    }
@@ -32,7 +32,7 @@ boot.fear <- function(X,Y, NREP=200, EFF=NULL, RTS="vrs", ORIENTATION="in",
 
 
    orientation_ <- c("in-out","in","out","graph")
-   if ( is.real(ORIENTATION) )  {
+   if ( is.numeric(ORIENTATION) )  {
       ORIENTATION_ <- orientation[ORIENTATION+1]  # "in-out" er nr. 0
       ORIENTATION <- ORIENTATION_
    }

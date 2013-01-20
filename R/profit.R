@@ -1,4 +1,4 @@
-# $Id: profit.R 114 2011-04-10 20:55:50Z Lars $
+# $Id: profit.R 125 2013-01-20 16:54:54Z Lars $
 
 # Calculates optimal input and output to maximize profit for given
 # input and output prices.
@@ -28,7 +28,7 @@ profit.opt <- function(XREF, YREF, W, P, RTS="vrs", param=NULL,
 
    rts <- c("fdh","vrs","drs","crs","irs","irs","add","fdh+")
    if ( missing(RTS) ) RTS <- "vrs" 
-   if ( is.real(RTS) )  {
+   if ( is.numeric(RTS) )  {
       if (LP) cat(paste("Number '",RTS,"'",sep=""),quote=F)
       RTStemp <- rts[1+RTS] # the first fdh is number 0
       RTS <- RTStemp

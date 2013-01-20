@@ -1,11 +1,11 @@
-# $Id: addModel.R 114 2011-04-10 20:55:50Z Lars $
+# $Id: addModel.R 125 2013-01-20 16:54:54Z Lars $
 
 # Additive model, corresponds to eqs. 4.34-4.38 in Cooper et al., 2007 
 dea.add <- function(X, Y, RTS="vrs", XREF=NULL, YREF=NULL, 
              FRONT.IDX=NULL, param=NULL, TRANSPOSE=FALSE, LP=FALSE)  {
 
    rts <- c("fdh","vrs","drs","crs","irs","irs","add","fdh+")
-   if ( is.real(RTS) )  {
+   if ( is.numeric(RTS) )  {
       if (LP) print(paste("Number '",RTS,"'",sep=""),quote=F)
       RTStemp <- rts[1+RTS] # the first fdh is number 0
       RTS <- RTStemp

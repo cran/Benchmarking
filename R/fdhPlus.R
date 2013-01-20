@@ -1,4 +1,4 @@
-# $Id: fdhPlus.R 107 2011-03-25 13:27:26Z Lars $
+# $Id: fdhPlus.R 125 2013-01-20 16:54:54Z Lars $
 
 
 # FDH+.  Beregn foerst CRS efficiency med kun en mulig peer; se om
@@ -12,7 +12,7 @@ dea.fdhPlus <- function(X, Y, ORIENTATION="in",
 {
 
    orientation <- c("in-out","in","out","graph")
-   if ( is.real(ORIENTATION) )  {
+   if ( is.numeric(ORIENTATION) )  {
       ORIENTATION_ <- orientation[ORIENTATION+1]  # "in-out" er nr. 0
       ORIENTATION <- ORIENTATION_
    }

@@ -1,4 +1,4 @@
-# $Id: dea.direct.R 124 2012-08-20 21:26:26Z Lars $
+# $Id: dea.direct.R 125 2013-01-20 16:54:54Z Lars $
 
 
 dea.direct <- function(X,Y, DIRECT, RTS="vrs", ORIENTATION="in", 
@@ -7,7 +7,7 @@ dea.direct <- function(X,Y, DIRECT, RTS="vrs", ORIENTATION="in",
 
 
    orientation <- c("in-out","in","out","graph")
-   if ( is.real(ORIENTATION) )  {
+   if ( is.numeric(ORIENTATION) )  {
       ORIENTATION_ <- orientation[ORIENTATION+1]  # "in-out" er nr. 0
       ORIENTATION <- ORIENTATION_
    }

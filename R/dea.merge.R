@@ -1,4 +1,4 @@
-# $Id: dea.merge.R 117 2011-05-17 10:17:07Z Lars $
+# $Id: dea.merge.R 125 2013-01-20 16:54:54Z Lars $
 
 
 dea.merge <- function(X, Y, M, RTS = "vrs", ORIENTATION = "in", 
@@ -6,7 +6,7 @@ dea.merge <- function(X, Y, M, RTS = "vrs", ORIENTATION = "in",
 {
 
    rts <- c("fdh","vrs","drs","crs","irs","irs","add")
-   if ( is.real(RTS) )  {
+   if ( is.numeric(RTS) )  {
       RTStemp <- rts[1+RTS] # the first fdh is number 0
       RTS <- RTStemp
    }
@@ -14,7 +14,7 @@ dea.merge <- function(X, Y, M, RTS = "vrs", ORIENTATION = "in",
    if ( !(RTS %in% rts) )  stop(paste("Unknown scale of returns:", RTS))
 
    orientation <- c("in-out","in","out","graph")
-   if ( is.real(ORIENTATION) )  {
+   if ( is.numeric(ORIENTATION) )  {
       ORIENTATION_ <- orientation[ORIENTATION+1]  # "in-out" er nr. 0
       ORIENTATION <- ORIENTATION_
    }

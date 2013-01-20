@@ -1,4 +1,4 @@
-# $Id: cost.R 122 2012-06-02 20:25:48Z Lars $
+# $Id: cost.R 125 2013-01-20 16:54:54Z Lars $
 
 # Function to calculate minimum cost input.
 
@@ -31,7 +31,7 @@ cost.opt <- function(XREF, YREF, W, YOBS=NULL, RTS="vrs", param=NULL,
       stop("Number of outputs in YREF and YOBS differ")
 
    rts <- c("fdh","vrs","drs","crs","irs","irs","add","fdh+")
-   if ( is.real(RTS) )  {
+   if ( is.numeric(RTS) )  {
       if (LP) cat(paste("Number '",RTS,"'",sep=""),quote=F)
       RTStemp <- rts[1+RTS] # the first fdh is number 0
       RTS <- RTStemp

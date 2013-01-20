@@ -1,4 +1,4 @@
-# $Id: dea.R 121 2011-10-10 21:12:44Z Lars $
+# $Id: dea.R 125 2013-01-20 16:54:54Z Lars $
 
 # DEA beregning via brug af lp_solveAPI. Fordelene ved lp_solveAPI er
 # færre kald fra R med hele matricer for hver firm og dermed skulle
@@ -32,7 +32,7 @@ dea  <-  function(X,Y, RTS="vrs", ORIENTATION="in", XREF=NULL,YREF=NULL,
 
    rts <- c("fdh","vrs","drs","crs","irs","irs2","add","fdh+","fdh++","fdh0")
    if ( missing(RTS) ) RTS <- "vrs" 
-   if ( is.real(RTS) )  {
+   if ( is.numeric(RTS) )  {
       if (LP) print(paste("Number '",RTS,"'",sep=""),quote=F)
       RTStemp <- rts[1+RTS] # the first fdh is number 0
       RTS <- RTStemp
@@ -42,7 +42,7 @@ dea  <-  function(X,Y, RTS="vrs", ORIENTATION="in", XREF=NULL,YREF=NULL,
    if ( !(RTS %in% rts) )  stop(paste("Unknown scale of returns:", RTS))
 
    orientation <- c("in-out","in","out","graph")
-   if ( is.real(ORIENTATION) )  {
+   if ( is.numeric(ORIENTATION) )  {
       ORIENTATION_ <- orientation[ORIENTATION+1]  # "in-out" er nr. 0
       ORIENTATION <- ORIENTATION_
    }
@@ -273,7 +273,10 @@ dea  <-  function(X,Y, RTS="vrs", ORIENTATION="in", XREF=NULL,YREF=NULL,
    }
 
    if ( !is.null(CONTROL) )  {
-      lp.control(lps,CONTROL)
+      if( !is.list(CONTROL)) {
+         stop( "argument 'control' must be a 'list' object")
+      }
+      do.call( lp.control, c( list( lprec = lps ), CONTROL ) )
    }
 
    if ( ORIENTATION == "graph" )  {
@@ -395,7 +398,10 @@ dea  <-  function(X,Y, RTS="vrs", ORIENTATION="in", XREF=NULL,YREF=NULL,
          }
       }
       if ( !is.null(CONTROL) )  {
-         lp.control(lps,CONTROL)
+         if( !is.list(CONTROL)) {
+            stop( "argument 'control' must be a 'list' object")
+         }
+         do.call( lp.control, c( list( lprec = lps ), CONTROL ) )
       }
       if ( LP && k <= 10 )  print(lps)
       set.basis(lps, default=TRUE)

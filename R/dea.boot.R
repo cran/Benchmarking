@@ -1,4 +1,4 @@
-# $Id: dea.boot.R 101 2011-01-11 20:23:25Z Lars $
+# $Id: dea.boot.R 125 2013-01-20 16:54:54Z Lars $
 
 # Boot No FEAR: boot.nf
 # Bootstrap af dea model a la Simar Wilson 1998.
@@ -14,7 +14,7 @@ dea.boot <- function(X,Y, NREP=200, EFF=NULL, RTS="vrs",
       stop("Use of DIRECT does not yet work in dea.boot")
 
    rts_ <- c("fdh","vrs","drs","crs","irs","irs","add")
-   if ( is.real(RTS) )  {
+   if ( is.numeric(RTS) )  {
       RTStemp <- rts_[1+RTS] # the first fdh is number 0
       RTS <- RTStemp
    }
@@ -27,7 +27,7 @@ dea.boot <- function(X,Y, NREP=200, EFF=NULL, RTS="vrs",
 
 
    orientation_ <- c("in-out","in","out","graph")
-   if ( is.real(ORIENTATION) )  {
+   if ( is.numeric(ORIENTATION) )  {
       ORIENTATION_ <- orientation[ORIENTATION+1]  # "in-out" er nr. 0
       ORIENTATION <- ORIENTATION_
    }

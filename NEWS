@@ -1,4 +1,12 @@
-$Id: NEWS 124 2012-08-20 21:26:26Z Lars $
+$Id: NEWS 125 2013-01-20 16:54:54Z Lars $
+
+
+Changes to Benchmarking version 0.23
+
+* Corrected setting of options CONTROL (suggested by Arne Henningsen).
+
+* Changed from using the deprecated function is.real to use of
+  is.numeric.
 
 
 Changes to Benchmarking version 0.22
