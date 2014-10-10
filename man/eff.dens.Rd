@@ -1,4 +1,4 @@
-% $Id: eff.dens.Rd 118 2011-07-22 23:28:53Z Lars $
+% $Id: eff.dens.Rd 131 2014-06-24 17:00:12Z b002961 $
 \name{eff.dens}
 \alias{eff.dens}
 \alias{eff.dens.plot}
@@ -46,7 +46,7 @@ defaults. }
 
 
 \details{ The calculation is based on a reflection method (Silverman
-1986, 30) using the default window kernel and defult bandwidth (wndow
+1986, 30) using the default window kernel and defult bandwidth (window
 width) in the method \code{density}.  
 
 The method \code{eff.dens.plot} plot the density directly, and

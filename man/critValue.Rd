@@ -1,12 +1,13 @@
-% $Id: critValue.Rd 118 2011-07-22 23:28:53Z Lars $
+% $Id: critValue.Rd 129 2014-06-16 13:31:01Z b002961 $
 \name{critValue}
 \alias{critValue}
 
 \title{Critical values from bootstrapped DEA models}
 
 \description{Calculates critical value for test using bootstrap output
-in DEA models; an after method for the method boot.sw98 in the FEAR
-package} 
+in DEA models%; an after method for the method boot.sw98 in the FEAR
+%package
+} 
 
 \usage{ critValue(s, alpha=0.05) }
 

@@ -1,4 +1,4 @@
-# $Id: dea.plot.R 125 2013-01-20 16:54:54Z Lars $
+# $Id: dea.plot.R 128 2014-06-14 16:19:18Z B002961 $
 "dea.plot" <-
 function(x, y, RTS="vrs", ORIENTATION="in-out", txt=NULL, add=FALSE, 
             wx=NULL, wy=NULL, TRANSPOSE = FALSE, fex=1, GRID=FALSE,
@@ -189,6 +189,9 @@ function(x, y, RTS="vrs", ORIENTATION="in-out", txt=NULL, add=FALSE,
    } else if (ORIENTATION == "out") {
       # produktionsmulighedsområde for output, output afstandsfunktion
       hpts=chull( c(x,0,0,max(x)) , c(y,0,max(y),0) )
+      # For at være sikre på at alle linjer tegnes laves en lukket graf
+      # eller kan der opstå et hul i fronten
+      hpts <- c(hpts, hpts[1])
       if ( RTS != "fdh" ) {
          lines(x[hpts],y[hpts],...)
          # Problem hvis mindste x er 0 ved max(y) for så bliver

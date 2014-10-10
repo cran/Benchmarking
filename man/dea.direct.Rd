@@ -1,4 +1,4 @@
-% $Id: dea.direct.Rd 118 2011-07-22 23:28:53Z Lars $
+% $Id: dea.direct.Rd 129 2014-06-16 13:31:01Z b002961 $
 \name{dea.direct}
 \alias{dea.direct}
 
@@ -102,7 +102,7 @@ dea.direct(X, Y, DIRECT, RTS = "vrs", ORIENTATION = "in",
   to inputs (\code{ORIENTATION="in"}), restricted to outputs
   (\code{ORIENTATION="out"}), or both include inputs and output
   directions (\code{ORIENTATION="in-out"}). Directional efficiency is
-  discussed on pages 31--25 and 121--127 in Bogetoft and Otto (2011).
+  discussed on pages 31--35 and 121--127 in Bogetoft and Otto (2011).
 
   The Farrell efficiency interpretation is the ratio by which a firm
   can proportionally reduce all inputs (or expand all outputs) without
@@ -148,7 +148,7 @@ dea.direct(X, Y, DIRECT, RTS = "vrs", ORIENTATION = "in",
 }
 
 
-\references{ Directional efficiency is discussed on pages 31--25 and
+\references{ Directional efficiency is discussed on pages 31--35 and
 121--127 in Bogetoft and Otto (2011).
 
 Peter Bogetoft and Lars Otto; \emph{Benchmarking with DEA, SFA, and

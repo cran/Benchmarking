@@ -1,15 +1,15 @@
-% $Id: Benchmarking-package.Rd 125 2013-01-20 16:54:54Z Lars $
+% $Id: Benchmarking-package.Rd 134 2014-10-08 18:21:00Z B002961 $
 \name{Benchmarking-package}
 \alias{Benchmarking-package}
 \alias{Benchmarking}
 \docType{package}
 
 \title{ Data Envelopment Analyses (DEA) and Stochastic Frontier
-Analyses (SFA) -- Model estimations and efficiency measuring }
+Analyses (SFA) -- Model Estimations and Efficiency Measuring }
 
 \description{
 
-The package contains methods to estimate technologies and measure
+The Benchmarking package contains methods to estimate technologies and measure
 efficiencies using DEA and SFA. Data Envelopment Analysis (DEA) are
 supported under different technology assumptions (fdh, vrs, drs, crs,
 irs, add), and using different efficiency measures (input based,
@@ -38,8 +38,8 @@ can of course also be used as a stand-alone package.
 \tabular{ll}{
 Package: \tab Benchmarking\cr
 Type: \tab Package\cr
-Version: \tab 0.23 ($Revision: 125 $)\cr
-Date: \tab $Date: 2013-01-20 17:54:54 +0100 (20 jan 2013) $\cr
+Version: \tab 0.24 ($Revision: 134 $)\cr
+Date: \tab $Date: 2014-10-08 20:21:00 +0200 (on, 08 okt 2014) $\cr
 License: \tab Copyright\cr
 }
 
@@ -70,7 +70,7 @@ License: \tab Copyright\cr
 \code{peers} \tab  get the peers for each firm. \cr
 
 \code{dea.boot} \tab Bootstrap DEA models \cr
-\code{boot.fear}  \cr
+% \code{boot.fear}  \cr
 
 \code{cost.opt} \tab Optimal input for given output and prices. \cr
 
@@ -143,8 +143,8 @@ The input and output matrices can contain negative numbers, and the
 methods can thereby manage restricted or fixed input or output.
 
 The return is not just the efficiency, but also slacks, dual values
-(shadow prices), peers, and lambdas (weights). Bootstrap rely on the
-package \pkg{FEAR} (Wilson 2008).
+(shadow prices), peers, and lambdas (weights). % Bootstrap rely on the
+% package \pkg{FEAR} (Wilson 2008).
 
 }
 

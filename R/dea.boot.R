@@ -1,4 +1,4 @@
-# $Id: dea.boot.R 125 2013-01-20 16:54:54Z Lars $
+# $Id: dea.boot.R 130 2014-06-17 08:02:39Z B002961 $
 
 # Boot No FEAR: boot.nf
 # Bootstrap af dea model a la Simar Wilson 1998.
@@ -115,6 +115,10 @@ dea.boot <- function(X,Y, NREP=200, EFF=NULL, RTS="vrs",
       # print(dist)
    # Behold efficiencer over 1, drop 1-erne når bredden beregnes
    zeff <- eff[ dist > 1 + 1e-6 ]
+   if ( length(zeff) == 0 )  {
+      cat("No unit with efficiency different from 1.0000.\n", quote=FALSE)
+      stop("The range of efficiencies is degenrate, 'dea.boot' stops-")
+   }
    # Spejling om 1
    neff <- c(zeff,2-zeff)
    # Ratio |adjust| som bredden skal ganges med fordi der er for mange
@@ -145,7 +149,7 @@ if ( ORIENTATION == "in" )  {
       boot[,b] <- dea(X,Y, RTS, ORIENTATION, XREF=xstar, YREF, FAST=TRUE)
       # if (LP) print(boot[,b])
    }  # b in 1:NREP
-} else if ( ORIENTATION == "out" )  {
+} else if ( ORIENTATION == "out" )  {   # farrel er TRUE
    for ( b in 1:NREP )  {
       # Farrell output efficiencer
       estar <- dea.sample(eff, h, K)
@@ -165,9 +169,9 @@ if ( ORIENTATION == "in" )  {
 }
 
 
-if ( ORIENTATION == "out" )  {
+if ( ORIENTATION == "out" )  {  #farrel er TRUE
    # Efficiencer stoerre end 1
-   bias <- rowMeans(boot) - eff
+   bias <- rowMeans(boot, na.rm=TRUE) - eff
    eff.bc <- eff - bias
 
    ci_ <- t(apply(eff-boot,1, quantile, 
@@ -179,7 +183,7 @@ if ( ORIENTATION == "out" )  {
 } else {
    # Efficiencer er mindre end 1, men blev bootstrappet som var de
    # over 1, og der skal derfor regnes på dem som var de over 1
-   bias <- 1/eff - rowMeans(1/boot)
+   bias <- 1/eff - rowMeans(1/boot, na.rm=TRUE)
    eff.bc <- eff - bias
 
    boot_ <- 1/boot - 1/eff

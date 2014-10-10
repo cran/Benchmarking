@@ -1,4 +1,4 @@
-# $Id: sfa.R 102 2011-01-23 18:50:21Z Lars $
+# $Id: sfa.R 128 2014-06-14 16:19:18Z B002961 $
 # \encoding{latin1}
 
 
@@ -6,8 +6,6 @@ sfa <- function(x, y, beta0=NULL, lambda0=1, resfun=ebeta,
                 TRANSPOSE = FALSE, DEBUG=FALSE, 
                 control=list(maxeval=1000, stepmax=1), hessian=2)  
 {
-   require(ucminf)
-
 
 # Funktion: beregner minus loglikelihood
 loglik <- function(parm) {

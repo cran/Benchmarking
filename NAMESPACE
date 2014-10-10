@@ -1,4 +1,4 @@
-# $Id: NAMESPACE 101 2011-01-11 20:23:25Z Lars $
+# $Id: NAMESPACE 128 2014-06-14 16:19:18Z B002961 $
 export(dea, sdea,   # efficiency, eff,
 excess, eladder, eladder.plot,
 dea.dual,
@@ -64,4 +64,5 @@ S3method( "vcov", "sfa" )
 
 
 # importFrom(FEAR,boot.sw98)
-
+import(lpSolveAPI)
+importFrom(ucminf, ucminf)

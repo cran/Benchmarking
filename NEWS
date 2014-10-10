@@ -1,4 +1,21 @@
-$Id: NEWS 125 2013-01-20 16:54:54Z Lars $
+$Id: NEWS 129 2014-06-16 13:31:01Z b002961 $
+
+Upcoming
+
+* Implementing Malmquist index
+
+* Directional distance efficiency for parametric function
+
+
+Changes to Benchmarking version 0.24
+
+* Corrected dea.plot.transform that in certain cases missed a segment on the frontier
+
+* Corrected several manual pages
+
+* Use of FEAR has been droped as FEAR is hard to install and is not free.
+
+* The method mea can now be used for directions in, out, and in-out.
 
 
 Changes to Benchmarking version 0.23

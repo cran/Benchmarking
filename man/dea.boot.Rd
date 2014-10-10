@@ -1,4 +1,4 @@
-% $Id: dea.boot.Rd 118 2011-07-22 23:28:53Z Lars $
+% $Id: dea.boot.Rd 129 2014-06-16 13:31:01Z b002961 $
 \name{dea.boot}
 \alias{dea.boot}
 \alias{boot.fear}
@@ -7,9 +7,11 @@
 \title{ Bootstrap DEA models }
 
 \description{ The function \code{dea.boot} bootstrap DEA models and
-returns bootstrap of Farrell efficiencies. The faster function
-\code{boot.fear} is a wrapper for \code{boot.sw89} from the package
-\pkg{FEAR} returning results directly as Farrell measures.}
+returns bootstrap of Farrell efficiencies. This function is slower than the 
+\code{boot.sw89} from the package \pkg{FEAR}. 
+The faster function \code{boot.fear} is a wrapper for \code{boot.sw89} from 
+the package \pkg{FEAR} returning results directly as Farrell measures.
+}
 
 
 \usage{
@@ -119,22 +121,24 @@ boot.fear(X, Y, NREP = 200, EFF = NULL, RTS = "vrs", ORIENTATION = "in",
 \author{ Peter Bogetoft and Lars Otto \email{larsot23@gmail.com}}
 
 
-\note{ \emph{The function \code{boot.fear} only works if the package
-   \pkg{FEAR} is installed}; it does not need to be loaded.  The
-   \code{boot.sw89} from the package \pkg{FEAR} is designed for
-   Shephard distance functions, and \code{boot.fear} is a wrapper to
-   recalculate the results suitable for Farrell efficiencies.
+\note{ 
+   %\emph{The function \code{boot.fear} only works if the package
+   %\pkg{FEAR} is installed}; it does not need to be loaded.  The
+   %\code{boot.sw89} from the package \pkg{FEAR} is designed for
+   %Shephard distance functions, and \code{boot.fear} is a wrapper to
+   %recalculate the results suitable for Farrell efficiencies.
 
    The function \code{dea.boot} does not depend on the FEAR package
    and can therefore be used on computers where the package FEAR is
    not available. This, however, comes with a time penalty as it takes
-   around 4 times longer to run compared to using FEAR directly or
-   indirectly by the wrapper \code{boot.fear}.
+   around 4 times longer to run compared to using FEAR directly% or
+   %indirectly by the wrapper \code{boot.fear}
+   %.
 
-   The returned bootstrap estimates from \code{boot.fear} of
-   efficiencies are sorted for each firm individually as this is done
-   by \code{FEAR::boot.sw98}. Unfortunately, this means that the
-   columns of the component \code{boot} is not the efficiencies for
+   The returned bootstrap estimates from \code{FEAR::boot.sw98} %\code{boot.fear} 
+   of efficiencies are sorted for each firm individually. 
+   % as this is done    by \code{FEAR::boot.sw98}. 
+   Unfortunately, this means that the component of replicas is not the efficiencies for
    the same bootstrap replica, but could easily be from differencts
    bootstrap replicas. This also means that this function can
    \emph{not} be used to bootstrap tests for statistical hypotheses

@@ -1,4 +1,4 @@
-# $Id: dea.R 125 2013-01-20 16:54:54Z Lars $
+# $Id: dea.R 131 2014-06-24 17:00:12Z b002961 $
 
 # DEA beregning via brug af lp_solveAPI. Fordelene ved lp_solveAPI er
 # færre kald fra R med hele matricer for hver firm og dermed skulle
@@ -188,8 +188,10 @@ dea  <-  function(X,Y, RTS="vrs", ORIENTATION="in", XREF=NULL,YREF=NULL,
 
    # saet raekker i matrix med restriktioner, saet 0'er for den foerste
    # soejle for den skal alligevel aendres for hver firm.
+   # Første 'm' rækker med input
    for ( h in 1:m )
        set.row(lps,h, c(0,-XREF[,h]))
+   # Følgende 'n' rækker med output
    for ( h in 1:n)
        set.row(lps,m+h, c(0,YREF[,h]))
    # restriktioner paa lambda
@@ -258,6 +260,7 @@ dea  <-  function(X,Y, RTS="vrs", ORIENTATION="in", XREF=NULL,YREF=NULL,
    }
 
    set.objfn(lps, 1,1)
+   # Både in- og output modeller skal formuleres med ">="
    set.constr.type(lps, rep(">=",m+n+rlamb))
    if ( ORIENTATION %in% c("in","graph") )  {
       lp.control(lps, sense="min")
@@ -268,6 +271,7 @@ dea  <-  function(X,Y, RTS="vrs", ORIENTATION="in", XREF=NULL,YREF=NULL,
    } else  
      stop("In 'dea' for ORIENTATION use only 'in', 'out', 'graph', or 'in-out (only for DIRECT)")
 
+   # Ved brug af directional efficiency er der altid tale om et max-problem
    if ( !is.null(DIRECT) )  {
       lp.control(lps, sense="max")
    }
@@ -330,28 +334,29 @@ dea  <-  function(X,Y, RTS="vrs", ORIENTATION="in", XREF=NULL,YREF=NULL,
 
 
       if ( directMin )  {
-         # Find retningen og saet foerste soejle til den
+         # Sæt højreside for enhedens input og output
          set.rhs(lps, c(-X[k,],Y[k,]), 1:(m+n))
 
+         # Find retningen og saet foerste soejle til den
          if ( ORIENTATION=="in" )  {
             DIRECT <- minDirection(lps, m, n, ORIENTATION, LP=LP)
             set.column(lps, 1, c(1,-DIRECT),0:m)
          } else if ( ORIENTATION=="out" )  {
             DIRECT <- minDirection(lps, m, n, ORIENTATION, LP=LP)
-            set.column(lps, 1, c(1,DIRECT), c(0,(m+1):(m+n)) )
+            set.column(lps, 1, c(1,-DIRECT), c(0,(m+1):(m+n)) )
          } else if ( ORIENTATION=="in-out" )  {
-              stop(paste("ORIENTATION=\"in-out\" does at the moment",
-                         "not work with DIRECT=\"min\""))
-            # DIRECT <- minDirection(lps, m, n, ORIENTATION)
-            # set.column(lps, 1, c(1,-DIRECT),0:(m+n))
+              #stop(paste("ORIENTATION=\"in-out\" does at the moment",
+              #           "not work with DIRECT=\"min\""))
+            DIRECT <- minDirection(lps, m, n, ORIENTATION)
+            set.column(lps, 1, c(1,-DIRECT),0:(m+n))
          }
          directMatrix[k,] <- DIRECT
          if (LP) { print("Min DIRECT:"); print(DIRECT) }
+
          # Check om DIRECT er 0, hvis den er nul gaa til naeste firm
          lpcontr <- lp.control(lps)
          eps <- sqrt(lpcontr$epsilon["epsint"])
          if (LP) print(paste("eps for minDirectin",eps), quote=FALSE)
-
 # Dårligt test for om direction er 0, tager ikke hensyn at X og Y kan
 # være forskellig størrelse
          if ( ORIENTATION=="in" )  {

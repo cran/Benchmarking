@@ -1,4 +1,4 @@
-# $Id: boot.fear.R 125 2013-01-20 16:54:54Z Lars $
+# $Id: boot.fear.R 128 2014-06-14 16:19:18Z B002961 $
 
 # Bootstrap DEA functions, a wrapper for FEAR::boot.sw98
 
@@ -53,16 +53,16 @@ boot.fear <- function(X,Y, NREP=200, EFF=NULL, RTS="vrs", ORIENTATION="in",
    if ( !is.null(YREF) )  YREF <- t(YREF)
    if ( !is.null(EFF)  )  EFF  <- 1/EFF   # Konverter til Shephard
    if ( !is.null(EREF) )  EREF <- 1/EREF  # Konverter til Shephard
-   tryCatch( b <- FEAR::boot.sw98(t(X), t(Y), NREP, EFF, rts, 
-                    orientation, alpha,,XREF, YREF, EREF,
-                    OUTPUT.FARREL=farrell) , 
-      warning = function(w) print(w),
-      error = function(e) {
-         print(e)
-         stop("boot.fear aborted:  Could be that FEAR is not installed")
-      } # ,
-      # finaly=print("FEAR::boot.sw98 finished with bootstrap",quote=FALSE)
-   )
+##   tryCatch( b <- FEAR::boot.sw98(t(X), t(Y), NREP, EFF, rts, 
+##                    orientation, alpha,,XREF, YREF, EREF,
+##                    OUTPUT.FARREL=farrell) , 
+##      warning = function(w) print(w),
+##      error = function(e) {
+##         print(e)
+##         stop("boot.fear aborted:  Could be that FEAR is not installed")
+##      } # ,
+##      # finaly=print("FEAR::boot.sw98 finished with bootstrap",quote=FALSE)
+##   )
 
    # boot.sw98(t(x), t(y), NREP=NREP)
    # print("FEAR done; now for calculating the aggregate statistics")

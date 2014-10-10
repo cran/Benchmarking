@@ -1,4 +1,4 @@
-% $Id: dea.Rd 121 2011-10-10 21:12:44Z Lars $
+% $Id: dea.Rd 131 2014-06-24 17:00:12Z b002961 $
 \name{dea}
 \alias{dea}
 % \alias{dea.mat}
@@ -98,7 +98,7 @@ integers), and free disposability \cr
     the scalar; the value of the efficiency depends on the scalar as
     well as on the unit of measurements.
 
-    If the argument an array, this is used for the direction for every
+    If the argument is an array, this is used for the direction for every
     firm; the length of the array must correspond to the number of
     inputs and/or outputs depending on the \code{ORIENTATION}.
 
@@ -188,7 +188,7 @@ units of measurements, i.e. \eqn{x-e d}, and for output orientation
 (\code{ORIENTAION="in"}), restricted to outputs
 (\code{ORIENTAION="out"}), or both include inputs and output
 directions (\code{ORIENTAION="in-out"}). Dirctional efficiency is
-discussed on pages 31--25 and 121--127 in Bogetoft and Otto (2011).
+discussed on pages 31--35 and 121--127 in Bogetoft and Otto (2011).
 
 }
 

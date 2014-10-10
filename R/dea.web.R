@@ -1,4 +1,7 @@
 # $Id$
+
+# Første forsøg med en web-graf for efficiens og tilhørende input/output
+
 dea.web <-
 function(X, E, N=NULL, txt=NULL, add=FALSE, 
             GRID=FALSE, fex=1,

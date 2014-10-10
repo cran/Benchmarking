@@ -1,4 +1,4 @@
-% $Id: mea.Rd 118 2011-07-22 23:28:53Z Lars $
+% $Id: mea.Rd 129 2014-06-16 13:31:01Z b002961 $
 \name{mea}
 \alias{mea}
 \alias{mea.lines}
@@ -19,7 +19,7 @@ changed one at a time.  }
 mea(X, Y, RTS = "vrs", ORIENTATION = "in", XREF = NULL, YREF = NULL, 
     FRONT.IDX = NULL, param=NULL, TRANSPOSE = FALSE, 
     LP = FALSE, CONTROL = NULL, LPK = NULL)
-mea.lines(N, X, Y)  
+mea.lines(N, X, Y, ORIENTATION="in")  
 }
 
 
@@ -47,10 +47,12 @@ mea.lines(N, X, Y)
 
 }
 
-  \item{ORIENTATION}{Input efficiency "in" (1), output efficiency
-      "out" (2), and graph efficiency "graph" (3). For use with
-      \code{DIRECT}, an additional option is "in-out" (0). In this
-      case, "graph" is not feasible}
+  \item{ORIENTATION}{Input efficiency "in" (1) or output efficiency
+      "out" (2)%, and graph efficiency "graph" (3). For use with
+      % \code{DIRECT}, an additional option is "in-out" (0). In this
+      % case, "graph" is not feasible 
+      and also the additional option "in-out" (0) for both input and output directions.
+      }
 
   \item{XREF}{Inputs of the firms determining the technology, defaults
       to \code{X}}

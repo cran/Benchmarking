@@ -1,12 +1,13 @@
-% $Id: typeIerror.Rd 118 2011-07-22 23:28:53Z Lars $
+% $Id: typeIerror.Rd 129 2014-06-16 13:31:01Z b002961 $
 \name{typeIerror}
 \alias{typeIerror}
 
 \title{Probability of type I error for test in a bootstrap DEA model}
 
 \description{Calculates the probability of a type I error for a test
-   in bootstrapped DEA models; gives an after-method for the method
-   \code{boot.sw98} in the \pkg{FEAR} package}
+   in bootstrapped DEA models. %; gives an after-method for the method
+   %\code{boot.sw98} in the \pkg{FEAR} package
+   }
 
 \usage{typeIerror(shat,s) }
 
@@ -16,7 +17,7 @@
      type I error is to be calculated}
 
 \item{s}{Vector with calculated values of the statistic for each of
-     the \code{NREP} bootstraps; NREP is from \code{boot.sw98} }
+     the \code{NREP} bootstraps; NREP is from \code{dea.boot} }
 
 }
 
