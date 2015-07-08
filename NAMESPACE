@@ -1,4 +1,4 @@
-# $Id: NAMESPACE 128 2014-06-14 16:19:18Z B002961 $
+# $Id: NAMESPACE 153 2015-07-07 14:01:23Z b002961 $
 export(dea, sdea,   # efficiency, eff,
 excess, eladder, eladder.plot,
 dea.dual,
@@ -36,6 +36,10 @@ S3method("summary", "slack")
 
 S3method("print", "cost.opt")
 S3method("summary", "cost.opt")
+S3method("print", "profit.opt")
+S3method("summary", "profit.opt")
+S3method("print", "revenue.opt")
+S3method("summary", "revenue.opt")
 
 
 S3method("print", "sfa")
@@ -66,3 +70,7 @@ S3method( "vcov", "sfa" )
 # importFrom(FEAR,boot.sw98)
 import(lpSolveAPI)
 importFrom(ucminf, ucminf)
+importFrom(stats, IQR, coef, complete.cases, density, dnorm, lm, na.omit, pnorm, pt, quantile, residuals, rnorm, sd, uniroot, var) 
+importFrom(graphics, abline, arrows, axis, box, grid, hist, lines, mtext, par, plot, points, segments, text)
+importFrom(grDevices, chull)
+importFrom(methods, is)

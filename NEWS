@@ -1,10 +1,26 @@
-$Id: NEWS 129 2014-06-16 13:31:01Z b002961 $
+$Id: NEWS 152 2015-07-07 10:02:02Z b002961 $
 
 Upcoming
 
 * Implementing Malmquist index
 
 * Directional distance efficiency for parametric function
+
+* A fast version of dea.boot
+
+
+Changes to Benchmarking version 0.26
+
+
+Changes to Benchmarking version 0.25
+
+* Corrected a feature/bug in dea.boot that could lead to negative bias corrected efficiencies (reported by sevaral). Implemented option SHEPHARD.INPUT to avoid negative bias corrected efficiencies if this is wanted.
+
+* Corrected bug in summary percentages for direction out (reported by Dana Pancurova)
+
+* Corrected a bug in the sfa function that could leed to wrong results and missing standard errors if the function was called two or more times.
+
+* Direction graph does not work for the method mea; the function now stops with an error message and does no longer return ordinary dea efficiencies
 
 
 Changes to Benchmarking version 0.24

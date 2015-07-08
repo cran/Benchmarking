@@ -1,4 +1,4 @@
-# $Id: fdhPlus.R 125 2013-01-20 16:54:54Z Lars $
+# $Id: fdhPlus.R 149 2015-07-03 14:53:18Z b002961 $
 
 
 # FDH+.  Beregn foerst CRS efficiency med kun en mulig peer; se om
@@ -159,6 +159,9 @@ stop("Directional efficiency does not yet work for RTS='fdh+'")
    for (k in 1:K)  {
        lam[k, peer[k]] <- 1
    }
+   if ( !is.null(dimnames(X)[[1]]) )  {
+	   names(eff) <- dimnames(X)[[1]]
+	}
    e <- list(eff=eff, objval=eff, peers=peer, lambda=lam, RTS="fdh",
              direct=DIRECT, ORIENTATION=ORIENTATION, TRANSPOSE=FALSE)
    class(e) <- "Farrell"
@@ -217,6 +220,10 @@ for (k in 1:K)  {
    if (!is.na(peer[k])) { lambda[k,peer[k]] <- lamR[k,peer[k]] }
 }
 
+if ( !is.null(dimnames(X)[[1]]) )  {
+	names(E) <- dimnames(X)[[1]]
+}
+
 obj <- list(eff=E, lambda=lambda,RTS="fdh+",  lamR=lamR, peers=peer, 
             ORIENTATION=ORIENTATION, TRANSPOSE=FALSE)
 class(obj) <- "Farrell"
@@ -235,8 +242,8 @@ dea.csrOne <- function(X,Y, XREF, YREF, ORIENTATION="in")  {
    n <- length(Y)
    Kr <- dim(XREF)[1]
 
-   # alle kombinationer af x og y så vi kan finde all partielle
-   # produktiviteter. Index ix og iy så vi blot kan bruge y[iy]/x[ix]
+   # alle kombinationer af x og y sae vi kan finde all partielle
+   # produktiviteter. Index ix og iy sae vi blot kan bruge y[iy]/x[ix]
 
    ix <- gl(m,1,m*n)
    iy <- gl(n,m)

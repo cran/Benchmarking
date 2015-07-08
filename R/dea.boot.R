@@ -1,4 +1,4 @@
-# $Id: dea.boot.R 130 2014-06-17 08:02:39Z B002961 $
+# $Id: dea.boot.R 156 2015-07-08 13:34:15Z b002961 $
 
 # Boot No FEAR: boot.nf
 # Bootstrap af dea model a la Simar Wilson 1998.
@@ -7,7 +7,7 @@
 
 dea.boot <- function(X,Y, NREP=200, EFF=NULL, RTS="vrs", 
        ORIENTATION="in", alpha=0.05, XREF=NULL, YREF=NULL, 
-       EREF=NULL, DIRECT=NULL, TRANSPOSE=FALSE, LP=FALSE)
+       EREF=NULL, DIRECT=NULL, TRANSPOSE=FALSE, SHEPHARD.INPUT=TRUE, LP=FALSE)
 {
 
    if ( !is.null(DIRECT) )
@@ -26,17 +26,18 @@ dea.boot <- function(X,Y, NREP=200, EFF=NULL, RTS="vrs",
       stop(paste("Invalid value of RTS in call to boot:",RTS))
 
 
-   orientation_ <- c("in-out","in","out","graph")
+   orientation <- c("in-out","in","out","graph")
    if ( is.numeric(ORIENTATION) )  {
       ORIENTATION_ <- orientation[ORIENTATION+1]  # "in-out" er nr. 0
       ORIENTATION <- ORIENTATION_
    }
    ORIENTATION <- tolower(ORIENTATION)
-   orientation <- which(ORIENTATION == orientation_) -1
+   orientation <- which(ORIENTATION == orientation) -1
    if ( orientation < 1 || 3 < orientation )
       stop("Invalid value of ORIENTATION in call to boot")
 
-   # print(paste("rts =",rts,"   orientation=",orientation))
+   if (LP) print(paste("rts =",RTS,"   orientation=",ORIENTATION))
+   if (LP) print(paste("rts =",rts,"     orientation=",orientation), quote=FALSE)
 
    if ( class(X)!="matrix" )
       stop("X is not a matrix")
@@ -68,18 +69,13 @@ dea.boot <- function(X,Y, NREP=200, EFF=NULL, RTS="vrs",
       if ( !is.null(DIRECT) & class(DIRECT)=="matrix" )
          DIRECT <- t(DIRECT)
    }
-   orgKr <- dim(XREF)
 
    rNames <- rownames(XREF)
    if ( is.null(rNames) & !is.null(rownames(YREF)) )
       rNames <- rownames(YREF)
 
-   m <- dim(X)[2]  # number of inputs
-   n <- dim(Y)[2]  # number of outputs
    K <- dim(X)[1]  # number of units, firms, DMUs
-   Ky <- dim(Y)[1]  
-   Kr <- dim(XREF)[1] # number of units,firms in the reference technology
-
+ 
    if ( is.null(EFF) )
       eff <- dea(X,Y, RTS, ORIENTATION, XREF, YREF, FAST=TRUE)
    else if ( class(EFF)=="Farrell" )
@@ -99,13 +95,14 @@ dea.boot <- function(X,Y, NREP=200, EFF=NULL, RTS="vrs",
       eff <- EREF
    # if (LP) print(eff)
 
+	# Bootstrap noget der er over 1, dvs. Farrel output eller Shephard input
    if (ORIENTATION=="out")  farrell<-TRUE else farrell<-FALSE
 
 
    # Beregn vinduesbredden til udglatning af efficiensers fordeling.
-   # Lav det alene for efficencer på 1 eller over, dvs. for Farrell
+   # Lav det alene for efficencer paa 1 eller over, dvs. for Farrell
    # output eller Shephard input orienterede efficiencer fordi det er
-   # dem der samples på.
+   # dem der samples paa.
    # Fjern 1-erne saa de ikke dominerer og spejl efficiencer i 1,
    # Daraio and Simar (2007, 61) ligning (3.23) og (3.26)
    dist <- eff
@@ -113,7 +110,7 @@ dea.boot <- function(X,Y, NREP=200, EFF=NULL, RTS="vrs",
       # print("Range of dist: ")
       # print(range(dist))
       # print(dist)
-   # Behold efficiencer over 1, drop 1-erne når bredden beregnes
+   # Behold efficiencer over 1, drop 1-erne naar bredden beregnes
    zeff <- eff[ dist > 1 + 1e-6 ]
    if ( length(zeff) == 0 )  {
       cat("No unit with efficiency different from 1.0000.\n", quote=FALSE)
@@ -122,7 +119,7 @@ dea.boot <- function(X,Y, NREP=200, EFF=NULL, RTS="vrs",
    # Spejling om 1
    neff <- c(zeff,2-zeff)
    # Ratio |adjust| som bredden skal ganges med fordi der er for mange
-   # elementer i den spejlede vektor som båndbredden bregnes ud fra
+   # elementer i den spejlede vektor som baandbredden bregnes ud fra
    adjust <- sd(dist)/sd(neff) * (length(neff)/length(dist))^(1/5)
    # Ligning (3.28), (3.30) og (3.31) i Silverman (1986, 45--47)
    std <- sd(neff) 
@@ -134,6 +131,7 @@ dea.boot <- function(X,Y, NREP=200, EFF=NULL, RTS="vrs",
    h <- adjust * h0
    if (LP) cat("Bandwidth =",h,"\n")
 
+	# matrix til at gemme de bootstrappede efficiencer
    boot <- matrix(NA, nrow=K, ncol=NREP)
 
 
@@ -143,8 +141,9 @@ if ( ORIENTATION == "in" )  {
       estar <- dea.sample(eff, h, K)
       # if (LP) print(estar)
       # if (LP) print(eff/estar)
-      # estar/eff ganges på hver soejle i X; benytter at R har data
-      # efter søjler, byrow=FALSE er default i R.
+      # estar/eff ganges paa hver soejle i X; benytter at R har data
+      # efter soejler, byrow=FALSE er default i R.
+      # eff*XREF er paa randen, og eff/estar*XREF bliver indre punkt
       xstar <- eff/estar * XREF
       boot[,b] <- dea(X,Y, RTS, ORIENTATION, XREF=xstar, YREF, FAST=TRUE)
       # if (LP) print(boot[,b])
@@ -160,61 +159,48 @@ if ( ORIENTATION == "in" )  {
    for ( b in 1:NREP )  {
       estar <- dea.sample(eff, h, K)
       xstar <- eff/estar * XREF
-      ystar <- eff/estar * YREF
+      ystar <- estar/eff * YREF
       boot[,b] <- dea(X,Y, RTS, ORIENTATION, XREF=xstar, YREF=ystar,
                       FAST=TRUE)
    }  # b in 1:NREP
 } else {
-   stop("Unknown ORIENTATION")
+   stop("Unknown ORIENTATION for dea.boot")
 }
 
 
-if ( ORIENTATION == "out" )  {  #farrel er TRUE
-   # Efficiencer stoerre end 1
-   bias <- rowMeans(boot, na.rm=TRUE) - eff
-   eff.bc <- eff - bias
+	if ( SHEPHARD.INPUT & ORIENTATION != "out" )  {
+		# Lav input efficiencer storre end 1 hvis den er under 1
+		eff <- 1/eff
+		boot <- 1/boot
+	}
+	# Efficiencer stoerre end 1
+	bias <- rowMeans(boot, na.rm=TRUE) - eff
+	eff.bc <- eff - bias
 
-   ci_ <- t(apply(eff-boot,1, quantile, 
-            probs=c(0.5*alpha, 1-0.5*alpha), type=9, na.rm=TRUE))
-   ci <- eff + ci_
+	#ci <- t(apply(boot,1, quantile, 
+	#			probs=c(0.5*alpha, 1-0.5*alpha), type=9, na.rm=TRUE))
+	ci_ <- t(apply(eff-boot,1, quantile, 
+				probs=c(0.5*alpha, 1-0.5*alpha), type=9, na.rm=TRUE))
+	ci <- eff + ci_
 
-   var <- apply(boot,1,var)
-   var0 <- NULL
-} else {
-   # Efficiencer er mindre end 1, men blev bootstrappet som var de
-   # over 1, og der skal derfor regnes på dem som var de over 1
-   bias <- 1/eff - rowMeans(1/boot, na.rm=TRUE)
-   eff.bc <- eff - bias
-
-   boot_ <- 1/boot - 1/eff
-   ci_ <- 
-     t(apply(boot_,1, quantile, 
-       probs=c(0.5*alpha, 1-0.5*alpha), type=9, na.rm=TRUE))
-   ci  <-  1/(1/eff - ci_)
-   rm(boot_, ci_)
-
-   # ci1 <- 1/(1/eff+t(apply(1/eff-1/boot,1, quantile, 
-   #             probs=c(1-0.5*alpha, 0.5*alpha), type=9, na.rm=TRUE)))
-
-   # boot_ <- boot - eff
-   # ci_ <- 
-   #   t(apply(boot_,1, quantile, 
-   #     probs=c(0.5*alpha, 1-0.5*alpha), type=9, na.rm=TRUE))
-   # ci0 <-  eff + ci_
-   # rm(boot_, ci_)
-
-   var0 <- apply(1/boot,1,var)*eff^2
-   var <- apply(boot,1,var)
-}
+	if (SHEPHARD.INPUT & ORIENTATION!="out")  {
+		# Lan efficiencer mm. tilbage til under 1
+		eff <- 1/eff
+		boot <- 1/boot
+		eff.bc <- 1/eff.bc
+		ci <- t(apply(1/ci, 1,rev))  # Byt om paa de lave og hoeje graenser
+		bias <- eff - eff.bc
+	}
+	var <- apply(boot,1,var)
 
    # Sorter boot efficiencerne, det goer FEAR::boot.sw98; men er det
-   # ikke tåbeligt at gøre det?
+   # ikke taabeligt at goere det?
    # sboot <- t(apply(boot,1,sort))
    # boot <- sboot
 
    bb <- list(eff=eff, eff.bc=eff.bc,
            bias=bias,
-           var=var, var0=var0,
+           var=var,
            conf.int=ci,
            eref=EREF, boot=boot)
 
@@ -225,30 +211,30 @@ if ( ORIENTATION == "out" )  {  #farrel er TRUE
 
 
 
-# Bootstrap sample fra efficiencer over 1, Shephard input eller Farrell
-# output
+# Bootstrap sample fra efficiencer over 1, 
+# Shephard input eller Farrell output
 dea.sample <- function(e, h, K=NULL)  {
-   # sample for Shaphard input efficiens
+   # sample for Shaphard input afstandsfunktion, dvs. vaerdier over 1
    if ( min(e) < 1-1e-6 )  {
       e <- 1/e   
       farrell <- TRUE
    } else {
-      farrell <- FALSE
+      farrell <- FALSE  # Vaerdi over 1 er ikke Farrel, men Shephard
    }
    if ( is.null(K) )
       K <- length(e)
-   # spejling i 1
+   # spejling omkring 1
    espejl <- c(e, 2-e)
    beta <- sample(espejl, K, replace=TRUE)
    etilde <- beta + h * rnorm(K)
    # Juster saa varians bliver rigtig, Daraio and Simar (2007, 62) [3]
    estar <- mean(beta) + (etilde-mean(beta)) / sqrt(1+h^2/var(espejl))
    # estar <- 1 + (etilde-1) / sqrt(1+h^2/var(espejl))
-   # Spejl for at faa vaerdier storre end 1
+   # Genspejl for at faa alle vaerdier storre end 1
    estar <- ifelse(estar < 1, 2-estar, estar)
    # estar[estar < 1] <- 2 - estar[estar < 1]
    if ( farrell )  {
-      # print("Omsæt til Farrell")
+      # print("Omsaet til Farrell")
       estar <- 1/estar
    }
    return(estar)

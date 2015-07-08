@@ -1,4 +1,4 @@
-% $Id: dea.Rd 131 2014-06-24 17:00:12Z b002961 $
+% $Id: dea.Rd 150 2015-07-06 20:48:17Z B002961 $
 \name{dea}
 \alias{dea}
 % \alias{dea.mat}
@@ -62,10 +62,18 @@ down-scaling), convexity and free disposability \cr
 down-scaling), additivity, and free disposability \cr
 
 6 \tab add \tab Additivity (scaling up and down, but only with
-integers), and free disposability \cr
+integers), and free disposability; also known af replicability and 
+free disposability, the free disposability and replicability hull 
+(frh) -- no convexity assumption \cr
 
 7 \tab fdh+ \tab A combination of free disposability and restricted
- or local constant return to scale
+ or local constant return to scale 
+
+%8 \tab fdh++ \tab Should be the same as fdh+, but without use of Special 
+%Ordered Set in the solution of the LP problem; unfortunately this is not
+%always the case, and the problem is with fdh++ \cr
+
+%9 \tab fdh0 \tab Same as fdh, but always solved as a LP problem 
 
 }
 
@@ -170,7 +178,7 @@ less than 1. A value of 0 corresponds to RTS="fdh".  To get an
 asymmetric interval set param to a 2 dimentional array with values for
 the low and high end for interval, for instance
 \code{param=c(.8,1.15)}.  The FDH+ technology set is described in
-Bogetoft and Otto (2011) pages 72--73.
+Bogetoft and Otto (2011) pages 73--74.
 
 % The method \code{dea.mat} uses \code{lpSolve} as the LP engine instead
 % of the \code{lpSolveAOI} LP engine. The result is that \code{dea.mat}
@@ -277,7 +285,7 @@ and 0 for the fixed inputs (outputs).
 
 When the the argument \code{DIRECT=X} is used the then the returned
 effiency is equal to 1 minus the Farrell efficiency for input
-orientation anf to the Farrell effiency minus 1 for output
+orientation and to the Farrell effiency minus 1 for output
 orientation.
 
 To use matrices \code{X} and \code{Y} prepared for the methods in the

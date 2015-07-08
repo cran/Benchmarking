@@ -1,4 +1,4 @@
-# $Id: fdhPlus.plot.R 91 2010-11-18 18:16:31Z Lars $
+# $Id: fdhPlus.plot.R 156 2015-07-08 13:34:15Z b002961 $
 
 
 dea.plot.fdhPlus <- function(x, y, param = 0.15, ...)  {
@@ -41,7 +41,7 @@ for ( i in idx$ix )  {
 rand <- effektive[!is.na(effektive)]
 x <- matrix(x[rand])
 y <- matrix(y[rand])
-# kun (x,y) på FDH frontier er nu tilbage
+# kun (x,y) paa FDH frontier er nu tilbage
 sx <- sort(x,index.return=TRUE)
 ix <- sx$ix
 # crs-linjestykker starter i foerste soejles koordinat og 
@@ -66,7 +66,7 @@ y_ <- y0[1,1]
 nx <- dim(x0)[1]
 for ( i in 1:(nx-1) )  {
    # Loeb alle de fdh effektive punkter igennem
-   # Ved starten skal punkt være start eller punkt på linjestykke 
+   # Ved starten skal punkt vaere start eller punkt paa linjestykke 
    # der skal tegnes
 # print(i)
 # if ( i==15 ) break
@@ -120,13 +120,12 @@ for ( i in 1:(nx-1) )  {
 	         y_ <- y0[i+h,1]
             # Vi er paa starten af en nyt linjesykke
 	   } else {
-            # Der må så være et stykke der starter under. 
+            # Der maa saa vaere et stykke der starter under. 
             # Find det foerste der starter under
             lambda <- (y0[i,2]-y0[i+1,1])/(y0[i+1,2]-y0[i+1,1])
             xk <- (1-lambda)*x0[i+1,1] + lambda*x0[i+1,2]
             yk <- y0[i,2]
             h <- 1
-            hmin <- 1
             xkmin <- xk
             while ( i+h+1<=nx )  {
                # det er ikke til at vide hvor de sidste numre rammer 
@@ -136,14 +135,13 @@ for ( i in 1:(nx-1) )  {
                if ( lambda < 0 || lambda > 1 ) break
                xk <- (1-lambda)*x0[i+h,1] + lambda*x0[i+h,2]
                if ( xk < xkmin )  {
-                  hmin <- h
                   xkmin <- xk
                }
             }
             segments(x0[i,2],y0[i,2], xkmin,yk, ...)
             x_ <- xkmin
             y_ <- yk
-            # Vi er på nyt linjestykke
+            # Vi er paa nyt linjestykke
          }
    } else {
       # Der var ingen linjestykker foer slut saa tegn linjen til slut

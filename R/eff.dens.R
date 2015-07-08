@@ -1,6 +1,6 @@
-# $Id: eff.dens.R 98 2010-12-14 21:23:13Z Lars $
+# $Id: eff.dens.R 140 2015-05-15 21:48:02Z B002961 $
 
-# Plot af tæthed for efficiencer, bruger spejlingsprcincip
+# Plot af taethed for efficiencer, bruger spejlingsprcincip
 
 eff.dens <- function(eff, bw="nrd0")  {
    if ( class(eff) == "Farrell" )

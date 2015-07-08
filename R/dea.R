@@ -1,13 +1,13 @@
-# $Id: dea.R 131 2014-06-24 17:00:12Z b002961 $
+# $Id: dea.R 151 2015-07-07 07:09:13Z B002961 $
 
 # DEA beregning via brug af lp_solveAPI. Fordelene ved lp_solveAPI er
-# færre kald fra R med hele matricer for hver firm og dermed skulle
-# det gerne være en hurtigere metode.  Måske er det også lettere at
+# faerre kald fra R med hele matricer for hver firm og dermed skulle
+# det gerne vaere en hurtigere metode.  Maaske er det ogsaa lettere at
 # gennemskue hvad der bliver gjort en gang for alle og hvad der bliver
-# ændret ved beregning for hver firm.
+# aendret ved beregning for hver firm.
 
 # Option FAST=TRUE giver en meget hurtigere beregning af efficienser,
-# men tilgængæld bliver der IKKE gemt de beregnede lambdaer.  Det
+# men tilgaengaeld bliver der IKKE gemt de beregnede lambdaer.  Det
 # betyder bl.a. at der ikke kan findes peers for de enkelte firms.
 
 
@@ -17,12 +17,12 @@ dea  <-  function(X,Y, RTS="vrs", ORIENTATION="in", XREF=NULL,YREF=NULL,
    # XREF, YREF determines the technology
    # FRONT.IDX index for units that determine the technology
 
-   # TRANSPOSE the restriction matrix is transposed, default (TRUE) is
-   # number of inputs/ouputs times number of firms, i.e. by default
-   # goods are rows.
-
    # In the calculation in the method input/output matrices X and Y
-   # are of the order good x firms.  Ie. X, Y etc must be transformed
+   # are of the order good x firms.  
+
+   # TRANSPOSE the restriction matrix is transposed, For TRUE then X and Y are
+   # matrices of dimension inputs/ouputs times number of firms, i.e.
+   # goods are rows, and therefore X, Y etc must be transformed
    # as default in R is firm x good.
 
    if ( FAST ) { 
@@ -51,6 +51,8 @@ dea  <-  function(X,Y, RTS="vrs", ORIENTATION="in", XREF=NULL,YREF=NULL,
       stop(paste("Unknown value for ORIENTATION:",ORIENTATION))
    }
 
+	# Hvis data er en data.frame saa tjek om det er numerisk data og lav
+	# dem i saa fald om til en matrix
    if ( class(X)=="data.frame" && data.kontrol(X) || is.numeric(X) ) 
       { X <- as.matrix(X) }
    if ( class(Y)=="data.frame" && data.kontrol(Y) || is.numeric(Y) ) 
@@ -131,8 +133,9 @@ dea  <-  function(X,Y, RTS="vrs", ORIENTATION="in", XREF=NULL,YREF=NULL,
    if ( Kr != dim(YREF)[1] )
       stop("Number of units must be the same in XREF and YREF")
 
-   if ( !is.null(DIRECT) & isTRUE(DIRECT!="min") & ORIENTATION=="graph" )
-         stop("DIRECT cannot not be used with ORIENTATION=\"graph\"")
+   if ( !is.null(DIRECT) & isTRUE(DIRECT=="min") & ORIENTATION=="graph" )
+		# Kaldet kommer fra 'mea' og stop vil vise 'dea' kaldet som mea laver; derfor call.=FALSE
+		stop("The option 'ORIENTATION=\"graph\"' cannot be used for 'mea'", call.=FALSE)
  
    if ( !is.null(DIRECT) & length(DIRECT) > 1 )  {
       if ( ORIENTATION=="in" & md!=m )
@@ -188,10 +191,10 @@ dea  <-  function(X,Y, RTS="vrs", ORIENTATION="in", XREF=NULL,YREF=NULL,
 
    # saet raekker i matrix med restriktioner, saet 0'er for den foerste
    # soejle for den skal alligevel aendres for hver firm.
-   # Første 'm' rækker med input
+   # Foerste 'm' raekker med input
    for ( h in 1:m )
        set.row(lps,h, c(0,-XREF[,h]))
-   # Følgende 'n' rækker med output
+   # Foelgende 'n' raekker med output
    for ( h in 1:n)
        set.row(lps,m+h, c(0,YREF[,h]))
    # restriktioner paa lambda
@@ -260,7 +263,7 @@ dea  <-  function(X,Y, RTS="vrs", ORIENTATION="in", XREF=NULL,YREF=NULL,
    }
 
    set.objfn(lps, 1,1)
-   # Både in- og output modeller skal formuleres med ">="
+   # Baade in- og output modeller skal formuleres med ">="
    set.constr.type(lps, rep(">=",m+n+rlamb))
    if ( ORIENTATION %in% c("in","graph") )  {
       lp.control(lps, sense="min")
@@ -334,7 +337,7 @@ dea  <-  function(X,Y, RTS="vrs", ORIENTATION="in", XREF=NULL,YREF=NULL,
 
 
       if ( directMin )  {
-         # Sæt højreside for enhedens input og output
+         # Saet hoejreside for enhedens input og output
          set.rhs(lps, c(-X[k,],Y[k,]), 1:(m+n))
 
          # Find retningen og saet foerste soejle til den
@@ -357,8 +360,8 @@ dea  <-  function(X,Y, RTS="vrs", ORIENTATION="in", XREF=NULL,YREF=NULL,
          lpcontr <- lp.control(lps)
          eps <- sqrt(lpcontr$epsilon["epsint"])
          if (LP) print(paste("eps for minDirectin",eps), quote=FALSE)
-# Dårligt test for om direction er 0, tager ikke hensyn at X og Y kan
-# være forskellig størrelse
+# Daarligt test for om direction er 0, tager ikke hensyn at X og Y kan
+# vaere forskellig stoerrelse
          if ( ORIENTATION=="in" )  {
             deltaDir <- DIRECT/( X[k,] + .Machine$double.xmin )
          } else if ( ORIENTATION=="out" )  {
@@ -412,7 +415,7 @@ dea  <-  function(X,Y, RTS="vrs", ORIENTATION="in", XREF=NULL,YREF=NULL,
       set.basis(lps, default=TRUE)
       status <- solve(lps)
       if ( status == 5 )  {
-         # Numerical failure, reset basis og prøv igen
+         # Numerical failure, reset basis og proev igen
          set.basis(lps, default=TRUE)
          status <- solve(lps)
       }
@@ -467,7 +470,7 @@ dea  <-  function(X,Y, RTS="vrs", ORIENTATION="in", XREF=NULL,YREF=NULL,
       names(e) <- dimnames(X)[[1]]
    }
 
-   # Færdig med at bruge lps
+   # Faerdig med at bruge lps
    # delete.lp(lps)
 
 #   if ( ORIENTATION == "in" )  {
@@ -576,7 +579,7 @@ dea  <-  function(X,Y, RTS="vrs", ORIENTATION="in", XREF=NULL,YREF=NULL,
 
 
 
-
+# Kontrol af om data er numerisk
 data.kontrol <- function(X)  {
    if ( is.null(X) )  return(TRUE)
    if ( class(X) == "data.frame" )  {

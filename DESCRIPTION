@@ -1,28 +1,29 @@
 Package: Benchmarking
 Type: Package
 Title: Benchmark and Frontier Analysis Using DEA and SFA
-Version: 0.24
-Date: 2014-09-28 ($Date: 2014-10-10 15:30:26 +0200 (fr, 10 okt 2014) $)
+Version: 0.26
+Date: 2015-7-8 ($Date: 2015-07-08 12:32:10 +0200 (on, 08 jul 2015) $)
 Author: Peter Bogetoft and Lars Otto
 Maintainer: Lars Otto <larsot23@gmail.com>
 Depends: lpSolveAPI, ucminf
-Description: The Benchmarking package contains methods for frontier
-	analysis. It supports Data Envelopment Analysis (DEA) under different
+Imports: methods, stats, graphics, grDevices
+Description: Methods for frontier
+	analysis, Data Envelopment Analysis (DEA), under different
 	technology assumptions (fdh, vrs, drs, crs, irs, add/frh, and fdh+),
 	and using different efficiency measures (input based, output based,
 	hyperbolic graph, additive, super, and directional efficiency). Peers
 	and slacks are available, partial price information can be included,
 	and optimal cost, revenue and profit can be calculated. Evaluation of
 	mergers is also supported.  Methods for graphing the technology sets
-	are also included. The package also support comparative methods based
+	are also included. There is also support comparative methods based
 	on Stochastic Frontier Analyses (SFA). In general, the methods can be
 	used to solve not only standard models, but also many other model
-	variants. The package complements the book, Bogetoft and Otto,
+	variants. It complements the book, Bogetoft and Otto,
 	Benchmarking with DEA, SFA, and R, Springer-Verlag, 2011, but can of
 	course also be used as a stand-alone package.
 License: GPL (>= 2)
 LazyLoad: yes
-Packaged: 2014-10-10 13:34:00 UTC; b002961
 NeedsCompilation: no
+Packaged: 2015-07-08 14:36:25 UTC; b002961
 Repository: CRAN
-Date/Publication: 2014-10-10 21:54:07
+Date/Publication: 2015-07-08 17:44:18

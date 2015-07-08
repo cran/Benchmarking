@@ -1,4 +1,4 @@
-# $Id: outlier.R 70 2010-08-31 08:29:20Z lo $
+# $Id: outlier.R 140 2015-05-15 21:48:02Z B002961 $
 
 
 outlier.ap <- function(X, Y, NDEL = 3, NLEN = 25, TRANSPOSE = FALSE)  
@@ -9,7 +9,7 @@ outlier.ap <- function(X, Y, NDEL = 3, NLEN = 25, TRANSPOSE = FALSE)
    K <- dim(X)[1]   # number of firms/observations
    Kset <- seq.int(K)
    n <- length(Kset)
-   last = min(NLEN, K)   # gem 25 mindste værdier af RX
+   last = min(NLEN, K)   # gem 25 mindste vaerdier af RX
    ratio <- array(Inf, c(last,R) )
    imat <- matrix(NA, nrow=R, ncol=R)
    rmin <- array(Inf, R)

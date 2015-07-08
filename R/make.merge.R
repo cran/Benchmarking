@@ -1,10 +1,10 @@
-# $Id: make.merge.R 84 2010-11-04 12:26:37Z Lars $
+# $Id: make.merge.R 140 2015-05-15 21:48:02Z B002961 $
 
 
 make.merge <- function(grp, nFirm=NULL, X=NULL, names=NULL)  {
    # Opstiller aggregeringsmatrix for at danne grupperne grp ud fra X.
    # Hvad der skal merges skal angives som indeks i en liste af arrays
-   # hvor hvert array er indeks for de enheder der skal indgå i en given
+   # hvor hvert array er indeks for de enheder der skal indgaa i en given
    # gruppe
    if ( class(grp) == "factor" )  {
       # print("Faktor")
@@ -53,7 +53,7 @@ make.merge <- function(grp, nFirm=NULL, X=NULL, names=NULL)  {
 
    Mer <- matrix(0, nrow=g, ncol=K)
    if ( class(grp) == "factor" )  {
-      for ( i in 1:g )  {  # Sæt 1-taller søjler for dem der skal merges
+      for ( i in 1:g )  {  # Saet 1-taller soejler for dem der skal merges
      	    Mer[i,as.numeric(grp)==i] <- 1 
       }
    } else if ( class(grp)=="list" && class(grp[[1]])=="character")  {
@@ -61,7 +61,7 @@ make.merge <- function(grp, nFirm=NULL, X=NULL, names=NULL)  {
          Mer[i,which(names %in% grp[[i]])] <- 1
       }
    } else {
-      for ( i in 1:g )  {  # Sæt 1-taller søjler for dem der skal merges
+      for ( i in 1:g )  {  # Saet 1-taller soejler for dem der skal merges
      	    Mer[i,grp[[i]]] <- 1 
       }
    }

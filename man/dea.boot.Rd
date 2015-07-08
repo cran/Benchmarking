@@ -1,4 +1,4 @@
-% $Id: dea.boot.Rd 129 2014-06-16 13:31:01Z b002961 $
+% $Id: dea.boot.Rd 150 2015-07-06 20:48:17Z B002961 $
 \name{dea.boot}
 \alias{dea.boot}
 \alias{boot.fear}
@@ -17,7 +17,7 @@ the package \pkg{FEAR} returning results directly as Farrell measures.
 \usage{
 dea.boot(X, Y, NREP = 200, EFF = NULL, RTS = "vrs", ORIENTATION="in", 
          alpha = 0.05, XREF = NULL, YREF = NULL, EREF = NULL, 
-         DIRECT = NULL, TRANSPOSE = FALSE, LP)
+         DIRECT = NULL, TRANSPOSE = FALSE, SHEPHARD.INPUT = TRUE, LP)
 
 boot.fear(X, Y, NREP = 200, EFF = NULL, RTS = "vrs", ORIENTATION = "in", 
          alpha = 0.05, XREF = NULL, YREF = NULL, EREF = NULL)
@@ -59,6 +59,11 @@ boot.fear(X, Y, NREP = 200, EFF = NULL, RTS = "vrs", ORIENTATION = "in",
       the default value \code{TRANSPOSE=FALSE}; this is standard in R
       for statistical models.  When \code{TRANSPOSE=TRUE} data
       matrices are m x K and n x K.}
+      
+  \item{SHEPHARD.INPUT}{The bootstrap of the Farrell input
+	efficiencies is done as a Shephard input distance function,
+	the inverse Farrell input efficiency. The option is only
+	relevant for input and graph directions. }
 
   \item{LP}{Only for debugging purposes.}
 
@@ -75,7 +80,14 @@ boot.fear(X, Y, NREP = 200, EFF = NULL, RTS = "vrs", ORIENTATION = "in",
    The returned confidence intervals are for the bias corrected
    efficiencies; to get confidence intervals for the uncorrected
    efficiencies add the biases to both upper and lower values for the
-   intervals.}
+   intervals.
+   
+   Under the default option \code{SHEPHARD.INPUT=TRUE} bias and bias
+   corrected efficiencies are calculated for Shephard input distance
+   function and then transformed to Farrell input efficiencies to
+   avoid possible negative biased corrected input efficiencies. If
+   this is not wanted use the option \code{SHEPHARD.INPUT=FALSE}. This
+   option is only relevant for input and graph oriented directions.}
 
 
 
@@ -85,17 +97,15 @@ boot.fear(X, Y, NREP = 200, EFF = NULL, RTS = "vrs", ORIENTATION = "in",
 
   \item{eff.bc}{Bias-corrected efficiencies}
 
-  \item{bias}{An array of bootstrap bias estimates for the firms in X,Y}
+  \item{bias}{An array of bootstrap bias estimates for the K firms}
 
   \item{conf.int}{\code{K x 2} matrix with confidence interval for the
       estimated efficiencies}
 
-  \item{var}{An array of bootstrap variance estimates for the firms in
-      X,Y}
+  \item{var}{An array of bootstrap variance estimates for the K firms}
 
   \item{boot}{ The replica bootstrap estimates of the Farrell
-      efficiencies, a K times NREP matrix. Note the bootstrap
-      estimates are sorted for each firm.}.
+      efficiencies, a \code{K x NREP} matrix }
 
 }
 

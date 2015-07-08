@@ -1,4 +1,4 @@
-# $Id: slack.R 113 2011-04-04 22:21:05Z Lars $
+# $Id: slack.R 153 2015-07-07 14:01:23Z b002961 $
 
 # Calculate slack at the efficient points.
 
@@ -8,7 +8,7 @@
 
 slack <- function(X, Y, e, XREF=NULL, YREF=NULL, FRONT.IDX=NULL, 
                   LP=FALSE)  {       # , CONTROL=NULL, LPK=NULL
-   if ( !is(e,"Farrell") )  {
+   if ( !methods::is(e,"Farrell") )  {
        stop("In call of slack: argument 'e' must be of class 'Farrell'")
    }
 

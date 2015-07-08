@@ -1,4 +1,4 @@
-# $Id: dea.dual.R 125 2013-01-20 16:54:54Z Lars $
+# $Id: dea.dual.R 156 2015-07-08 13:34:15Z b002961 $
 
 # In the calculation in the method input/output matrices X and Y are
 # of the order good x firms.  Ie. X, Y etc must be transformed as
@@ -92,7 +92,6 @@ dea.dual <- function(X,Y, RTS="vrs", ORIENTATION="in",
    n = dim(Y)[2]  # number of outputs
    K = dim(X)[1]  # number of units, firms, DMUs
    Kr = dim(XREF)[1]  # number of units, firms, DMUs
-   okr <- orgKr[1]
    if ( !is.null(DIRECT) )  {
       if ( class(DIRECT)=="matrix" ) {
          md <- dim(DIRECT)[2]

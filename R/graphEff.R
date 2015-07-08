@@ -1,13 +1,13 @@
-# $Id: graphEff.R 112 2011-04-04 01:10:33Z Lars $
+# $Id: graphEff.R 140 2015-05-15 21:48:02Z B002961 $
 
 # Funktion til beregning af graf efficiens.  Beregning sker via
-# bisection hvor der itereres mellem mulige og ikke-mulige løsninger
+# bisection hvor der itereres mellem mulige og ikke-mulige loesninger
 # et LP problem hvor venstreside er som in- og output orienteret
-# efficiens. blot er første søjle erstattet af rene nuller, og G*X og
-# (1/G)*Y optræder på højresiden. Minimering af 0 så der blot søges om
-# der er en mulig løsning. Da søjlen for efficiens er bar 0'er vil
+# efficiens. blot er foerste soejle erstattet af rene nuller, og G*X og
+# (1/G)*Y optraeder paa hoejresiden. Minimering af 0 saa der blot soeges om
+# der er en mulig loesning. Da soejlen for efficiens er bar 0'er vil
 # justering af efficiens ud over G ikke ske, dvs. det er kun lambdaer
-# der tilpasses for at se om der er en mulig løsning.
+# der tilpasses for at se om der er en mulig loesning.
 
 graphEff <- function(lps, X, Y, XREF, YREF, RTS, FRONT.IDX, rlamb, oKr, 
          param=param, TRANSPOSE=FALSE, SLACK=FALSE, FAST=FALSE, LP=FALSE) 
@@ -30,7 +30,7 @@ graphEff <- function(lps, X, Y, XREF, YREF, RTS, FRONT.IDX, rlamb, oKr,
       if ( LP )  print(paste("Firm",k), quote=FALSE)
       # Lav bisection
       a <- 0
-      b <- 2  # medfører start med G=1
+      b <- 2  # medfoerer start med G=1
       nIter <- 0
       gFundet <- FALSE
       xIset <- TRUE
@@ -94,7 +94,7 @@ graphEff <- function(lps, X, Y, XREF, YREF, RTS, FRONT.IDX, rlamb, oKr,
             nIter <- nIter + 1
             i <- i+1
          }
-         # enten er i==10 eller også er status!=0
+         # enten er i==10 eller ogsaa er status!=0
          if ( i==10 )  {
             a <- 0
             b <- dif
@@ -105,7 +105,7 @@ graphEff <- function(lps, X, Y, XREF, YREF, RTS, FRONT.IDX, rlamb, oKr,
       }
 
 
-      # bisection løkke
+      # bisection loekke
       if (LP) print(paste("Bisection interval: [",a,",",b,"]"))
       while ( !gFundet && b-a > tol && nIter < 50 )  {
          G <- (a+b)/2
@@ -115,7 +115,7 @@ graphEff <- function(lps, X, Y, XREF, YREF, RTS, FRONT.IDX, rlamb, oKr,
          status <- solve(lps)
          if (LP) print(paste("G = ",G,"(",k,"); status =",status))
          if ( status == 0 ) {
-            # løsning findes
+            # loesning findes
             b <- G
          } else {
             a <- G
@@ -125,9 +125,9 @@ graphEff <- function(lps, X, Y, XREF, YREF, RTS, FRONT.IDX, rlamb, oKr,
       if (LP) print(paste("nIter =",nIter,"; status =",status))
 
       if ( status != 0 )  {
-         # Hvis den sidste værdi af G ikke var mulig bruger vi den
-         # øvre grænse. Det er nødvendigt med en mulig løsning for at
-         # kunne få lambdaer og duale værdier.
+         # Hvis den sidste vaerdi af G ikke var mulig bruger vi den
+         # oevre graense. Det er noedvendigt med en mulig loesning for at
+         # kunne faa lambdaer og duale vaerdier.
          G <- b
 	      set.rhs(lps, c(-G*X[k,],Y[k,]/G), 1:(m+n))
          status <- solve(lps)

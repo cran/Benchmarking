@@ -1,4 +1,4 @@
-% $Id: sfa.Rd 118 2011-07-22 23:28:53Z Lars $
+% $Id: sfa.Rd 141 2015-06-12 13:29:10Z b002961 $
 \name{sfa}
 \alias{sfa}
 \alias{lambda.sfa}
@@ -32,7 +32,7 @@ likelihood method.
 \usage{
 sfa(x, y, beta0 = NULL, lambda0 = 1, resfun = ebeta, 
     TRANSPOSE = FALSE, DEBUG=FALSE,
-    control=list(maxeval=1000, stepmax=1), hessian=2)
+    control=list(), hessian=2)
 
 % \method{efficiencies}{sfa}(object)
 % \method{eff}{sfa}(object)
@@ -98,6 +98,14 @@ lambda.sfa(object)
 \details{ The optimization is done by the R method \code{ucminf} from
    the package with the same name. The efficiency terms are assumed to
    be half--normal distributed.
+   
+   Changing the maximum steplength, the trust rgion,  might be important,
+	and this can be done by the option 'control= list(stepmax=0.1)'. The
+	default value is 0.1 and that value is suitable for parameters
+	around 1; for smaller parameters a lower value should be used.
+	Notice that the step length is updated by the optimizing program and
+	thus must be set for every call of the function sfa if it is to be
+	set.
 
 The generic functions \code{print.sfa}, \code{summary.sfa},
    \code{fitted.sfa}, \code{residuals.sfa}, \code{logLik.sfa}, and

@@ -1,11 +1,11 @@
-# $Id: dea.plot.R 128 2014-06-14 16:19:18Z B002961 $
+# $Id: dea.plot.R 140 2015-05-15 21:48:02Z B002961 $
 "dea.plot" <-
 function(x, y, RTS="vrs", ORIENTATION="in-out", txt=NULL, add=FALSE, 
             wx=NULL, wy=NULL, TRANSPOSE = FALSE, fex=1, GRID=FALSE,
             RANGE=FALSE, param=NULL, ..., xlim, ylim, xlab, ylab)
 # x er input 1 og y er iput 2 eller output.
 # Hvis der flere varer i de to input/output bliver de lagt sammen som
-# vægtet sum med vægte wx og wy; default vægte som være simpel addition.
+# vaegtet sum med vaegte wx og wy; default vaegte som vaere simpel addition.
 #
 {
    rts <- c("fdh","vrs","drs","crs","irs","irs2","add","fdh+")
@@ -108,7 +108,7 @@ function(x, y, RTS="vrs", ORIENTATION="in-out", txt=NULL, add=FALSE,
          }
       }
       if ( class(txt)!="logical" && length(txt) > 0 ) {
-        # Evt. tekst på punkter sættes lidt nede til højre
+        # Evt. tekst paa punkter saettes lidt nede til hoejre
         text(x,y,txt,adj=c(-.75,.75),cex=fex)
       }
    }  # if ( add == FALSE )
@@ -138,14 +138,14 @@ function(x, y, RTS="vrs", ORIENTATION="in-out", txt=NULL, add=FALSE,
       nx <- round(xlim[2]/x[rand])
 
       # lav aggregerings matrix til alle kombinationer af data
-      # Højst 5 gentagelser hvis nx er uendelig fordi x[rand] er 0
+      # Hoejst 5 gentagelser hvis nx er uendelig fordi x[rand] er 0
       if ( is.infinite(nx) )  nx <- 5
       M <- matrix(NA, nrow=prod(1+nx), ncol=nr)
       M[,1] <- rep(0:nx[1], prod(1+nx[-1]))
       if ( nr>1) for ( j in 2:nr )  {
          M[,j] <- as.integer(gl(1+nx[j], prod(1+nx[1:(j-1)]))) -1
       }
-      # Drop foerste række med bar nuller
+      # Drop foerste raekke med bar nuller
       M <- M[-1,]
       # Lav saa alle kombinationerne
       x <- M %*% as.matrix(x[rand])
@@ -166,7 +166,7 @@ function(x, y, RTS="vrs", ORIENTATION="in-out", txt=NULL, add=FALSE,
 
 
    if ( ORIENTATION == "in" ) {
-      # inputkravmængde, input afstandsfunktion
+      # inputkravmaengde, input afstandsfunktion
       hpts=chull(c(x,min(x),2*max(x)),c(y,2*max(y),min(y)))
       if ( RTS != "fdh" ) {
          lines(x[hpts],y[hpts],...)
@@ -187,14 +187,14 @@ function(x, y, RTS="vrs", ORIENTATION="in-out", txt=NULL, add=FALSE,
       lines(c(x1fmax,2*max(x)), c(min(y), min(y)),...)
       lines(c(min(x), min(x)), c(x2fmax,2*max(y)),...)
    } else if (ORIENTATION == "out") {
-      # produktionsmulighedsområde for output, output afstandsfunktion
+      # produktionsmulighedsomraade for output, output afstandsfunktion
       hpts=chull( c(x,0,0,max(x)) , c(y,0,max(y),0) )
-      # For at være sikre på at alle linjer tegnes laves en lukket graf
-      # eller kan der opstå et hul i fronten
+      # For at vaere sikre paa at alle linjer tegnes laves en lukket graf
+      # eller kan der opstaa et hul i fronten
       hpts <- c(hpts, hpts[1])
       if ( RTS != "fdh" ) {
          lines(x[hpts],y[hpts],...)
-         # Problem hvis mindste x er 0 ved max(y) for så bliver
+         # Problem hvis mindste x er 0 ved max(y) for saa bliver
          # min(x(hpts)) ikke 0 da det omtalte punkt ikke er i hpts som
          # del af x, men det ekstra punkt (0,max(y)).
          lines(c(0, min(x[hpts],na.rm=T) ), 
@@ -217,9 +217,9 @@ function(x, y, RTS="vrs", ORIENTATION="in-out", txt=NULL, add=FALSE,
       }
    } else {  # ORIENTATION == "in-out"
       # Et input og et output, "normal produktionsfunktion"
-      # Først findes det konvekse hul af punkterne og linjer 
+      # Foerst findes det konvekse hul af punkterne og linjer 
       # for yderpunkter tegnes.
-      # Punkterne udvides med noget større end max for at tegne linjer
+      # Punkterne udvides med noget stoerre end max for at tegne linjer
       # der peger mod uendelig (free disposability)
       if ( RTS == "crs" ) {
          # crs

@@ -1,4 +1,4 @@
-# $Id: deaUtil.R 122 2012-06-02 20:25:48Z Lars $
+# $Id: deaUtil.R 140 2015-05-15 21:48:02Z B002961 $
 
 
 efficiencies <- function( object, ... )  {
@@ -79,6 +79,7 @@ summary.Farrell <- function(object, digits=4, ...)  {
          sum(abs(eff-1) < eps), 
          "\nMean efficiency:", format(mean(object$eff),digit=3), "\n---" )
    if ( object$ORIENTATION!="out" && is.null(object$direct) )  {
+      # Orientering er in eller graph
       minE <- min(eff)
       minE <- floor( 10 * minE ) / 10
       dec <- seq(from=minE, to=1, by=.1)
@@ -95,6 +96,7 @@ summary.Farrell <- function(object, digits=4, ...)  {
          antal[i] <- sum(dec[i]-eps <= eff & eff < dec[i+1]-eps)
       antal[n] <- sum(abs(eff-1) < eps)
    } else if ( is.null(object$direct) )  {
+      # Orientering er out
       maxF <- max(eff)
       maxF <- ceiling( 10 * maxF ) / 10
       dec <- seq(from=1, to=maxF, by=.1)
@@ -113,12 +115,13 @@ summary.Farrell <- function(object, digits=4, ...)  {
       for ( i in 2:n )
          estr[i] <- paste(format(dec[i-1],digits=2,width=3),Estr,
                           format(dec[i],digits=3,width=3),"  ",sep="")
-      antal <- rep(NA,n)
-      antal[1] <- sum(abs(eff-1) < eps)
-      for ( i in 2:n )
-         antal[i] <- sum(dec[i-1]-eps <= eff & eff < dec[i]-eps)
+      his <- hist(object$eff, breaks=dec, plot=FALSE)
+      antal <- his$counts
+      # Foerste gruppe skal vaere eff==1; fra dist er foerte gruppe eff mellem 1 og 1.1
+      antal[1] <- antal[1] - sum(abs(eff-1) < eps)
+      antal <- c(sum(abs(eff-1) < eps), antal)
    } else {
-      # directional er det så
+      # directional er det saa
       cat("Number of firms with directional efficiency==0 are",
          sum(abs(eff) < eps), 
          "\nMean efficiency:", format(mean(object$eff),digit=3), "\n---" )
@@ -172,7 +175,7 @@ peers <- function(object, NAMES=FALSE)  {
       lam <- object$lambda
    }
 
-   # Fjern foranstillet L_ eller L i søjlenavne for lambda
+   # Fjern foranstillet L_ eller L i soejlenavne for lambda
    if ( all("L_" == substr(colnames(lam),1,2)) )  {
       colnames(lam) <- substring(colnames(lam),3)
    }
@@ -269,12 +272,12 @@ get.number.peers  <-  function(object, NAMES=FALSE)  {
       lam <- t(object$lambda)
    }
 
-   # Fjern foranstillet L i søjlenavne for lambda
+   # Fjern foranstillet L i soejlenavne for lambda
    # if ( "L" %in% substr(rownames(lam),1,1) )  {
    #    rownames(lam) <- substring(rownames(lam),2)
    # }
-   # rownames er overflødige da de fremgår af første søjle, index er
-   # ofte lettere for at kunne udpege rækker
+   # rownames er overfloedige da de fremgaar af foerste soejle, index er
+   # ofte lettere for at kunne udpege raekker
    rownames(lam) <- NULL
 
    peer <- which(rowSums(lam, na.rm=TRUE)>0)
@@ -414,8 +417,8 @@ eladder <- function(n, X, Y, RTS="vrs", ORIENTATION="in",
     # Er der nogen peers overhovedet ellers kan vi bare slutte nu
     if ( is.na(peers(e)[1]) ) break
     elad[i] <- e$eff
-    # Array nr. for den stoerste værdi af lambda
-    # Brug kun den første hvis der er flere
+    # Array nr. for den stoerste vaerdi af lambda
+    # Brug kun den foerste hvis der er flere
     p <- which(max(e$lambda)==e$lambda)[1]
     # if (LP) print(paste("p =",p))
     # firm number for array number p, firm numbers follow L in the colnames

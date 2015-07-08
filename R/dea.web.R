@@ -1,6 +1,6 @@
-# $Id$
+# $Id: dea.web.R 141 2015-06-12 13:29:10Z b002961 $
 
-# Første forsøg med en web-graf for efficiens og tilhørende input/output
+# Foerste forsoeg med en web-graf for efficiens og tilhoerende input/output
 
 dea.web <-
 function(X, E, N=NULL, txt=NULL, add=FALSE, 
@@ -31,7 +31,7 @@ function(X, E, N=NULL, txt=NULL, add=FALSE,
       X <- X[N,]
       E <- E[N]
    } else  m <- length(X)
-   # Så er en X et array
+   # Nu er en X et array
    if ( class(sl) == "matrix" )  {
       sl <- sl[N,]
    }
@@ -47,7 +47,7 @@ function(X, E, N=NULL, txt=NULL, add=FALSE,
         xlim=xlim, ylim=ylim)
    lines( c((E * X-sl) * cos(angle), E*X[1]-sl[1]), c((E * X-sl) * sin(angle),0))
 
-   # Polære linjer for hver vare
+   # Polaere linjer for hver vare
    segments(rep(0,m),rep(0,m), xlim[2]*cos(angle), xlim[2]*sin(angle), 
 	col="darkgray")
 
@@ -69,7 +69,7 @@ function(X, E, N=NULL, txt=NULL, add=FALSE,
       }
    }
    if ( class(txt)!="logical" && length(txt) > 0 ) {
-     # Evt. tekst på punkter sættes lidt nede til højre
+     # Evt. tekst paa punkter saettes lidt nede til hoejre
      text(X,X,txt,adj=c(-.75,.75),cex=fex)
    }
 

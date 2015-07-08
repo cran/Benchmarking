@@ -1,4 +1,4 @@
-# $Id: profit.R 125 2013-01-20 16:54:54Z Lars $
+# $Id: profit.R 140 2015-05-15 21:48:02Z B002961 $
 
 # Calculates optimal input and output to maximize profit for given
 # input and output prices.
@@ -51,11 +51,11 @@ profit.opt <- function(XREF, YREF, W, P, RTS="vrs", param=NULL,
 
    set.objfn(lps, c(-W[,1],P[,1], rep(0,Kr)))
    # saet raekker i matrix med restriktioner, 
-   # først for input
+   # foerst for input
    dia <- diag(1,nrow=m)
    for ( h in 1:m )
        set.row(lps,h, c(-dia[h,], rep(0,n), XREF[h,]))
-   # så for output
+   # saa for output
    dia <- diag(1,nrow=n)
    for ( h in 1:n)
        set.row(lps,m+h, c(rep(0,m), dia[h,], -YREF[h,]))
@@ -77,7 +77,7 @@ profit.opt <- function(XREF, YREF, W, P, RTS="vrs", param=NULL,
       delete.constraint(lps, m+n+1)
       rlamb <- rlamb -1
 #   } else if ( RTS == "crs" )  {
-#     # En mystisk restriktion for at tvinge løsning til eksisterende firm
+#     # En mystisk restriktion for at tvinge loesning til eksisterende firm
 #     add.constraint(lps, rep(1,Kr),">=", 1, (m+n+1):(m+n+Kr))
    } else if ( RTS == "irs" )  {
       set.rhs(lps, -1, m+n+1)

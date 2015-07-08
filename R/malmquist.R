@@ -1,10 +1,10 @@
-# $Id$
+# $Id: malmquist.R 144 2015-06-24 19:49:51Z B002961 $
 
 # Beregner Malmquist indeks for enhederne ID over tidspunkterne i TIME
 
-# Det forudsættes at der ikke er huller i TIME, dvs. indeks beregnes i
-# mellem to på hinanden værdier i TIME. Hvis TIME ikke er numerisk,
-# antages at rækkefølgen er den ønskede.
+# Det forudsaettes at der ikke er huller i TIME, dvs. indeks beregnes i
+# mellem to paa hinanden vaerdier i TIME. Hvis TIME ikke er numerisk,
+# antages at raekkefoelgen er den oenskede.
 
 
 malmquist <- function(X, Y, ID, TIME, 
@@ -17,11 +17,11 @@ malmquist <- function(X, Y, ID, TIME,
    time <- unique(TIME)
    unit <- unique(ID)
    
-   # |time| sorteres hvis variablen er numerisk ellers bruges implicit rækkefølge
+   # |time| sorteres hvis variablen er numerisk ellers bruges implicit raekkefoelge
    if ( is.numeric(time) )  time <- sort(time)
 
-   # Første årstal |time| vedbliver med at være NA
-   # Skal rækkefølgen ikke være som i X og Y?
+   # Foerste aarstal |time| vedbliver med at vaere NA
+   # Skal raekkefoelgen ikke vaere som i X og Y?
    Malm <- matrix(NA, nrow=length(time), ncol=length(unit))
    TC <- matrix(NA, nrow=length(time), ncol=length(unit))
    EC <- matrix(NA, nrow=length(time), ncol=length(unit))
@@ -31,7 +31,7 @@ malmquist <- function(X, Y, ID, TIME,
    E10 <- matrix(NA, nrow=length(time), ncol=length(unit))
    E11 <- matrix(NA, nrow=length(time), ncol=length(unit))
 
-   # Løb perioderne igennem og beregn Malmquist for parvise perioder
+   # Loeb perioderne igennem og beregn Malmquist for parvise perioder
    for ( t in 2:length(time) )  {
        # Find units i periode 0 og periode 1
        id0 <- ID[time[t-1]==TIME]
@@ -51,7 +51,7 @@ malmquist <- function(X, Y, ID, TIME,
          SLACK=SLACK, DUAL=DUAL, DIRECT=DIRECT, param=param,
          TRANSPOSE=TRANSPOSE, FAST=TRUE, LP=LP, CONTROL=CONTROL, LPK=LPK)
 
-       # Skal rækkefølgen ikke være som i X og Y?
+       # Skal raekkefoelgen ikke vaere som i X og Y?
        Malm[t,unit %in% m$id] <- m$m
        TC[t,unit %in% m$id] <- m$tc
        EC[t,unit %in% m$id] <- m$ec

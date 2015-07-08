@@ -1,4 +1,4 @@
-% $Id: mea.Rd 129 2014-06-16 13:31:01Z b002961 $
+% $Id: mea.Rd 150 2015-07-06 20:48:17Z B002961 $
 \name{mea}
 \alias{mea}
 \alias{mea.lines}
@@ -48,10 +48,9 @@ mea.lines(N, X, Y, ORIENTATION="in")
 }
 
   \item{ORIENTATION}{Input efficiency "in" (1) or output efficiency
-      "out" (2)%, and graph efficiency "graph" (3). For use with
-      % \code{DIRECT}, an additional option is "in-out" (0). In this
-      % case, "graph" is not feasible 
-      and also the additional option "in-out" (0) for both input and output directions.
+      "out" (2), and also the additional option "in-out" (0) for 
+      both input and output direction. 
+		 
       }
 
   \item{XREF}{Inputs of the firms determining the technology, defaults

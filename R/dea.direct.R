@@ -1,4 +1,4 @@
-# $Id: dea.direct.R 125 2013-01-20 16:54:54Z Lars $
+# $Id: dea.direct.R 156 2015-07-08 13:34:15Z b002961 $
 
 
 dea.direct <- function(X,Y, DIRECT, RTS="vrs", ORIENTATION="in", 
@@ -35,7 +35,6 @@ dea.direct <- function(X,Y, DIRECT, RTS="vrs", ORIENTATION="in",
    m <- dim(X)[2]  # number of inputs
    n <- dim(Y)[2]  # number of outputs
    K <- dim(X)[1]  # number of units, firms, DMUs
-   Kr <- dim(XREF)[1] # number of units,firms in the reference technology
 
    ee <- dea(X,Y, RTS=RTS, ORIENTATION=ORIENTATION, XREF=XREF, YREF=YREF,
              FRONT.IDX=FRONT.IDX, SLACK=SLACK, DUAL=FALSE, 

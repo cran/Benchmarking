@@ -1,4 +1,4 @@
-# $Id: minDirection.R 131 2014-06-24 17:00:12Z b002961 $
+# $Id: minDirection.R 140 2015-05-15 21:48:02Z B002961 $
 
 # Function to calculate the min step for each input or max step for
 # each output to the frontier, retninger i MEA. A series of LP problems
@@ -15,8 +15,8 @@ minDirection <- function(lps, m, n, ORIENTATION, LP=FALSE)  {
    Direct <- rep(NA,md)
    for ( h in 1:md )  {
       if (LP) print(paste(" -->  Vare",h),quote=FALSE)
-      # Sæt 1 i 0'te række svarende til kriterifunktion -- default er 0 -- og
-      # -1 i rækken for den relevante vare/element
+      # Saet 1 i 0'te raekke svarende til kriterifunktion -- default er 0 -- og
+      # -1 i raekken for den relevante vare/element
       set.column(lps, 1, c(1,-1), c(0,mn0+h))
       if (LP) print(lps)
       set.basis(lps, default=TRUE)

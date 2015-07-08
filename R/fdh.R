@@ -1,4 +1,4 @@
-# $Id: fdh.R 110 2011-03-31 13:24:18Z Lars $
+# $Id: fdh.R 140 2015-05-15 21:48:02Z B002961 $
 
 # FDH efficiency uden brug af LP.
 # Der er ingen kontrol af argumenter, den taenkes at blive kaldt fra dea.R
@@ -30,8 +30,8 @@ fdh <- function(X,Y, ORIENTATION="in", XREF=NULL, YREF=NULL,
    orgKr <- dim(XREF)
 
    if ( length(FRONT.IDX) > 0 && oKr==dim(XREF)[1] )  {
-      # Brug kun FRONT.IDX hvis den ikke allerede er brugt og så vil
-      # oKr være forskellig fra dim(XREF)[1]
+      # Brug kun FRONT.IDX hvis den ikke allerede er brugt og saa vil
+      # oKr vaare forskellig fra dim(XREF)[1]
       if ( !is.vector(FRONT.IDX) )
          stop("FRONT.IDX is not a vector in 'dea'")
       XREF <- XREF[FRONT.IDX,, drop=FALSE]
@@ -45,7 +45,7 @@ fdh <- function(X,Y, ORIENTATION="in", XREF=NULL, YREF=NULL,
    m <- dim(X)[2]
    n <- dim(Y)[2]
    Kr <- dim(XREF)[1]
-   # Sæt kun oKr hvis den ikke allerede er sat i kaldet af fdh
+   # Saat kun oKr hvis den ikke allerede er sat i kaldet af fdh
    if (oKr==0) oKr <- orgKr[1]
    eff <- rep(NA, K)
    peer <- rep(NA, K)
