@@ -1,4 +1,4 @@
-# $Id: dea.plot.R 140 2015-05-15 21:48:02Z B002961 $
+# $Id: dea.plot.R 174 2017-03-23 17:13:15Z lao $
 "dea.plot" <-
 function(x, y, RTS="vrs", ORIENTATION="in-out", txt=NULL, add=FALSE, 
             wx=NULL, wy=NULL, TRANSPOSE = FALSE, fex=1, GRID=FALSE,
@@ -8,6 +8,7 @@ function(x, y, RTS="vrs", ORIENTATION="in-out", txt=NULL, add=FALSE,
 # vaegtet sum med vaegte wx og wy; default vaegte som vaere simpel addition.
 #
 {
+	if ( sum(is.na(x)) + sum(is.na(y)) > 0 ) stop("There is one or more NA in 'x' or 'y'")
    rts <- c("fdh","vrs","drs","crs","irs","irs2","add","fdh+")
    if ( is.numeric(RTS) )  {
       cat("Number '",RTS,sep="")
@@ -33,6 +34,19 @@ function(x, y, RTS="vrs", ORIENTATION="in-out", txt=NULL, add=FALSE,
 
    if ( RTS=="add" && ORIENTATION!="in-out" )
       stop("RTS=\"add\" only works for ORIENTATION=\"in-out\"")
+
+   # Hvis data er en data.frame saa tjek om det er numerisk data og lav
+   # dem i saa fald om til en matrix
+   if ( class(x)=="data.frame" && data.kontrol(x) || is.numeric(x) ) 
+      { x <- as.matrix(x) }
+   if ( class(y)=="data.frame" && data.kontrol(y) || is.numeric(y) ) 
+      { y <- as.matrix(y) }
+
+   if ( class(x)!="matrix" || !is.numeric(x) )
+      stop("x is not a numeric matrix (or data.frame)")
+   if ( class(y)!="matrix" || !is.numeric(y) )
+      stop("y is not a numeric matrix (or data.frame)")
+
 
    if (TRANSPOSE) {
       x <- t(x)
@@ -139,7 +153,7 @@ function(x, y, RTS="vrs", ORIENTATION="in-out", txt=NULL, add=FALSE,
 
       # lav aggregerings matrix til alle kombinationer af data
       # Hoejst 5 gentagelser hvis nx er uendelig fordi x[rand] er 0
-      if ( is.infinite(nx) )  nx <- 5
+      nx[is.infinite(nx)] <- 5
       M <- matrix(NA, nrow=prod(1+nx), ncol=nr)
       M[,1] <- rep(0:nx[1], prod(1+nx[-1]))
       if ( nr>1) for ( j in 2:nr )  {

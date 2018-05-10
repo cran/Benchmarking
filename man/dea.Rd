@@ -1,6 +1,7 @@
-% $Id: dea.Rd 150 2015-07-06 20:48:17Z B002961 $
+% $Id: dea.Rd 182 2018-05-10 11:52:55Z lao $
 \name{dea}
 \alias{dea}
+\alias{deaSlack}
 % \alias{dea.mat}
 % \alias{efficiencies}
 % \alias{eff}
@@ -19,6 +20,10 @@ measures a la Farrell.}
 dea(X, Y, RTS="vrs", ORIENTATION="in", XREF=NULL, YREF=NULL,
     FRONT.IDX=NULL, SLACK=FALSE, DUAL=FALSE, DIRECT=NULL, param=NULL,
     TRANSPOSE=FALSE, FAST=FALSE, LP=FALSE, CONTROL=NULL, LPK=NULL)
+
+% deaSlack(X, Y, RTS="vrs", ORIENTATION="in", XREF=NULL, YREF=NULL,
+%     FRONT.IDX=NULL, SLACK=FALSE, DUAL=FALSE, DIRECT=NULL, param=NULL,
+%     TRANSPOSE=FALSE, FAST=FALSE, LP=FALSE, CONTROL=NULL, LPK=NULL, delta=1e-6)
 
 \method{print}{Farrell}(x, digits=4, ...) 
 \method{summary}{Farrell}(object, digits=4, ...)
@@ -67,13 +72,16 @@ free disposability, the free disposability and replicability hull
 (frh) -- no convexity assumption \cr
 
 7 \tab fdh+ \tab A combination of free disposability and restricted
- or local constant return to scale 
-
+ or local constant return to scale \cr
+ 
 %8 \tab fdh++ \tab Should be the same as fdh+, but without use of Special 
 %Ordered Set in the solution of the LP problem; unfortunately this is not
 %always the case, and the problem is with fdh++ \cr
 
 %9 \tab fdh0 \tab Same as fdh, but always solved as a LP problem 
+
+10 \tab vrs+ \tab As vrs, but with restrictions on the individual lambdas 
+via \code{param}
 
 }
 
@@ -91,11 +99,10 @@ free disposability, the free disposability and replicability hull
 
 \item{FRONT.IDX}{Index for firms determining the technology}
 
-\item{SLACK}{Calculate slack in a phase II calculation; the precision
-    for calculating slacks for orientation graph is low. The
-    calculation is then done by an intern call of the function
-    \code{\link{slack}}.}
-
+\item{SLACK}{Calculate slack in a phase II calculation by an intern 
+	call of the function \code{\link{slack}}. Note that the precision
+    for calculating slacks for orientation graph is low. }
+	 
 \item{DUAL}{Calculate dual variables, i.e. shadow prices; not
     calculated for orientation graph as that is not an LP problem.}
 
@@ -118,7 +125,7 @@ free disposability, the free disposability and replicability hull
     \code{DIRECT} must not be used in connection with
     \code{DIRECTION="graph"}.
 
-     }
+   }
 
 \item{param}{Possible parameters. At the moment only used for
     RTS="fdh+" to set low and high values for restrictions on lambda;
@@ -154,6 +161,17 @@ free disposability, the free disposability and replicability hull
    \code{k}; it can be used as input to an alternative LP solver
    to check the results.}
 
+   %\item{delta}{Penalty for slack in the optimal solution, a suggested
+   %   value to penalize slack is \code{delta=e-6}; depends on the
+   %   scaling of X.  Default is no penalty.  If \code{delta} is an
+   %   array it must be of length as the number of inputs and the
+   %   number of outputs and it then uses a different penalty for each
+   %   input and output.}
+   
+   %\item{DELTA}{When \code{TRUE} each slack is penalized relative to
+   %   the value of the input and output for the unit in question,
+   %   i.e. different penalties for different units.}
+
 }
 
 
@@ -180,6 +198,17 @@ the low and high end for interval, for instance
 \code{param=c(.8,1.15)}.  The FDH+ technology set is described in
 Bogetoft and Otto (2011) pages 73--74.
 
+The technology RTS="vrs+" uses the parameter \code{param} to set 
+restrictions on lambda, the convexity parameters. The elements of param 
+are \code{param=(low, high, sum_low, sum_high)} where "low" and "high"
+are restrictions on the individual lambda and "sum_low" and "sum_high" are 
+restrictions on the sum of lambdas. The individual lambda must be in the 
+interval from low to high or be zero. With one parameter the restrictions 
+set are \code{(param, 1+1-(param),1,1)}, with two parameters 
+\code{(param[1], param[2],1,1)}, and with four parameters 
+\code{(param[1], param[2],param[3], param[4])}. The resulting technology set is 
+not necessarily convex.
+
 % The method \code{dea.mat} uses \code{lpSolve} as the LP engine instead
 % of the \code{lpSolveAOI} LP engine. The result is that \code{dea.mat}
 % is much slower than \code{dea} except for data with very small number
@@ -198,6 +227,9 @@ units of measurements, i.e. \eqn{x-e d}, and for output orientation
 directions (\code{ORIENTAION="in-out"}). Dirctional efficiency is
 discussed on pages 31--35 and 121--127 in Bogetoft and Otto (2011).
 
+% When using the option \code{delta} the underlying LP problem might 
+% be unbounded; i.e. the efficiency is returned as NA. In this case 
+% use a lower value of \code{delta}.
 }
 
 
@@ -253,7 +285,7 @@ DEA, SFA, and R}; Springer 2011 }
 \note{ 
 
 The arguments \code{X}, \code{Y}, \code{XREF}, and \code{YREF} are
-supposed to be matrices or numerical data frames that in the functin
+supposed to be matrices or numerical data frames that in the function
 will be converted to matrices. When subsetting a matrix or data frame
 to just one column then the class of the resulting object/variable is
 no longer a matrix or a data frame, but just a numeric (array,

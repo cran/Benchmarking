@@ -1,4 +1,4 @@
-% $Id: eladder.Rd 119 2011-07-23 22:15:48Z Lars $
+% $Id: eladder.Rd 173 2017-03-14 10:24:21Z lao $
 \name{eladder}
 \alias{eladder}
 \alias{eladder.plot}
@@ -10,8 +10,8 @@ is removed sequentially one at a time }
 
 \usage{
 eladder(n, X, Y, RTS = "vrs", ORIENTATION = "in", 
-        XREF=NULL, YREF=NULL, DIRECT = NULL, param=NULL)
-eladder.plot(elad, peer, TRIM = NULL)
+        XREF=NULL, YREF=NULL, DIRECT = NULL, param=NULL, MAXELAD=NULL)
+eladder.plot(elad, peer, TRIM = NULL, ...)
 }
 
 
@@ -53,6 +53,8 @@ eladder.plot(elad, peer, TRIM = NULL)
     see the section details and examples in \code{\link{dea}} for its
     use. Future versions might also use \code{param} for other
     purposes.}
+    
+  \item{MAXELAD}{The maximum number of influential peers to remove.}
 
   \item{elad}{The sequence of efficiencies returned from \code{eladder}. }
 
@@ -60,6 +62,8 @@ eladder.plot(elad, peer, TRIM = NULL)
 
   \item{TRIM}{The number of characters for the name of the peers on
       the axis in the plot. }
+      
+   \item{\dots}{Usual options for the method \code{plot}.}
 
 }
 

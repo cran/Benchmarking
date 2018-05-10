@@ -1,15 +1,36 @@
-$Id: NEWS 152 2015-07-07 10:02:02Z b002961 $
+$Id: NEWS 182 2018-05-10 11:52:55Z lao $
 
 Upcoming
-
-* Implementing Malmquist index
 
 * Directional distance efficiency for parametric function
 
 * A fast version of dea.boot
 
+* In dea.boot the options XREF and YREF must have the same units as does X and Y; this is about to change
+
+
+Changes to Benchmarking version 0.27
+
+* An experimental implementing of the Malmquist index; minimal manual
+
+* Now dea.plot and related plots accept data.frame as arguments for X and Y as do the dea methods
+
+* It is possible to name the peers using the option \code{NAMES}
+
+* Check for NA in dea.plot and in summary(E)
+
+* Possible to set maximum number of peers to delete in eladder by parameter MAXELAD
+
+* Name of collumn for count of peers changed from '#' to 'count'
+
+* New technology "vrs+"; as "vrs", but with restrictins on individual lambda and sums of lambda by using the parameter \code{param}; note that the resulting technology set is not necessarily convex.
+
 
 Changes to Benchmarking version 0.26
+
+* Corrected bug in sfa such that it now works when hessian=1 even when the package numDeriv is missing
+
+* All global functions are now imported in NAMESPACE; a demand from CRAN
 
 
 Changes to Benchmarking version 0.25

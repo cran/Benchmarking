@@ -1,4 +1,4 @@
-# $Id: NAMESPACE 153 2015-07-07 14:01:23Z b002961 $
+# $Id: NAMESPACE 175 2017-05-22 09:12:40Z lao $
 export(dea, sdea,   # efficiency, eff,
 excess, eladder, eladder.plot,
 dea.dual,
@@ -7,6 +7,7 @@ dea.direct, dea.boot, boot.fear,
 dea.add,
 # print.Farrell, summary.Farrell,
 slack, # print.slack, summary.slack,
+# deaSlack,
 lambda,
 peers, get.number.peers, get.which.peers,
 # print.peers, 
@@ -26,6 +27,7 @@ critValue, typeIerror,
 outlier.ap, outlier.ap.plot,
 eff.dens, eff.dens.plot,
 mea, mea.lines
+, malmq, malmquist
 )
 
 S3method("print", "Farrell")
@@ -74,3 +76,4 @@ importFrom(stats, IQR, coef, complete.cases, density, dnorm, lm, na.omit, pnorm,
 importFrom(graphics, abline, arrows, axis, box, grid, hist, lines, mtext, par, plot, points, segments, text)
 importFrom(grDevices, chull)
 importFrom(methods, is)
+importFrom("utils", "flush.console")

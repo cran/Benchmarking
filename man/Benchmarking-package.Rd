@@ -1,4 +1,4 @@
-% $Id: Benchmarking-package.Rd 152 2015-07-07 10:02:02Z b002961 $
+% $Id: Benchmarking-package.Rd 157 2015-07-09 09:40:20Z b002961 $
 \name{Benchmarking-package}
 \alias{Benchmarking-package}
 \alias{Benchmarking}
@@ -38,8 +38,8 @@ can of course also be used as a stand-alone package.
 \tabular{ll}{
 Package: \tab Benchmarking\cr
 Type: \tab Package\cr
-Version: \tab 0.26 ($Revision: 152 $)\cr
-Date: \tab $Date: 2015-07-07 12:02:02 +0200 (ti, 07 jul 2015) $\cr
+Version: \tab 0.27 ($Revision: 157 $)\cr
+Date: \tab $Date: 2015-07-09 11:40:20 +0200 (to, 09 jul 2015) $\cr
 License: \tab Copyright\cr
 }
 

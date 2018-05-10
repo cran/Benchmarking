@@ -1,10 +1,12 @@
-# $Id: malmquist.R 144 2015-06-24 19:49:51Z B002961 $
+# $Id: malmquist.R 178 2017-12-20 15:05:12Z lao $
 
 # Beregner Malmquist indeks for enhederne ID over tidspunkterne i TIME
 
 # Det forudsaettes at der ikke er huller i TIME, dvs. indeks beregnes i
 # mellem to paa hinanden vaerdier i TIME. Hvis TIME ikke er numerisk,
 # antages at raekkefoelgen er den oenskede.
+
+# Parvise perioder beregnes via functionen 'malmq'
 
 
 malmquist <- function(X, Y, ID, TIME, 
@@ -20,19 +22,21 @@ malmquist <- function(X, Y, ID, TIME,
    # |time| sorteres hvis variablen er numerisk ellers bruges implicit raekkefoelge
    if ( is.numeric(time) )  time <- sort(time)
 
-   # Foerste aarstal |time| vedbliver med at vaere NA
-   # Skal raekkefoelgen ikke vaere som i X og Y?
-   Malm <- matrix(NA, nrow=length(time), ncol=length(unit))
-   TC <- matrix(NA, nrow=length(time), ncol=length(unit))
-   EC <- matrix(NA, nrow=length(time), ncol=length(unit))
+   # Vaerdier for foerste aarstal |time| vedbliver med at vaere NA
+   # Raekkefoelgen er som i ID?
+   Malm <- array(NA, dim=c(length(ID)))
+   TC <- array(NA, dim=c(length(ID)))
+   EC <- array(NA, dim=c(length(ID)))
 
-   E00 <- matrix(NA, nrow=length(time), ncol=length(unit))
-   E01 <- matrix(NA, nrow=length(time), ncol=length(unit))
-   E10 <- matrix(NA, nrow=length(time), ncol=length(unit))
-   E11 <- matrix(NA, nrow=length(time), ncol=length(unit))
+   E00 <- array(NA, dim=c(length(ID)))
+   E01 <- array(NA, dim=c(length(ID)))
+   E10 <- array(NA, dim=c(length(ID)))
+   E11 <- array(NA, dim=c(length(ID)))
 
    # Loeb perioderne igennem og beregn Malmquist for parvise perioder
    for ( t in 2:length(time) )  {
+   	cat("\n Periode ",t,"\n")
+		flush.console()
        # Find units i periode 0 og periode 1
        id0 <- ID[time[t-1]==TIME]
        id1 <- ID[time[t]==TIME]
@@ -51,18 +55,21 @@ malmquist <- function(X, Y, ID, TIME,
          SLACK=SLACK, DUAL=DUAL, DIRECT=DIRECT, param=param,
          TRANSPOSE=TRANSPOSE, FAST=TRUE, LP=LP, CONTROL=CONTROL, LPK=LPK)
 
-       # Skal raekkefoelgen ikke vaere som i X og Y?
-       Malm[t,unit %in% m$id] <- m$m
-       TC[t,unit %in% m$id] <- m$tc
-       EC[t,unit %in% m$id] <- m$ec
+       # Raekkefoelgen skal vaere som i X og Y, dvs. som ID
+       Malm[ID %in% m$id & TIME==time[t]] <- m$m # Malmquist indeks for aendring i produktivitet
+       TC[ID %in% m$id & TIME==time[t]] <- m$tc # teknisk aendring, flytning af frontier
+       EC[ID %in% m$id & TIME==time[t]] <- m$ec # aendring i effektivitet
 
-       E00[t,unit %in% m$id] <- m$e00
-       E01[t,unit %in% m$id] <- m$e01
-       E10[t,unit %in% m$id] <- m$e10
-       E11[t,unit %in% m$id] <- m$e11
-       
+       E00[ID %in% m$id & TIME==time[t]] <- m$e00
+       E01[ID %in% m$id & TIME==time[t]] <- m$e01
+       E10[ID %in% m$id & TIME==time[t]] <- m$e10
+       E11[ID %in% m$id & TIME==time[t]] <- m$e11
+       if ( t==2 )  {
+       	# Foerste aar kan saettes 
+	       E11[ID %in% m$id & TIME==time[t-1]] <- m$e00
+       } 
    }  # for (t)
 
-   return(list(m=Malm, tc=TC, ec=EC, id=unit, time=time,
+   return(list(m=Malm, tc=TC, ec=EC, id=ID, time=TIME,
                e00=E00, e10=E10, e11=E11, e01=E01))
 } # function

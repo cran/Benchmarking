@@ -1,4 +1,4 @@
-# $Id: malmq.R 144 2015-06-24 19:49:51Z B002961 $
+# $Id: malmq.R 178 2017-12-20 15:05:12Z lao $
 
 # Beregner Malmquist indeks og dekomponering af samme ud fra to perioder
 
@@ -64,12 +64,21 @@
    idlab <- intersect(ID0, ID1)
    id0 <- ID0 %in% idlab   # seq(1,length(id0))[id0 %in% idlab]
    id1 <- ID1 %in% idlab
+# print(sum(id0))
+# print(length(unique(ID0[id0])))
+# print(sum(id1))
+# print(length(unique(ID1[id1])))
+	# Er der gengangere, og er der samme antal i de to perioder
+	if ( sum(id0) != length(unique(ID0[id0])) || sum(id1) != length(unique(ID1[id1])) || 
+			sum(id0)!=sum(id1) )
+		stop("Units in ID are not unique for each period")
 
    # Input og output for faellesmaengden af units
    x0 <- X0[id0,]   
    y0 <- Y0[id0,]
    x1 <- X1[id1,]   
    y1 <- Y1[id1,]
+
 
    # Skal teknologien i en periode bestemmes af alle dem der i
    # perioden uafhaengigt af om de er i den anden periode?  Som det er
@@ -84,14 +93,14 @@
    e11 <- dea(x1, y1, RTS=RTS, ORIENTATION=ORIENTATION,
          SLACK=SLACK, DUAL=DUAL, DIRECT=DIRECT, param=param,
          TRANSPOSE=TRANSPOSE, FAST=TRUE, LP=LP, CONTROL=CONTROL, LPK=LPK)
-   e01 <- dea(x0, y0, RTS=RTS, ORIENTATION=ORIENTATION,, XREF=x1,YREF=y1,
+   e01 <- dea(x0, y0, RTS=RTS, ORIENTATION=ORIENTATION, XREF=x1,YREF=y1,
          SLACK=SLACK, DUAL=DUAL, DIRECT=DIRECT, param=param,
          TRANSPOSE=TRANSPOSE, FAST=TRUE, LP=LP, CONTROL=CONTROL, LPK=LPK)
 
-   tc <- sqrt(e10/e11 * e00/e01)
-   ec <- e11/e00
+   tc <- sqrt(e10/e11 * e00/e01)  # teknisk aendring; flytning af frontier
+   ec <- e11/e00                  # aendring i effektivitet
    m  <- tc * ec
-   mq <- sqrt(e10/e00 * e11/e01)
+   mq <- sqrt(e10/e00 * e11/e01)  ## == m;  Malmquist indeks for produktivitet
 
    
    return( list(m=m, tc=tc, ec=ec, mq=mq, id=idlab, id0=id0, id1=id1, 

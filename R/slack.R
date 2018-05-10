@@ -1,4 +1,4 @@
-# $Id: slack.R 153 2015-07-07 14:01:23Z b002961 $
+# $Id: slack.R 160 2015-12-22 13:58:31Z b018694 $
 
 # Calculate slack at the efficient points.
 
@@ -15,7 +15,29 @@ slack <- function(X, Y, e, XREF=NULL, YREF=NULL, FRONT.IDX=NULL,
    RTS <- e$RTS
    if ( RTS == "fdh0" ) RTS <- "fdh"
    if (LP) print(paste("slack:  RTS =",RTS),quote=F)
-   if ( missing(XREF) || is.null(XREF) )  {
+   
+	# Hvis data er en data.frame saa tjek om det er numerisk data og lav
+	# dem i saa fald om til en matrix
+   if ( class(X)=="data.frame" && data.kontrol(X) || is.numeric(X) ) 
+      { X <- as.matrix(X) }
+   if ( class(Y)=="data.frame" && data.kontrol(Y) || is.numeric(Y) ) 
+      { Y <- as.matrix(Y) }
+   if ( class(XREF)=="data.frame" && data.kontrol(XREF)||is.numeric(XREF))
+      { XREF <- as.matrix(XREF) }
+   if ( class(YREF)=="data.frame" && data.kontrol(YREF)||is.numeric(YREF)) 
+      { YREF <- as.matrix(YREF) }
+
+	if ( class(X)!="matrix" || !is.numeric(X) )
+      stop("X is not a numeric matrix (or data.frame)")
+   if ( class(Y)!="matrix" || !is.numeric(Y) )
+      stop("Y is not a numeric matrix (or data.frame)")
+   if ( !is.null(XREF) && (class(XREF)!="matrix" || !is.numeric(XREF)) )
+      stop("XREF is not a numeric matrix (or data.frame)")
+   if ( !is.null(YREF) && (class(YREF)!="matrix" || !is.numeric(YREF)) )
+      stop("YREF is not a numeric matrix (or data.frame)")
+
+
+	if ( missing(XREF) || is.null(XREF) )  {
       XREF <- X
    }
    if ( missing(YREF) || is.null(YREF) )  {
@@ -64,7 +86,7 @@ slack <- function(X, Y, e, XREF=NULL, YREF=NULL, FRONT.IDX=NULL,
    mmm <- (colMeans(X))
    nnn <- (colMeans(Y))
    if ( min(mmm) < 1e-4 || max(mmm) > 1e4 || 
-       min(nnn) < 1e-4 || max(nnn) > 1e4 )  {
+			min(nnn) < 1e-4 || max(nnn) > 1e4 )  {
       SKALERING <- TRUE
       X <- X / matrix(mmm, nrow=K, ncol=m, byrow=TRUE)
       XREF <- XREF / matrix(mmm, nrow=Kr, ncol=m, byrow=TRUE)
@@ -323,7 +345,7 @@ print.slack  <- function(x, digits=4, ...)  {
 
 
 summary.slack <- function(object, digits=4, ...)  {
-   eps <- 1e-6
+   eps <- 1e-7
    cat("Efficiency and slacks:\n")
 
    # if ( object$ORIENTATION != "out" ) 
@@ -335,26 +357,28 @@ summary.slack <- function(object, digits=4, ...)  {
    # print(a,...)
 
    cat("Number of firms with efficiency==1 and positive slacks:",
-         sum(abs(object$eff-1) < eps & object$slack ),"\n" )
+         sum(abs(object$eff-1) < eps & object$slack , na.rm=TRUE),"\n" )
 
    if ( dim(object$sx)[2]==1 )  {
      SX <- object$sx > eps
    } else {
-     SX <- rowSums(object$sx) > eps  
+     SX <- rowSums(object$sx, na.rm=TRUE) > eps  
    }
    if ( dim(object$sy)[2]==1 )  {
      SY <- object$sy > eps
    } else {
-     SY <- rowSums(object$sy) > eps
+     SY <- rowSums(object$sy, na.rm=TRUE) > eps
    }
    cat("Number of firms with:\n")
-   cat("  only x slacks: ", sum(SX & !SY), "\n")
-   cat("  only y slacks: ", sum(!SX & SY), "\n")
-   cat("  x and y slacks:", sum(SY & SX), "\n")
+   cat("  only x slacks: ", sum(SX & !SY, na.rm=TRUE), "\n")
+   cat("  only y slacks: ", sum(!SX & SY, na.rm=TRUE), "\n")
+   cat("  x and y slacks:", sum(SY & SX, na.rm=TRUE), "\n")
 
-   cat("\n  x slacks: ", sum(SX), "\n")
-   cat(   "  y slacks: ", sum(SY), "\n")
-   cat(   "all slacks: ", sum(SX | SY), "\n")
+   cat("\n  x slacks: ", sum(SX, na.rm=TRUE), "\n")
+   cat(   "  y slacks: ", sum(SY, na.rm=TRUE), "\n")
+   cat(   "all slacks: ", sum(SX | SY, na.rm=TRUE), "\n")
+	if (sum(is.na(SX) | is.na(SY)))  cat("Number of firms Not Available for slacks: ", 
+												sum(is.na(SX)|is.na(SY)),"\n")
 
 
    # invisible(a)

@@ -1,4 +1,4 @@
-# $Id: dea.dual.R 156 2015-07-08 13:34:15Z b002961 $
+# $Id: dea.dual.R 160 2015-12-22 13:58:31Z b018694 $
 
 # In the calculation in the method input/output matrices X and Y are
 # of the order good x firms.  Ie. X, Y etc must be transformed as
@@ -396,7 +396,7 @@ if ( is.null(AD) )  {
 
    # undgaa afrundingsfejl i e naar den er taet ved 1.
    lpcontr <- lp.control(lps)
-   eps <- sqrt(lpcontr$epsilon["epsint"])
+   eps <- lpcontr$epsilon["epsint"]
    eff[abs(eff-1) < eps] <- 1
 
    # Slut med at bruge lps

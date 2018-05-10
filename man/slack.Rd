@@ -44,7 +44,8 @@ slack(X, Y, e, XREF = NULL, YREF = NULL, FRONT.IDX = NULL, LP = FALSE)
 
 
 \details{ Slacks are calculated in a LP problem where the sum of all
-   slacks are maximied after correction for efficiency.  }
+   slacks are maximied after correction for efficiency. 
+    The for calculating slacks for orientation graph is low because of the low precision in the calculated graph efficiency. }
 
 
 \value{The result is returned as the Farrell object used as the
@@ -79,10 +80,6 @@ DEA-Solver Software}, 2nd edn. Springer 2007 .  }
 \author{ Peter Bogetoft and Lars Otto \email{larsot23@gmail.com}}
 
 
-
-
-
-
 \examples{
 x <- matrix(c(100,200,300,500,100,200,600),ncol=1)
 y <- matrix(c(75,100,300,400,25,50,400),ncol=1)
@@ -96,5 +93,6 @@ sl <- slack(x,y,e)
 data.frame(e$eff,sl$slack,sl$sx,sl$sy)
 }
 
-\keyword{ ~kwd1 }
-\keyword{ ~kwd2 }% __ONLY ONE__ keyword per line
+\keyword{models}
+\keyword{efficiency}
+\keyword{slack}% __ONLY ONE__ keyword per line

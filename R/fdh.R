@@ -1,4 +1,4 @@
-# $Id: fdh.R 140 2015-05-15 21:48:02Z B002961 $
+# $Id: fdh.R 160 2015-12-22 13:58:31Z b018694 $
 
 # FDH efficiency uden brug af LP.
 # Der er ingen kontrol af argumenter, den taenkes at blive kaldt fra dea.R
@@ -86,7 +86,7 @@ if ( !is.null(DIRECT) )  {
       }
    }
 
-   eps <- 1e-6
+   eps <- 1e-7
 
    for ( k in 1:K )  {
       # For each firm find max(XREF/X) over inputs (rows)

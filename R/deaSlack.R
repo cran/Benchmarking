@@ -1,36 +1,36 @@
-# $Id: dea.R 182 2018-05-10 11:52:55Z lao $
+# $Id: deaSlack.R 162 2016-01-08 14:29:54Z b018694 $
 
 # DEA beregning via brug af lp_solveAPI. Fordelene ved lp_solveAPI er
-# faerre kald fra R med hele matricer for hver unit og dermed skulle
+# faerre kald fra R med hele matricer for hver firm og dermed skulle
 # det gerne vaere en hurtigere metode.  Maaske er det ogsaa lettere at
 # gennemskue hvad der bliver gjort en gang for alle og hvad der bliver
-# aendret ved beregning for hver unit.
+# aendret ved beregning for hver firm.
 
 # Option FAST=TRUE giver en meget hurtigere beregning af efficienser,
 # men tilgaengaeld bliver der IKKE gemt de beregnede lambdaer.  Det
-# betyder bl.a. at der ikke kan findes peers for de enkelte units.
+# betyder bl.a. at der ikke kan findes peers for de enkelte firms.
 
 
-dea  <-  function(X,Y, RTS="vrs", ORIENTATION="in", XREF=NULL,YREF=NULL,
+deaSlack  <-  function(X,Y, RTS="vrs", ORIENTATION="in", XREF=NULL,YREF=NULL,
          FRONT.IDX=NULL, SLACK=FALSE, DUAL=FALSE, DIRECT=NULL, param=NULL,
-         TRANSPOSE=FALSE, FAST=FALSE, LP=FALSE, CONTROL=NULL, LPK=NULL)  {
+         TRANSPOSE=FALSE, FAST=FALSE, LP=FALSE, CONTROL=NULL, LPK=NULL, delta=1e-6)  {
    # XREF, YREF determines the technology
    # FRONT.IDX index for units that determine the technology
 
    # In the calculation in the method input/output matrices X and Y
-   # are of the order good x units.  
+   # are of the order good x firms.  
 
    # TRANSPOSE the restriction matrix is transposed, For TRUE then X and Y are
-   # matrices of dimension inputs/ouputs times number of units, i.e.
+   # matrices of dimension inputs/ouputs times number of firms, i.e.
    # goods are rows, and therefore X, Y etc must be transformed
-   # as default in R is unit x good.
+   # as default in R is firm x good.
 
    if ( FAST ) { 
       DUAL=FALSE; # SLACK=FALSE; 
       # print("When  FAST then neither DUAL nor SLACK") 
    }
 
-   rts <- c("fdh","vrs","drs","crs","irs","irs2","add","fdh+","fdh++","fdh0", "vrs+")
+   rts <- c("fdh","vrs","drs","crs","irs","irs2","add","fdh+","fdh++","fdh0")
    if ( missing(RTS) ) RTS <- "vrs" 
    if ( is.numeric(RTS) )  {
       if (LP) print(paste("Number '",RTS,"'",sep=""),quote=F)
@@ -106,9 +106,9 @@ dea  <-  function(X,Y, RTS="vrs", ORIENTATION="in", XREF=NULL,YREF=NULL,
 
    m <- dim(X)[2]  # number of inputs
    n <- dim(Y)[2]  # number of outputs
-   K <- dim(X)[1]  # number of units, units, DMUs
+   K <- dim(X)[1]  # number of units, firms, DMUs
    Ky <- dim(Y)[1]  
-   Kr <- dim(XREF)[1] # number of units,units in the reference technology
+   Kr <- dim(XREF)[1] # number of units,firms in the reference technology
    oKr <- orgKr[1]
    if ( !is.null(DIRECT) )  {
       if ( class(DIRECT)=="matrix" ) {
@@ -145,7 +145,7 @@ dea  <-  function(X,Y, RTS="vrs", ORIENTATION="in", XREF=NULL,YREF=NULL,
       else if ( ORIENTATION=="in-out" & md!=m+n )
          stop("Length of DIRECT must be the number of inputs plus outputs")
       if ( class(DIRECT)=="matrix" & (Kd>0 & Kd!=K) )
-         stop("Number of units in DIRECT must equal units in X and Y") 
+         stop("Number of firms in DIRECT must equal firms in X and Y") 
    }
    if ( !is.null(DIRECT) & length(DIRECT) == 1 )  {
       if ( ORIENTATION=="in" & length(DIRECT)!=m )
@@ -184,25 +184,30 @@ dea  <-  function(X,Y, RTS="vrs", ORIENTATION="in", XREF=NULL,YREF=NULL,
    }
 
    # Initialiser LP objekt
-   lps <- make.lp(m+n +rlamb,1+Kr)
+   # lps <- make.lp(m+n +rlamb,1+Kr)
+	lps <- NULL
+	if (sum(delta) > 0)  {
+		# delete.lp(lps)
+		lps <- make.lp(m+n +rlamb, 1+Kr +m+n)
+	} else {
+		lps <- make.lp(m+n +rlamb,1+Kr)
+	}
    if ( is.null(DIRECT) ) dirStreng<-"" else dirStreng<-"Dir"
    name.lp(lps, paste(ifelse(is.null(DIRECT)||DIRECT!="min","Dea","Mea"),
                             ORIENTATION,RTS,dirStreng,sep="-"))
 
    # saet raekker i matrix med restriktioner, saet 0'er for den foerste
-   # soejle for den skal alligevel aendres for hver unit.
-   # Bemaerk X og Y transponeres implicit naar de saettes i lp_solveAPI; 
-   # soejler i X og Y saettes so raekker i lp_solveAPI.
+   # soejle for den skal alligevel aendres for hver firm.
    # Foerste 'm' raekker med input
    for ( h in 1:m )
-       set.row(lps,h, c(0,-XREF[,h]))
+       set.row(lps,h, c(0,-XREF[,h]), 1:(1+Kr))
    # Foelgende 'n' raekker med output
    for ( h in 1:n)
-       set.row(lps,m+h, c(0,YREF[,h]))
+       set.row(lps,m+h, c(0,YREF[,h]), 1:(1+Kr))
    # restriktioner paa lambda
    if ( RTS != "crs" && RTS != "add" )  {
-      set.row(lps, m+n+1, c(0,rep(-1,Kr)))
-      set.row(lps, m+n+2, c(0,rep( 1,Kr)))
+      set.row(lps, m+n+1, c(0,rep(-1,Kr)), 1:(1+Kr))
+      set.row(lps, m+n+2, c(0,rep( 1,Kr)), 1:(1+Kr))
    }
 
    if ( RTS == "fdh" || RTS == "fdh0" ) {
@@ -212,29 +217,7 @@ dea  <-  function(X,Y, RTS="vrs", ORIENTATION="in", XREF=NULL,YREF=NULL,
       rlamb <- rlamb -1
    } else if ( RTS == "vrs" )  {
       set.rhs(lps, c(-1,1), (m+n+1):(m+n+2))
-   } else if ( RTS == "vrs+" )  {
-   	# param: (lav, hoej, sum lav, sum hoej)
-      # Saet parametrene low og high
-      if ( is.null(param) )  {
-         param <- c(.5, 2.)
-      }
-      if ( length(param) == 1 )  {
-         low <- param
-         high <- 1+(1-param)
-      } else {
-         low <- param[1]
-         high <- param[2]
-      }
-      if (length(param) == 4)  {
-			# print("Graenser for sum af lambda sat")
-			set.rhs(lps, c(-param[4], param[3]), (m+n+1):(m+n+2))
-		} else {
-			set.rhs(lps, c(-1,1), (m+n+1):(m+n+2))
-		}
-		param <- c(low=low, high=high)
-		set.semicont(lps, 2:(1+Kr))
-		set.bounds(lps, lower=rep(low,Kr), upper=rep(high,Kr), columns=2:(1+Kr))
-	} else if ( RTS == "drs" )  {
+   } else if ( RTS == "drs" )  {
       set.rhs(lps, -1, m+n+1)
       delete.constraint(lps, m+n+2)
       rlamb <- rlamb -1
@@ -287,8 +270,29 @@ dea  <-  function(X,Y, RTS="vrs", ORIENTATION="in", XREF=NULL,YREF=NULL,
    }
 
    set.objfn(lps, 1,1)
+	
+	if (sum(delta)>0)  {
+		# For at maksimere slacks saettes foerst kriteriefunktion og
+		# dernaest soejler med minus enhedsmatrix for hver x og y slack
+		# set.objfn(lps, rep(-delta, m+n), (1+Kr+1):(1+Kr+m+n))
+		for (i in 1:(m+n))  {
+			set.column(lps, 1+Kr+i,-1, i)
+		}
+		if (length(delta)==1)
+			set.objfn(lps, c(1,rep(0,Kr), rep(-delta, m+n)))
+		else  {
+			if (length(delta) != m+n) 
+				stop("Length of 'delta' must correspond to the number of inputs and outputs")
+			set.objfn(lps, c(1,rep(0,Kr), -delta))
+		}
+		if (LP)  {
+			print("Kriterie er sat; foerste soejle mangler")
+			print(lps)
+		}
+	}
+	
    # Baade in- og output modeller skal formuleres med ">="
-   set.constr.type(lps, rep(">=",m+n+rlamb))
+   set.constr.type(lps, c(rep(">=",m+n),rep(">=",rlamb)))
    if ( ORIENTATION %in% c("in","graph") )  {
       lp.control(lps, sense="min")
    } else if ( ORIENTATION == "out" )  {
@@ -317,7 +321,8 @@ dea  <-  function(X,Y, RTS="vrs", ORIENTATION="in", XREF=NULL,YREF=NULL,
       return(oe)
    }
 
-   objval <- rep(NA,K)   # vector for the final efficiencies
+   objval <- rep(NA,K)   # vector for optimal values, i.e efficiencies
+	e <- rep(NA,K)        # vector for the final efficiencies
    if ( FAST ) {
      lambda <- NULL
      primal <- NULL
@@ -336,6 +341,10 @@ dea  <-  function(X,Y, RTS="vrs", ORIENTATION="in", XREF=NULL,YREF=NULL,
          dual <- NULL
       }
    }
+	if (SLACK | sum(delta)>0)  {
+		sx <- matrix(NA,K,m)
+		sy <- matrix(NA,K,n)
+	}
 
    if ( !is.null(DIRECT) && DIRECT[1] == "min" )  {
       directMin <- TRUE
@@ -350,9 +359,9 @@ dea  <-  function(X,Y, RTS="vrs", ORIENTATION="in", XREF=NULL,YREF=NULL,
       directMin <- FALSE
    }
 
-   # The loop for each unit
+   # The loop for each firm
    for ( k in 1:K)  {
-      if ( LP )  print(paste("Unit",k," -------------------"), quote=FALSE)
+      if ( LP )  print(paste("Firm",k," -------------------"), quote=FALSE)
  
       # Af en eller anden grund saetter set.column ogsaa vaerdi for
       # kriteriefunktion og hvis der ikke er nogen vaerdi bliver den
@@ -380,7 +389,7 @@ dea  <-  function(X,Y, RTS="vrs", ORIENTATION="in", XREF=NULL,YREF=NULL,
          directMatrix[k,] <- DIRECT
          if (LP) { print("Min DIRECT:"); print(DIRECT) }
 
-         # Check om DIRECT er 0, hvis den er nul gaa til naeste unit
+         # Check om DIRECT er 0, hvis den er nul gaa til naeste firm
          lpcontr <- lp.control(lps)
          eps <- sqrt(lpcontr$epsilon["epsint"])
          if (LP) print(paste("eps for minDirectin",eps), quote=FALSE)
@@ -396,13 +405,13 @@ dea  <-  function(X,Y, RTS="vrs", ORIENTATION="in", XREF=NULL,YREF=NULL,
 
          if ( max(DIRECT) < eps && max(abs(deltaDir)) < eps )
          {
-            if (LP) print(paste("Direction 0 for unit",k))
+            if (LP) print(paste("Direction 0 for firm",k))
             objval[k] <- 0
             if ( !FAST )  {
                lambda[k,] <- rep(0,Kr)
                lambda[k,k] <- 1
             }
-            next  # ingen direction at gaa, tag naeste unit
+            next  # ingen direction at gaa, tag naeste firm
          }
       }  # if ( directMin )
 
@@ -429,9 +438,6 @@ dea  <-  function(X,Y, RTS="vrs", ORIENTATION="in", XREF=NULL,YREF=NULL,
                set.column(lps, 1, c(1,-DIRECT[k,]),0:(m+n))
          }
       }
-      # Default scalering goer af og til, at en loesning ikke kan findes; laves
-      # foer evt CONTROL fra kald saettes saa den kan aendres her.
-      # lp.control(lps, scaling=c("range", "equilibrate", "integers"))
       if ( !is.null(CONTROL) )  {
          if( !is.list(CONTROL)) {
             stop( "argument 'control' must be a 'list' object")
@@ -449,11 +455,11 @@ dea  <-  function(X,Y, RTS="vrs", ORIENTATION="in", XREF=NULL,YREF=NULL,
       if (LP)  print(paste("Status =",status))
       if ( status != 0 )  {
         if ( status == 2 || status == 3 ) {
-	       print(paste("Unit",k,"is not in the technology set.", 
-				" Status =",status), quote=F)
+	        # print(paste("Firm",k,"not in the technology set"), quote=F)
+           # print(paste("Status =",status))
            objval[k] <- ifelse(ORIENTATION=="in",Inf,-Inf)
         } else {
-	        print(paste("Error in solving for unit",k,":  Status =",status), 
+	        print(paste("Error in solving for firm",k,":  Status =",status), 
              quote=F)
            objval[k] <- NA
         }
@@ -462,6 +468,10 @@ dea  <-  function(X,Y, RTS="vrs", ORIENTATION="in", XREF=NULL,YREF=NULL,
          objval[k] <- get.objective(lps)
          if ( !FAST ) sol <- get.variables(lps)
       }
+		if (LP)  {
+			print(paste("Enhed",k), quote=FALSE)
+			print(sol)
+		}
       if ( !FAST )  {
          lambda[k,] <- sol[2:(1+Kr)]
          if ( DUAL )  {
@@ -469,9 +479,20 @@ dea  <-  function(X,Y, RTS="vrs", ORIENTATION="in", XREF=NULL,YREF=NULL,
             dual[k,] <- get.dual.solution(lps)
          }
       }
+		if (SLACK)  {
+			slacks <- get.constraints(lps) - get.constr.value(lps, "rhs")
+			sx[k,] <- slacks[1:m]
+			sy[k,] <- slacks[(m+1):(m+n)]
+		}
+		if (sum(delta)>0)  {
+			e[k] <- sol[1]                   # efficiencer
+			objval[k] <- get.objective(lps)  # optimale vaerdi af kriterifunktion
+			sx[k,] <- sol[(1+Kr+1):(1+Kr+m)]
+			sy[k,] <- sol[(1+Kr+m+1):(1+Kr+m+n)]
+		}
 
    	if (LP && status==0) {
-         print(paste("Objval, unit",k))
+         print(paste("Objval, firm",k))
          print(get.objective(lps))
          print("Solution/variables")
          print(get.variables(lps))
@@ -485,9 +506,10 @@ dea  <-  function(X,Y, RTS="vrs", ORIENTATION="in", XREF=NULL,YREF=NULL,
          write.lp(lps, paste(name.lp(lps),k,".mps",sep=""),
                 type="mps",use.names=TRUE)
       }
-   }  # loop for each unit
+   }  # loop for each firm
 
-   e <- objval
+	# Hvis slack ikke indgaar i kriteriefunktion er e og objval ens
+   if (sum(delta)==0) e <- objval
 
 
    lpcontr <- lp.control(lps)
@@ -563,7 +585,7 @@ dea  <-  function(X,Y, RTS="vrs", ORIENTATION="in", XREF=NULL,YREF=NULL,
    oe <- list(eff=e, lambda=lambda, objval=objval, RTS=RTS,
               primal=primal, dual=dual, ux=ux, vy=vy, gamma=gamma,
               ORIENTATION=ORIENTATION, TRANSPOSE=TRANSPOSE,
-              # slack=NULL, sx=NULL, sy=NULL, sum=NULL, 
+              slack=NULL, sx=NULL, sy=NULL, sum=NULL, 
               param=param 
               )
 
@@ -574,31 +596,20 @@ dea  <-  function(X,Y, RTS="vrs", ORIENTATION="in", XREF=NULL,YREF=NULL,
    class(oe) <- "Farrell"
 
 
-	if ( SLACK ) {
-	     if ( TRANSPOSE )  { # Transponer tilbage hvis de blev transponeret
-         X <- t(X)
-         Y <- t(Y)
-         if (.xyref.missing) {
-            XREF <- NULL
-            YREF <- NULL
-         } else {
-            XREF <- t(XREF)
-            YREF <- t(YREF)
-         }
-      }
-      sl <- slack(X, Y, oe, XREF, YREF, FRONT.IDX, LP=LP)
-      oe$slack <- sl$slack
-      oe$sum <- sl$sum
-      oe$sx <- sl$sx
-      oe$sy <- sl$sy
-      oe$lambda <- sl$lambda
-      if (LP)  {
-         print("slack fra slack:")
-         print(sl$slack)
-         print("slack efter slack:")
-         print(oe$slack)
-      }
+	if ( SLACK | sum(delta)>0 ) {
+		sx[abs(sx) < eps^2 ] <- 0
+		sy[abs(sy) < eps^2 ] <- 0
+		oe$sum <- rowSums(sx) + rowSums(sy)
+		oe$slack <- oe$sum > eps^2
+		if ( TRANSPOSE ) {
+			oe$sx <- t(sx)
+			oe$sy <- t(sy)
+		} else {
+			oe$sx <- sx
+			oe$sy <- sy
+		}
 	}
+
 
    return(oe)
 

@@ -20,7 +20,7 @@ Find peer firms and units
 \usage{
   peers(object, NAMES = FALSE)
   get.number.peers(object, NAMES = FALSE)
-  get.which.peers(object, N = 1:length(object$eff))
+  get.which.peers(object, N = 1:dim(object$lambda)[2])
   % peerslambda(object)
 }
 
@@ -31,7 +31,9 @@ Find peer firms and units
       \code{\link{dea}}, \code{\link{dea.direct}} et al.}
 
   \item{NAMES}{If true then names for the peers are returned if names
-      are available otherwise the unit index numbers are used }
+      are available otherwise the unit index numbers are used. If \code{NAMES}
+		is a list of names with length equal to the number of units then it is 
+		used as names for peers. }
 
   \item{N}{The peer(s) for which  }
 

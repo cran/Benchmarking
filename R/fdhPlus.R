@@ -1,8 +1,8 @@
-# $Id: fdhPlus.R 149 2015-07-03 14:53:18Z b002961 $
+# $Id: fdhPlus.R 166 2016-04-21 16:54:20Z b018694 $
 
 
 # FDH+.  Beregn foerst CRS efficiency med kun en mulig peer; se om
-# lambda ligger inden for graenderne; hvis er den goer er alt ok,
+# lambda ligger inden for graenserne; hvis er den goer er alt ok,
 # ellers saet lambda svarende til den overtradte graense og beregn
 # efficiency svarende.
 

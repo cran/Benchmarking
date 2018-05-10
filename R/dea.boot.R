@@ -1,4 +1,4 @@
-# $Id: dea.boot.R 156 2015-07-08 13:34:15Z b002961 $
+# $Id: dea.boot.R 159 2015-12-21 09:06:54Z b018694 $
 
 # Boot No FEAR: boot.nf
 # Bootstrap af dea model a la Simar Wilson 1998.
@@ -36,7 +36,7 @@ dea.boot <- function(X,Y, NREP=200, EFF=NULL, RTS="vrs",
    if ( orientation < 1 || 3 < orientation )
       stop("Invalid value of ORIENTATION in call to boot")
 
-   if (LP) print(paste("rts =",RTS,"   orientation=",ORIENTATION))
+   if (LP) print(paste("rts =",RTS,"   orientation=",ORIENTATION), quote=FALSE)
    if (LP) print(paste("rts =",rts,"     orientation=",orientation), quote=FALSE)
 
    if ( class(X)!="matrix" )
@@ -114,7 +114,7 @@ dea.boot <- function(X,Y, NREP=200, EFF=NULL, RTS="vrs",
    zeff <- eff[ dist > 1 + 1e-6 ]
    if ( length(zeff) == 0 )  {
       cat("No unit with efficiency different from 1.0000.\n", quote=FALSE)
-      stop("The range of efficiencies is degenrate, 'dea.boot' stops-")
+      stop("The range of efficiencies is degenrate, 'dea.boot' stops.")
    }
    # Spejling om 1
    neff <- c(zeff,2-zeff)

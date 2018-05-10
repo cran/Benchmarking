@@ -1,4 +1,4 @@
-# $Id: deaUtil.R 140 2015-05-15 21:48:02Z B002961 $
+# $Id: deaUtil.R 182 2018-05-10 11:52:55Z lao $
 
 
 efficiencies <- function( object, ... )  {
@@ -68,19 +68,24 @@ print.Farrell  <- function(x, digits=4, ...)  {
 
 
 summary.Farrell <- function(object, digits=4, ...)  {
-   eps <- 1e-6
+   eps <- 1e-7
    eff <- object$eff
    cat("Summary of ", ifelse(is.null(object$direct),"","directional "), 
        "efficiencies\n", sep="")
-   cat("The technology is ", object$RTS," and ",object$ORIENTATION,
+   cat(toupper(object$RTS)," technology and ",object$ORIENTATION,
        "put orientated efficiency\n", sep="")
+   if ( sum(is.infinite(eff)) | sum(is.nan(eff)) )  {
+   	cat("Number of firms with infinite efficiency are ", 
+   		sum(is.infinite(eff)),"; removed below\n", sep="")
+   	eff <- eff[is.finite(eff)]
+   }
    if ( is.null(object$direct) ) 
       cat("Number of firms with efficiency==1 are",
-         sum(abs(eff-1) < eps), 
-         "\nMean efficiency:", format(mean(object$eff),digit=3), "\n---" )
+         sum(abs(eff-1) < eps, na.rm=TRUE), "out of", length(eff), 
+         "\nMean efficiency:", format(mean(eff, na.rm=TRUE),digit=3), "\n---" )
    if ( object$ORIENTATION!="out" && is.null(object$direct) )  {
       # Orientering er in eller graph
-      minE <- min(eff)
+      minE <- min(eff, na.rm=TRUE)
       minE <- floor( 10 * minE ) / 10
       dec <- seq(from=minE, to=1, by=.1)
       Estr <- "<= E <"
@@ -93,11 +98,11 @@ summary.Farrell <- function(object, digits=4, ...)  {
       estr[n] <- Eeff
       antal <- rep(NA,n)
       for ( i in 1:(n-1) )
-         antal[i] <- sum(dec[i]-eps <= eff & eff < dec[i+1]-eps)
-      antal[n] <- sum(abs(eff-1) < eps)
+         antal[i] <- sum(dec[i]-eps <= eff & eff < dec[i+1]-eps, na.rm=TRUE)
+      antal[n] <- sum(abs(eff-1) < eps, na.rm=TRUE)
    } else if ( is.null(object$direct) )  {
       # Orientering er out
-      maxF <- max(eff)
+      maxF <- max(eff, na.rm=TRUE)
       maxF <- ceiling( 10 * maxF ) / 10
       dec <- seq(from=1, to=maxF, by=.1)
       Estr <- "< F =<"
@@ -118,17 +123,17 @@ summary.Farrell <- function(object, digits=4, ...)  {
       his <- hist(object$eff, breaks=dec, plot=FALSE)
       antal <- his$counts
       # Foerste gruppe skal vaere eff==1; fra dist er foerte gruppe eff mellem 1 og 1.1
-      antal[1] <- antal[1] - sum(abs(eff-1) < eps)
-      antal <- c(sum(abs(eff-1) < eps), antal)
+      antal[1] <- antal[1] - sum(abs(eff-1) < eps, na.rm=TRUE)
+      antal <- c(sum(abs(eff-1) < eps, na.rm=TRUE), antal)
    } else {
       # directional er det saa
       cat("Number of firms with directional efficiency==0 are",
-         sum(abs(eff) < eps), 
-         "\nMean efficiency:", format(mean(object$eff),digit=3), "\n---" )
+         sum(abs(eff) < eps, na.rm=TRUE), 
+         "\nMean efficiency:", format(mean(eff, na.rm=TRUE),digit=3), "\n---" )
       his <- hist(object$eff, breaks=7, plot=FALSE)
       antal <- his$counts
-      antal[1] <- antal[1] - sum( abs(eff) < eps )
-      antal <- c(sum( abs(eff) < eps ), antal)
+      antal[1] <- antal[1] - sum( abs(eff) < eps , na.rm=TRUE)
+      antal <- c(sum( abs(eff) < eps , na.rm=TRUE), antal)
       dec <- his$breaks
       Estr <- "< D =<"
       Eeff <- "D ==0   "
@@ -145,11 +150,11 @@ summary.Farrell <- function(object, digits=4, ...)  {
    dimnames(a) <- list("  Eff range"=estr,c( "#", "%"))
    print(a,digits=c(2,3),quote=F,...)
    print(summary(eff))
-   if ( !is.null(object$slack) )  {
-      sl <- object
-      class(sl) <- "slack"
-      summary(sl)
-   }
+	#	if ( SLACK & !is.null(object$slack) )  {
+	#		sl <- object
+	#		class(sl) <- "slack"
+	#		summary(sl)
+	#	}
    invisible(object)
 }  ## summary.Farrell
 
@@ -198,7 +203,7 @@ peers <- function(object, NAMES=FALSE)  {
       # Hvis firm er uden for teknologi maengden er der ingen peers: next
       if ( sum(lam[i,peer],na.rm=TRUE) == 0 ) next
       # Hvem er peers for firm i
-      pe <- which(lam[i,peer]>0)
+      pe <- which(lam[i,peer]>1e-6)
       bench[i,1:length(pe)] <- peer[pe]
       maxj <- max(maxj,length(pe))
    }
@@ -211,8 +216,17 @@ peers <- function(object, NAMES=FALSE)  {
    bench <- bench[,1:maxj,drop = FALSE]
 
    # Skal der navne i matricen bench med peers i steder for blot numre
-   if ( NAMES & (!is.null(colnames(lam)) || !is.null(names(object$eff))) ) {
-      bench_ <- matrix(colnames(lam)[bench], nrow=dim(bench)[1])
+   if ( is.logical(NAMES) && NAMES & 
+			(!is.null(colnames(lam)) || !is.null(names(object$eff))) ) {
+			# der skal navne, og enten er der names paa lambda eller paa eff.
+		bench_ <- matrix(colnames(lam)[bench], nrow=dim(bench)[1])
+      rownames(bench_) <- rownames(bench)
+      bench <- bench_
+   } else if ( (class(NAMES)=="character" | class(NAMES)=="integer")
+			& length(NAMES)==dim(bench)[1])  {
+		# NAMES er et array med navne der bruges, dvs. character ell. 
+		# integer array
+		bench_ <- matrix(NAMES[bench], nrow=dim(bench)[1])
       rownames(bench_) <- rownames(bench)
       bench <- bench_
    }
@@ -278,26 +292,36 @@ get.number.peers  <-  function(object, NAMES=FALSE)  {
    # }
    # rownames er overfloedige da de fremgaar af foerste soejle, index er
    # ofte lettere for at kunne udpege raekker
-   rownames(lam) <- NULL
+   # rownames(lam) <- NULL
+   if ( all("L_" == substr(rownames(lam),1,2)) )  {
+	   rownames(lam) <- substring(rownames(lam),3)
+	}
 
    peer <- which(rowSums(lam, na.rm=TRUE)>0)
    # names(peer) <- NULL
 
-   number <- rowSums(lam[peer,]>0, na.rm=TRUE)
-   np <- cbind(peer,"#"=number)
-   if (NAMES) rownames(np) <- names(object$eff)[peer]
+   count <- rowSums(lam[peer,]>0, na.rm=TRUE)
+   np <- cbind(peer,count)
+   if (NAMES) rownames(np) <- rownames(lam)[peer]
    return(np)
 }  # get.number.peers
 
 
 
-get.which.peers <- function(object, N=1:length(object$eff))  {
+get.which.peers <- function(object, N=1:dim(object$lambda)[2] )  {
    if ( object$TRANSPOSE ) {
 	   lam <- object$lambda
    } else {
       lam <- t(object$lambda)
    }
-   p <- apply(object$lambda[,N,drop=FALSE]>0,2,which)
+      # Fjern foranstillet L_ eller L i soejlenavne for lambda
+	if ( all("L_" == substr(rownames(lam),1,2)) )  {
+		rownames(lam) <- substring(rownames(lam),3)
+	}
+   # Nu er lambda en K x Kr matrix
+   # Er peer for en unit, naar units lambda er positivt,
+   # positivt element i soejlen for N
+   p <- apply(lam[N,,drop=FALSE]>0,1,which)
    p0 <- p[lapply(p,length) > 0]
    return(p0)
 }  # get.which.peers
@@ -388,7 +412,7 @@ excess <- function(object, X=NULL, Y=NULL)  {
 
 
 eladder <- function(n, X, Y, RTS="vrs", ORIENTATION="in", 
-                    XREF=NULL, YREF=NULL, DIRECT=NULL, param=NULL)  {
+                    XREF=NULL, YREF=NULL, DIRECT=NULL, param=NULL, MAXELAD=NULL)  {
 
    if ( is.null(XREF) )  {
       XREF <- X
@@ -397,14 +421,20 @@ eladder <- function(n, X, Y, RTS="vrs", ORIENTATION="in",
       YREF <- Y
    }
 
-  idx <- NULL
-  elad <- rep(NA, dim(XREF)[1])
-  for ( i in 1:length(elad))  {
+   idx <- NULL
+   if ( missing(MAXELAD) || is.null(MAXELAD) ) {
+   	MAXELAD <- dim(XREF)[1]
+   } else {
+   	if( !is.numeric(MAXELAD) ) stop("MAXELAD must be an integer")
+  		MAXELAD <- min(abs(MAXELAD), dim(XREF)[1])
+   }
+   elad <- rep(NA, MAXELAD)
+   for ( i in 1:MAXELAD )  {
     # if (LP) print(paste("===> ",i),quote=FALSE)
     # if (LP) print("FRONT.IDX")
     # if (LP) print(idx)
     # print( length(idx) == dim(X)[1] )  
-    if ( length(idx) == dim(X)[1] )  {
+    if ( length(idx) == MAXELAD )  {
        break  
     }
     # Brug FRONT.IDX for at kunne bruge de oprindelige indeks i X og Y
@@ -452,7 +482,7 @@ eladder <- function(n, X, Y, RTS="vrs", ORIENTATION="in",
 
 
 
-eladder.plot <- function(elad, peer, TRIM=NULL)  {
+eladder.plot <- function(elad, peer, TRIM=NULL, ...)  {
    if ( all(is.na(elad)) )
       stop("All values of first argument are NA")
    if ( !is.null(TRIM) & !is.numeric(TRIM) )
@@ -466,7 +496,7 @@ eladder.plot <- function(elad, peer, TRIM=NULL)  {
    linje <- ifelse(TRIM==1,2,TRIM^(1/1.3))
    opar <- 
        par(mar=c(linje+2,4.1,4.1,2.1))
-   plot(elad, xaxt="n", xlab="", ylab="Efficiency")
+   plot(elad, xaxt="n", xlab="", ylab="Efficiency", ...)
    mtext("Most influential peers", side=1, line=linje+.5)
    if ( class(peer) == "character" || class(peer) == "factor" )  {
       axis(1, at=1:length(peer),
@@ -474,8 +504,23 @@ eladder.plot <- function(elad, peer, TRIM=NULL)  {
    } else {
       axis(1, at=1:length(peer), labels=peer, las=ifelse(TRIM>1,2,0) )
    }
-   abline(v=which(elad==1))
-   abline(h=1)
+   abline(v=which(elad==1), lty=3)
+   abline(h=1, lty=3)
    par(opar)
 }
 
+
+# Funktion til at droppe en eller flere units fra et
+# Farrrell objekt
+#dropUnit <- function(E, dmu)  {
+#	# Det foerste element er typisk eff og kan give
+#	# antal units.
+#	K <- length(E[[1]])
+#	for (n in 1:length(names(E)))  {
+#		if ( class(E[[n]]) == "matrix" ) 
+#			E[[n]] <- E[[n]][-dmu,,drop=FALSE]
+#		else if ( class(E[[n]]) == "numeric" )
+#			E[[n]] <- E[[n]][-dmu]
+#	}
+#	return(E)
+#}
