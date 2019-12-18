@@ -1,4 +1,4 @@
-% $Id: malmq.Rd 181 2018-05-06 14:58:02Z lao $
+% $Id: malmq.Rd 183 2018-06-14 15:45:11Z lao $
 
 \name{malmq}
 \alias{malmq}
@@ -52,7 +52,13 @@ malmq(X0, Y0, ID0 = NULL, X1, Y1, ID1 = NULL, RTS = "vrs", ORIENTATION = "in",
 }
 
 \details{
-See \dots\ for details
+The \emph{index for technical changes} \code{tc} is calculated as \code{sqrt(e10/e11 * e00/e01)} 
+where \code{e<s><t>} is the efficience for period \code{s} when the refenrece technology is
+for period \code{t}, i.e. determined from the observations for period \code{t} and 
+\code{XREF=X_t, YREF=Y_t}, as is the option for the function \code{dea}.
+
+The \emph{Malmquist index for productivity} \code{mq} is calculates as \code{sqrt(e10/e00 * e11/e01)} and the 
+\emph{index for change in efficiency} \code{ec} is \code{e11/e00}.  Note that \code{mq = tc * ec}.
 }
 
 \value{

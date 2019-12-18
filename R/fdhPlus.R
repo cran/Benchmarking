@@ -1,4 +1,4 @@
-# $Id: fdhPlus.R 166 2016-04-21 16:54:20Z b018694 $
+# $Id: fdhPlus.R 207 2019-12-16 20:14:51Z lao $
 
 
 # FDH+.  Beregn foerst CRS efficiency med kun en mulig peer; se om
@@ -88,7 +88,7 @@ if ( !is.null(DIRECT) )  {
 
 stop("Directional efficiency does not yet work for RTS='fdh+'")
 
-   if ( class(DIRECT)=="matrix" && dim(DIRECT)[1] > 1 ) {
+   if ( is(DIRECT, "matrix") && dim(DIRECT)[1] > 1 ) {
       if ( ORIENTATION=="in" )  {
          dirX <- DIRECT  # matrix(DIRECT, nrow=K, ncol=m)
          # dirY <- matrix(.Machine$double.xmin, nrow=K, ncol=n)

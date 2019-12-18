@@ -1,4 +1,4 @@
-# $Id: make.merge.R 140 2015-05-15 21:48:02Z B002961 $
+# $Id: make.merge.R 207 2019-12-16 20:14:51Z lao $
 
 
 make.merge <- function(grp, nFirm=NULL, X=NULL, names=NULL)  {
@@ -24,7 +24,7 @@ make.merge <- function(grp, nFirm=NULL, X=NULL, names=NULL)  {
    if ( !is.null(nFirm) && class(nFirm)!="numeric" && 
                                 class(nFirm)!="integer" )
       stop("The argument nFirm must be numeric or integer")
-   if ( !is.null(X) && class(X)!="matrix" )
+   if ( !is.null(X) && !is(X, "matrix") )
       stop("The argument X must be a matrix")
    # print(g)
    if ( Kg == -1 & is.null(X) & is.null(nFirm) ) {

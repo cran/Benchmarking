@@ -1,4 +1,4 @@
-$Id: NEWS 182 2018-05-10 11:52:55Z lao $
+$Id: NEWS 208 2019-12-17 22:39:13Z lao $
 
 Upcoming
 
@@ -6,7 +6,28 @@ Upcoming
 
 * A fast version of dea.boot
 
-* In dea.boot the options XREF and YREF must have the same units as does X and Y; this is about to change
+* An implementation of the StoNED estimator which combines the axiomatic and non-parametric frontier (the DEA aspect) with a stochastic noise term (the SFA aspect); a contribution from Stefan Seifert.
+
+
+
+Changes to Benchmarking version 0.28
+
+* Changed test of class to use 'is' instead of 'class()==...'
+
+* Added a set.basis in method for VRS="graph" to avoid numerical problems
+
+* Expanded manual for Malmquist, also an example with chain index
+
+* Functions to handle peers made faster and given an option to extract only peers for a few units.
+
+* In dea.boot the options XREF and YREF need not have the same units as does X and Y
+
+* The functions peers, get.number.peers, get.which.peers, and get.peers.lambda now have a parameter LAMBDA to limit extracted peers to weight above a certain value given by LAMBDA.
+
+* The tolerance that lambda is zero or one is changed to 1e-7; the same tolerance that the efficiency is one.
+
+* Default scaling method changed from 'geometric' to 'range' as it for problematic datasets gives results without the need to scale the data itself.
+
 
 
 Changes to Benchmarking version 0.27

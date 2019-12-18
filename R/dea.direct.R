@@ -1,4 +1,4 @@
-# $Id: dea.direct.R 156 2015-07-08 13:34:15Z b002961 $
+# $Id: dea.direct.R 207 2019-12-16 20:14:51Z lao $
 
 
 dea.direct <- function(X,Y, DIRECT, RTS="vrs", ORIENTATION="in", 
@@ -28,7 +28,7 @@ dea.direct <- function(X,Y, DIRECT, RTS="vrs", ORIENTATION="in",
       Y <- t(Y)
       XREF <- t(XREF)
       YREF <- t(YREF)
-      if ( !is.null(DIRECT) & class(DIRECT)=="matrix" )
+      if ( !is.null(DIRECT) & is(DIRECT, "matrix") )
          DIRECT <- t(DIRECT)
    }
 
@@ -43,7 +43,7 @@ dea.direct <- function(X,Y, DIRECT, RTS="vrs", ORIENTATION="in",
    mmd <- switch(ORIENTATION, "in"=m, "out"=n, "in-out"=m+n) 
    if ( is.null(ee$objval) )  ee$objval <- ee$eff
    ob <- matrix(ee$objval,nrow=K, ncol=mmd)
-   if ( class(DIRECT)=="matrix" && dim(DIRECT)[1] > 1 )  {
+   if ( is(DIRECT, "matrix") && dim(DIRECT)[1] > 1 )  {
        dir <- DIRECT
    } else {
        dir <- matrix(DIRECT,nrow=K, ncol=mmd, byrow=TRUE)
@@ -58,7 +58,7 @@ dea.direct <- function(X,Y, DIRECT, RTS="vrs", ORIENTATION="in",
    } else {
       warning("Illegal ORIENTATION for argument DIRECT") 
    }
-   if ( class(e)=="matrix" && dim(e)[2]==1 )
+   if ( is(e, "matrix") && dim(e)[2]==1 )
       e <- c(e) 
 
    if ( transpose )  {
@@ -68,10 +68,10 @@ dea.direct <- function(X,Y, DIRECT, RTS="vrs", ORIENTATION="in",
 
 
    if ( TRANSPOSE ) {
-      if ( class(e)=="matrix" )
+      if ( is(e, "matrix") )
          e <- t(e)
       ee$lambda <- t(ee$lambda)
-      if ( !is.null(DIRECT) & class(DIRECT)=="matrix" )
+      if ( !is.null(DIRECT) & is(DIRECT, "matrix") )
          DIRECT <- t(DIRECT)
    }
 

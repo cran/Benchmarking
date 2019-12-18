@@ -1,5 +1,8 @@
-# $Id: deaUtil.R 182 2018-05-10 11:52:55Z lao $
+# $Id: deaUtil.R 207 2019-12-16 20:14:51Z lao $
 
+# Naesten alle funktioner transponerer lambda i forhold til normal.
+# Normal er lambda K x Kr, men i naesten alle funktioner laves den
+# til en Kr x K matrix; uvist af hvilken grund
 
 efficiencies <- function( object, ... )  {
     UseMethod( "efficiencies" )
@@ -163,7 +166,7 @@ summary.Farrell <- function(object, digits=4, ...)  {
 
 # returns peers, i.e. numbers for units with positive lambda,
 # efficient units to be compared to
-peers <- function(object, NAMES=FALSE)  {
+peers <- function(object, NAMES=FALSE, N=1:dim(object$lambda)[1], LAMBDA=0)  {
    #  if ( object$TRANSPOSE ) {
    #    print("Colnames i lambda")
    #    print(colnames(object$lambda))
@@ -175,9 +178,10 @@ peers <- function(object, NAMES=FALSE)  {
       stop(paste("Object is not of class 'Farrell' (or 'slack');",
              "you might have used FAST=TRUE in 'dea'"))
    if ( object$TRANSPOSE ) {
-	   lam <- t(object$lambda)
+		# Gem kun de raekker/firms i lambda, der skal laves peers for
+		lam <- t(object$lambda[,N,drop=FALSE])
    } else {
-      lam <- object$lambda
+      lam <- object$lambda[N,,drop=FALSE]
    }
 
    # Fjern foranstillet L_ eller L i soejlenavne for lambda
@@ -187,35 +191,26 @@ peers <- function(object, NAMES=FALSE)  {
    if ( all("L" == substr(colnames(lam),1,1)) )  {
       colnames(lam) <- substring(colnames(lam),2)
    }
+   
 
-   # peers har positiv vaerdi af lambda i deres soejle
-   peer <- which(colSums(lam,na.rm=TRUE)>0)  #  , 1:dim(lam)[2])
-   # print("Firms der er peers:")
-   # print(peer)
-
-   # Matrix til i hver raekke at holde raekkens/firmaets peers
-   bench <- matrix(NA, nrow=dim(lam)[1], ncol=length(peer))
-   # Saet firms navne som soejlenavne
-   rownames(bench) <- rownames(lam)
-
-   maxj = 0  # det storste antal peers for en firm
-   for ( i in 1:dim(lam)[1] )  {  # for hver firm
-      # Hvis firm er uden for teknologi maengden er der ingen peers: next
-      if ( sum(lam[i,peer],na.rm=TRUE) == 0 ) next
-      # Hvem er peers for firm i
-      pe <- which(lam[i,peer]>1e-6)
-      bench[i,1:length(pe)] <- peer[pe]
-      maxj <- max(maxj,length(pe))
+	# Liste, for hver firm et array af peers
+   pt_ <- apply(lam, 1, function(x){which(x>LAMBDA)})
+   if ( dim(lam)[1] == 1 )  {
+   	# Kun een firm; problem at 'pt_' bliver vektor, men
+   	# skal vaere liste herefter
+   	pt_ <- list(c(pt_))
    }
-   # Der er hoejst maxj peers for en firm
-   if ( maxj == 0 )  {
-      # Der er ingen peers overhovedet 
-      return(NA)
-   }
-
-   bench <- bench[,1:maxj,drop = FALSE]
-
-   # Skal der navne i matricen bench med peers i steder for blot numre
+   # Lav liste om til matrix og transponer den saa firms er raekker
+   # Bemaerk pt_ er indeks er bench ogsaa indeks i reference matrix,
+   # og ikke navne.
+   bench <- t(mapply(function(x) x[1:max(sapply(pt_, length))], pt_))
+   # Hvis der kun er en peer for hver, bliver 'bench' et array,
+   # en raekke-vektor, og ikke en soejle-vektor; derfor saettes
+   # dim eksplicit.
+   dim(bench) <- c(dim(lam)[1], max(sapply(pt_, length)))
+	rownames(bench) <- rownames(lam)
+   
+   # Skal der navne i matricen bench med peers i steder for blot indeks
    if ( is.logical(NAMES) && NAMES & 
 			(!is.null(colnames(lam)) || !is.null(names(object$eff))) ) {
 			# der skal navne, og enten er der names paa lambda eller paa eff.
@@ -230,7 +225,7 @@ peers <- function(object, NAMES=FALSE)  {
       rownames(bench_) <- rownames(bench)
       bench <- bench_
    }
-
+		
    if ( object$TRANSPOSE ) {
       bench <- t(bench)
    }
@@ -247,44 +242,54 @@ peers <- function(object, NAMES=FALSE)  {
 
 
 
-# Returns lambda-values for peers for each unit
-peerslambda <- function(object)  {
+# For each unit return lambda-values for peers 
+get.peers.lambda <- function(object, N=1:dim(object$lambda)[1], LAMBDA=0)  {
    lambda <- object$lambda
    if (object$TRANSPOSE) {
 	   lambda <- t(lambda)
    }
-   bench <- array(NA,dim=c(2,dim(lambda)[1],dim(lambda)[2]))
-   maxj = 0
-   for ( h in 1:dim(lambda)[2] ) {
-	j = 0
-   	for ( i in 1:dim(lambda)[1] ) {
-	   	if ( lambda[i,h] > 0 ) {
-               j = j+1
-               bench[1,j,h] = i
-               bench[2,j,h] = lambda[i,h]
-   		}
-	   	maxj = max(maxj,j)
-   	}
+   if ( is.null(rownames(lambda)) ) {
+   	colnames(lambda) <- rownames(lambda) <- 1:dim(lambda)[1]
    }
-   bench <- bench[,1:maxj,]
+   bench <- apply(lambda[N,,drop=FALSE], 1, function(x) {x[x>LAMBDA]})
+   if (0)  {
+		bench <- array(NA,dim=c(2,dim(lambda)[2],dim(lambda)[1]))
+		maxj = 0  # Stoerste antal peers for en unit
+		for ( i in 1:dim(lambda)[1] ) {  # For hver unit
+			j = 0  # hvor mange peers for unit 'i'
+			for ( h in 1:dim(lambda)[2] ) {  # For hver reference unit
+				if ( lambda[i,h] > 0 ) {
+						j = j+1    # Har fundet en peer
+						bench[1,j,i] = h
+						bench[2,j,i] = lambda[i,h]
+				}
+				maxj = max(maxj,j)
+			}
+		}
+		bench <- bench[,1:maxj,]
+   }  ## if (0)
    return(bench)
-} ## peerslambda
+} ## get.peers.lambda
+
 
 
 print.peers  <- function(x, ...)  {
    a <- peers(x)
    print(a,...)
    invisible(a)
-} ## print.cost.opt
+} ## print.peers
 
 
 
-get.number.peers  <-  function(object, NAMES=FALSE)  {
+get.number.peers  <-  function(object, NAMES=FALSE, N=1:dim(object$lambda)[2], LAMBDA=0)  {
+	# For hver peer get antal units den er peer for
    if ( object$TRANSPOSE ) {
-	   lam <- object$lambda
+	   lam <- t(object$lambda)
    } else {
-      lam <- t(object$lambda)
+	   lam <- object$lambda
    }
+   # Kun de raekker af lambda som svarer til de oenskede peers
+   lam <- lam[,N,drop=FALSE]
 
    # Fjern foranstillet L i soejlenavne for lambda
    # if ( "L" %in% substr(rownames(lam),1,1) )  {
@@ -293,37 +298,47 @@ get.number.peers  <-  function(object, NAMES=FALSE)  {
    # rownames er overfloedige da de fremgaar af foerste soejle, index er
    # ofte lettere for at kunne udpege raekker
    # rownames(lam) <- NULL
-   if ( all("L_" == substr(rownames(lam),1,2)) )  {
-	   rownames(lam) <- substring(rownames(lam),3)
+   if ( all("L_" == substr(colnames(lam),1,2)) )  {
+	   colnames(lam) <- substring(colnames(lam),3)
 	}
 
-   peer <- which(rowSums(lam, na.rm=TRUE)>0)
+	# Hvem er overhovedet peer for firms
+   peer <- which(colSums(lam, na.rm=TRUE)>LAMBDA)
    # names(peer) <- NULL
 
-   count <- rowSums(lam[peer,]>0, na.rm=TRUE)
-   np <- cbind(peer,count)
-   if (NAMES) rownames(np) <- rownames(lam)[peer]
+	# Find hvor mange 'peer' er forbillede for
+   count <- colSums(lam[,peer,drop=FALSE]>LAMBDA, na.rm=TRUE)
+   np <- data.frame(peer,count)
+   # if (NAMES) rownames(np) <- colnames(lam)[peer]
+   if (NAMES) np$peer <- colnames(lam)[np$peer]
    return(np)
 }  # get.number.peers
 
 
 
-get.which.peers <- function(object, N=1:dim(object$lambda)[2] )  {
+get.which.peers <- function(object, N=1:dim(object$lambda)[2], LAMBDA=0 )  {
+   # Hvilke units en peer er peer for
+   # Problem: Hvis N ikke er blandt peers gives en R fejl.
+   # Jeg har ikke fundet en maade at teste for dette for at undgaa
+   # R fejlen.
    if ( object$TRANSPOSE ) {
-	   lam <- object$lambda
+	   lam <- t(object$lambda)
    } else {
-      lam <- t(object$lambda)
+      lam <- object$lambda
    }
-      # Fjern foranstillet L_ eller L i soejlenavne for lambda
-	if ( all("L_" == substr(rownames(lam),1,2)) )  {
-		rownames(lam) <- substring(rownames(lam),3)
-	}
+   # Fjern foranstillet L_ eller L i soejlenavne for lambda
+   if ( all("L_" == substr(colnames(lam),1,2)) )  {
+		colnames(lam) <- substring(colnames(lam),3)
+   }
    # Nu er lambda en K x Kr matrix
    # Er peer for en unit, naar units lambda er positivt,
    # positivt element i soejlen for N
-   p <- apply(lam[N,,drop=FALSE]>0,1,which)
+   p <- apply(lam[,N,drop=FALSE] > LAMBDA, 2, which)
    p0 <- p[lapply(p,length) > 0]
-   return(p0)
+   if ( length(p0) > 0 )
+   	return(p0)
+   else
+   	return(NULL)
 }  # get.which.peers
 
 
@@ -331,23 +346,23 @@ get.which.peers <- function(object, N=1:dim(object$lambda)[2] )  {
 
 lambda.print  <- function(x, KEEPREF=FALSE, ...)  {
    if ( x$TRANSPOSE ) {
-      lam <- x$lambda
-   } else {
       lam <- t(x$lambda)
+   } else {
+      lam <- x$lambda
    }
    # print(class(lam))
-   if (!KEEPREF && dim(lam)[2]>1 ) {
-      lam <- lam[rowSums(as.matrix(lam))>0,]
+   if (!KEEPREF && dim(lam)[1]>1 ) {
+      lam <- lam[,rowSums(as.matrix(lam))>0]
    }
    xx <- round(unclass(lam)*1000)/1000
    if (any(ina <- is.na(lam))) 
       xx[ina] <- ""
-   if ( any(i0 <- !ina & abs(lam) < 1e-9) ) 
+   if ( any(i0 <- !ina & abs(lam) < 1e-5) ) 
       xx[i0] <- sub("0.0000", ".", xx[i0])
-   if ( !x$TRANSPOSE )
+   if ( x$TRANSPOSE )
       xx <- t(as.matrix(xx))
    print(xx, quote=FALSE, rigth=TRUE, ...)
-   invisible(x)
+   invisible(xx)
    # printSpMatrix(Matrix(lam),digits=4, col.names=T,...)
    # invisible(lam)
 } ## print.lambda
@@ -394,7 +409,7 @@ excess <- function(object, X=NULL, Y=NULL)  {
       else # ( is.null(dir) )
          stop("X/Y missing for ORIENTATION =", object$ORIENTATION )
    } else {
-       if ( class(object$direct) == "matrix" )  {
+       if ( is(object$direct, "matrix") )  {
           ex <- apply(object$direct,2,"*",e)
        } else {
            dir <- matrix(object$direct, nrow=length(e), 
@@ -448,8 +463,8 @@ eladder <- function(n, X, Y, RTS="vrs", ORIENTATION="in",
     if ( is.na(peers(e)[1]) ) break
     elad[i] <- e$eff
     # Array nr. for den stoerste vaerdi af lambda
-    # Brug kun den foerste hvis der er flere
-    p <- which(max(e$lambda)==e$lambda)[1]
+    # Bruger kun den foerste hvis der er flere
+    p <- which.max(e$lambda)
     # if (LP) print(paste("p =",p))
     # firm number for array number p, firm numbers follow L in the colnames
     str <- substring(colnames(e$lambda)[p],2)
@@ -458,13 +473,15 @@ eladder <- function(n, X, Y, RTS="vrs", ORIENTATION="in",
     # if (LP) print(paste("    ", ip),quote=FALSE)
     # nok en firm der ikke laengere skal indgaa i referenceteknologien
     if ( is.na(ip) )  {
-       # det er et navn/en streng saa den skal laves om til nr.
+       # det er et navn/en streng saa den skal laves om til et indeks,
+       # et heltal, for elleres kan den ikke bruges som indeks til FRONT.IDX
        str0 <- substring(str,2)
        # if (LP) print(str0)
        navne <- rownames(XREF)
        # if (LP) print(navne)
        if ( is.null(navne) )
            navne <- rownames(YREF) 
+       # Find indeks for placering af str0 i rownames(XREF)/rownames(YREF)
        ip <- which( navne %in% str0 )
     }
     # saa er ip et tal
@@ -477,8 +494,8 @@ eladder <- function(n, X, Y, RTS="vrs", ORIENTATION="in",
   } else {
      idx <- -idx
   }
-  return(list(eff=elad,peer=idx))
-}
+  return(list(eff=elad, peer=idx, lastp=peers(e)))
+}  ## eladder
 
 
 
@@ -507,7 +524,7 @@ eladder.plot <- function(elad, peer, TRIM=NULL, ...)  {
    abline(v=which(elad==1), lty=3)
    abline(h=1, lty=3)
    par(opar)
-}
+}  ## eladder.plot
 
 
 # Funktion til at droppe en eller flere units fra et

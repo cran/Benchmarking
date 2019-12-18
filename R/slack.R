@@ -1,4 +1,4 @@
-# $Id: slack.R 160 2015-12-22 13:58:31Z b018694 $
+# $Id: slack.R 207 2019-12-16 20:14:51Z lao $
 
 # Calculate slack at the efficient points.
 
@@ -18,22 +18,22 @@ slack <- function(X, Y, e, XREF=NULL, YREF=NULL, FRONT.IDX=NULL,
    
 	# Hvis data er en data.frame saa tjek om det er numerisk data og lav
 	# dem i saa fald om til en matrix
-   if ( class(X)=="data.frame" && data.kontrol(X) || is.numeric(X) ) 
+   if ( is(X, "data.frame") && data.kontrol(X) || is.numeric(X) ) 
       { X <- as.matrix(X) }
-   if ( class(Y)=="data.frame" && data.kontrol(Y) || is.numeric(Y) ) 
+   if ( is(Y, "data.frame") && data.kontrol(Y) || is.numeric(Y) ) 
       { Y <- as.matrix(Y) }
-   if ( class(XREF)=="data.frame" && data.kontrol(XREF)||is.numeric(XREF))
+   if ( is(XREF, "data.frame") && data.kontrol(XREF)||is.numeric(XREF))
       { XREF <- as.matrix(XREF) }
-   if ( class(YREF)=="data.frame" && data.kontrol(YREF)||is.numeric(YREF)) 
+   if ( is(YREF, "data.frame") && data.kontrol(YREF)||is.numeric(YREF)) 
       { YREF <- as.matrix(YREF) }
 
-	if ( class(X)!="matrix" || !is.numeric(X) )
+	if ( !is(X, "matrix") || !is.numeric(X) )
       stop("X is not a numeric matrix (or data.frame)")
-   if ( class(Y)!="matrix" || !is.numeric(Y) )
+   if ( !is(Y, "matrix") || !is.numeric(Y) )
       stop("Y is not a numeric matrix (or data.frame)")
-   if ( !is.null(XREF) && (class(XREF)!="matrix" || !is.numeric(XREF)) )
+   if ( !is.null(XREF) && (!is(XREF, "matrix") || !is.numeric(XREF)) )
       stop("XREF is not a numeric matrix (or data.frame)")
-   if ( !is.null(YREF) && (class(YREF)!="matrix" || !is.numeric(YREF)) )
+   if ( !is.null(YREF) && (!is(YREF, "matrix") || !is.numeric(YREF)) )
       stop("YREF is not a numeric matrix (or data.frame)")
 
 
@@ -123,7 +123,7 @@ slack <- function(X, Y, e, XREF=NULL, YREF=NULL, FRONT.IDX=NULL,
    } else {
       mmd <- switch(e$ORIENTATION, "in"=m, "out"=n, "in-out"=m+n) 
       ob <- matrix(e$objval,nrow=K, ncol=mmd)
-      if ( class(e$direct)=="matrix" && dim(e$direct)[1] > 1 )  {
+      if ( is(e$direct, "matrix") && dim(e$direct)[1] > 1 )  {
           dir <- e$direct
       } else {
           dir <- matrix(e$direct,nrow=K, ncol=mmd, byrow=TRUE)
@@ -146,9 +146,13 @@ slack <- function(X, Y, e, XREF=NULL, YREF=NULL, FRONT.IDX=NULL,
 
    # Initialiser LP objekt
    lps <- make.lp(m+n +rlamb, m+n+Kr)
+	lp.control(lps,
+		scaling=c("range", "equilibrate", "integers")  # default scalering er 'geometric'
+	)					# og den giver ikke altid tilfredsstillende resultat;
+						# curtisreid virker i mange tilfaelde slet ikke
    name.lp(lps, 
           paste("DEA-slack",RTS,",",e$ORIENTATION,"orientated",sep="-"))
-   
+
    # saet raekker i matrix med restriktioner
    for ( h in 1:m )
        set.row(lps,h, XREF[,h], (m+n+1):(m+n+Kr) )
@@ -209,8 +213,6 @@ slack <- function(X, Y, e, XREF=NULL, YREF=NULL, FRONT.IDX=NULL,
    sy <- matrix(NA,K,n)
    lambda <- matrix(NA,K,Kr)
 
-   cont <- lp.control(lps)
-   eps <- cont$epsilon["epsint"]
    # if ( !is.null(CONTROL) )  {
    #    lp.control(lps,CONTROL)
    # }
@@ -285,6 +287,8 @@ slack <- function(X, Y, e, XREF=NULL, YREF=NULL, FRONT.IDX=NULL,
    # regneunoejagtighed som giver en forskel hvis X er meget stoerre
    # eller mindre end 1.
 
+	lpcontr <- lp.control(lps)
+	eps <- lpcontr$epsilon["epsint"]
    sx[abs(sx) < eps ] <- 0
    sy[abs(sy) < eps ] <- 0
    if ( SKALERING )  {
@@ -292,6 +296,9 @@ slack <- function(X, Y, e, XREF=NULL, YREF=NULL, FRONT.IDX=NULL,
       sy <- sy * matrix(nnn, nrow=K, ncol=n, byrow=TRUE)
    } 
    sum <- rowSums(sx) + rowSums(sy)
+	lambda[abs(lambda-1) < eps] <- 1   # taet ved 1
+	lambda[abs(lambda) < eps] <- 0     # taet ved 0
+
 
    if ( length(FRONT.IDX)>0 )  {
       colnames(lambda) <- paste("L",(1:okr)[FRONT.IDX],sep="")

@@ -1,6 +1,7 @@
-% $Id: sfa.Rd 141 2015-06-12 13:29:10Z b002961 $
+% $Id: sfa.Rd 192 2018-07-31 12:50:56Z lao $
 \name{sfa}
 \alias{sfa}
+\alias{sfa.cost}
 \alias{lambda.sfa}
 \alias{logLik.sfa}
 \alias{print.sfa}
@@ -25,12 +26,16 @@
 \title{Stochastic frontier estimation}
 
 \description{
-Estimate a stochastic frontier production function using a maximum 
+Estimate a stochastic frontier production or cost function using a maximum 
 likelihood method.
 }
 
 \usage{
 sfa(x, y, beta0 = NULL, lambda0 = 1, resfun = ebeta, 
+    TRANSPOSE = FALSE, DEBUG=FALSE,
+    control=list(), hessian=2)
+
+sfa.cost(W, Y, COST, beta0 = NULL, lambda0 = 1, resfun = ebeta, 
     TRANSPOSE = FALSE, DEBUG=FALSE,
     control=list(), hessian=2)
 
@@ -59,6 +64,12 @@ lambda.sfa(object)
     intercept should be included in x as it is added by default.}
 
   \item{y}{Output; K times 1 matrix (one output)  }
+
+  \item{Y}{Output; K times n matrix for m outputs; only to be used in cost function estimation.  }
+  
+  \item{W}{Input prices as a K x m matrix.}
+  
+  \item{COST}{Cost as a K array for the K firms}
 
   \item{beta0}{Optional initial parameter values}
 

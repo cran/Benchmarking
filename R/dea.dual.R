@@ -1,4 +1,4 @@
-# $Id: dea.dual.R 160 2015-12-22 13:58:31Z b018694 $
+# $Id: dea.dual.R 207 2019-12-16 20:14:51Z lao $
 
 # In the calculation in the method input/output matrices X and Y are
 # of the order good x firms.  Ie. X, Y etc must be transformed as
@@ -45,22 +45,22 @@ dea.dual <- function(X,Y, RTS="vrs", ORIENTATION="in",
    if ( !ORIENTATION %in% c("in","out","in-out") )
       stop("dea.dual does not work for \"graph\"")
 
-   if ( class(X)=="data.frame" && data.kontrol(X) || is.numeric(X) ) 
+   if ( is(X, "data.frame") && data.kontrol(X) || is.numeric(X) ) 
       { X <- as.matrix(X) }
-   if ( class(Y)=="data.frame" && data.kontrol(Y) || is.numeric(Y) ) 
+   if ( is(Y, "data.frame") && data.kontrol(Y) || is.numeric(Y) ) 
       { Y <- as.matrix(Y) }
-   if ( class(XREF)=="data.frame" && data.kontrol(XREF)||is.numeric(XREF))
+   if ( is(XREF, "data.frame") && data.kontrol(XREF)||is.numeric(XREF))
       { XREF <- as.matrix(XREF) }
-   if ( class(YREF)=="data.frame" && data.kontrol(YREF)||is.numeric(YREF)) 
+   if ( is(YREF, "data.frame") && data.kontrol(YREF)||is.numeric(YREF)) 
       { YREF <- as.matrix(YREF) }
 
-   if ( class(X)!="matrix" || !is.numeric(X) )
+   if ( !is(X, "matrix") || !is.numeric(X) )
       stop("X is not a numeric matrix (or data.frame)")
-   if ( class(Y)!="matrix" || !is.numeric(X) )
+   if ( !is(Y, "matrix") || !is.numeric(X) )
       stop("Y is not a numeric matrix (or data.frame)")
-   if ( !is.null(XREF) && (class(XREF)!="matrix" || !is.numeric(XREF)) )
+   if ( !is.null(XREF) && (!is(XREF, "matrix") || !is.numeric(XREF)) )
       stop("XREF is not a numeric matrix (or data.frame)")
-   if ( !is.null(YREF) && (class(YREF)!="matrix" || !is.numeric(YREF)) )
+   if ( !is.null(YREF) && (!is(YREF, "matrix") || !is.numeric(YREF)) )
       stop("YREF is not a numeric matrix (or data.frame)")
 
 
@@ -76,7 +76,7 @@ dea.dual <- function(X,Y, RTS="vrs", ORIENTATION="in",
       Y <- t(Y)
       XREF <- t(XREF)
       YREF <- t(YREF)
-      if ( !is.null(DIRECT) & class(DIRECT)=="matrix" )
+      if ( !is.null(DIRECT) & is(DIRECT, "matrix") )
          DIRECT <- t(DIRECT)
    }
    orgKr <- dim(XREF)
@@ -93,7 +93,7 @@ dea.dual <- function(X,Y, RTS="vrs", ORIENTATION="in",
    K = dim(X)[1]  # number of units, firms, DMUs
    Kr = dim(XREF)[1]  # number of units, firms, DMUs
    if ( !is.null(DIRECT) )  {
-      if ( class(DIRECT)=="matrix" ) {
+      if ( is(DIRECT, "matrix") ) {
          md <- dim(DIRECT)[2]
          Kd <- dim(DIRECT)[1]
       } else {
@@ -132,7 +132,7 @@ dea.dual <- function(X,Y, RTS="vrs", ORIENTATION="in",
          stop("Length of DIRECT must be the number of outputs")
       else if ( ORIENTATION=="in-out" & md!=m+n )
          stop("Length of DIRECT must be the number of inputs plus outputs")
-      if ( class(DIRECT)=="matrix" & (Kd>0 & Kd!=K) )
+      if ( is(DIRECT, "matrix") & (Kd>0 & Kd!=K) )
          stop("Number of firms in DIRECT must equal firms in X and Y") 
    }
    if ( !is.null(DIRECT) & length(DIRECT) == 1 )  {
@@ -203,6 +203,11 @@ if ( is.null(AD) )  {
 
    # Initialiser LP objekt
    lps <- make.lp(1+Kr+restr, m+n+rlamb )
+	# Saet lp options
+	lp.control(lps,
+		scaling=c("range", "equilibrate", "integers")  # default scalering er 'geometric'
+	)					# og den giver ikke altid tilfredsstillende resultat;
+						# curtisreid virker i mange tilfaelde slet ikke
    name.lp(lps, paste(ifelse(is.null(AD),"Dual","DualAC"),ORIENTATION,
              RTS,sep="-"))
    # if ( LP==TRUE ) print(lps)
@@ -373,7 +378,7 @@ if ( is.null(AD) )  {
    } else { 
       mmd <- switch(ORIENTATION, "in"=m, "out"=n, "in-out"=m+n) 
       ob <- matrix(objval, nrow=K, ncol=mmd)
-      if ( class(DIRECT)=="matrix" && dim(DIRECT)[1] > 1 )  {
+      if ( is(DIRECT, "matrix") && dim(DIRECT)[1] > 1 )  {
           dir <- DIRECT
       } else {
           dir <- matrix(DIRECT, nrow=K, ncol=mmd, byrow=TRUE)
@@ -390,7 +395,7 @@ if ( is.null(AD) )  {
       }
  # print("eff")
  # print(eff)
-      if ( class(eff)=="matrix" && ( dim(eff)[1]==1 || dim(eff)==1 ) )
+      if ( is(eff, "matrix") && ( dim(eff)[1]==1 || dim(eff)==1 ) )
          eff <- c(eff) 
    }
 
@@ -409,7 +414,7 @@ if ( is.null(AD) )  {
    if ( TRANSPOSE )  {
       u <- t(u)
       v <- t(v)
-      if ( class(eff)=="matrix" )
+      if ( is(eff, "matrix") )
          eff <- t(eff)
    }
 

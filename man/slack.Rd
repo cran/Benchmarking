@@ -1,3 +1,4 @@
+% $Id: slack.Rd 192 2018-07-31 12:50:56Z lao $
 \name{slack}
 \alias{slack}
 \alias{print.slack}

@@ -1,4 +1,4 @@
-% $Id: dea.boot.Rd 150 2015-07-06 20:48:17Z B002961 $
+% $Id: dea.boot.Rd 189 2018-07-15 12:16:41Z lao $
 \name{dea.boot}
 \alias{dea.boot}
 \alias{boot.fear}
@@ -16,7 +16,7 @@ the package \pkg{FEAR} returning results directly as Farrell measures.
 
 \usage{
 dea.boot(X, Y, NREP = 200, EFF = NULL, RTS = "vrs", ORIENTATION="in", 
-         alpha = 0.05, XREF = NULL, YREF = NULL, EREF = NULL, 
+         alpha = 0.05, XREF = NULL, YREF = NULL, FRONT.IDX=NULL, EREF = NULL, 
          DIRECT = NULL, TRANSPOSE = FALSE, SHEPHARD.INPUT = TRUE, LP)
 
 boot.fear(X, Y, NREP = 200, EFF = NULL, RTS = "vrs", ORIENTATION = "in", 
@@ -50,6 +50,8 @@ boot.fear(X, Y, NREP = 200, EFF = NULL, RTS = "vrs", ORIENTATION = "in",
 
   \item{YREF}{Outputs of the firms determining the technology,
       defaults to \code{Y}. }
+      
+  \item{FRONT.IDX}{Index for firms determining the technology.}
 
   \item{EREF}{Efficiencies for the firms in XREF, YREF.}
 
@@ -160,7 +162,7 @@ boot.fear(X, Y, NREP = 200, EFF = NULL, RTS = "vrs", ORIENTATION = "in",
 
 \examples{
 x <- matrix(c(100,200,300,500,100,200,600),ncol=1)
-y <- matrix(c(75,100,300,400,25,50,400),ncol=1)
+y <- matrix(c( 75,100,300,400, 25, 50,400),ncol=1)
 
 e <- dea(x,y)
 eff(e)
@@ -172,7 +174,7 @@ dea.plot.frontier(x,y,txt=TRUE)
 #  bootstrap frontier changes from one run to the next. Try the same
 #  with NREP=2000 even though is does take a longer time to run,
 #  especially for dea.boot.
-nrep <- 1
+nrep <- 5
 # nrep <- 2000
 
 # if ( "FEAR" \%in\% .packages(TRUE) )  {

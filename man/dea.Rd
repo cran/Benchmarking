@@ -1,7 +1,6 @@
-% $Id: dea.Rd 182 2018-05-10 11:52:55Z lao $
+% $Id: dea.Rd 201 2019-01-20 20:39:57Z lao $
 \name{dea}
 \alias{dea}
-\alias{deaSlack}
 % \alias{dea.mat}
 % \alias{efficiencies}
 % \alias{eff}
@@ -20,10 +19,6 @@ measures a la Farrell.}
 dea(X, Y, RTS="vrs", ORIENTATION="in", XREF=NULL, YREF=NULL,
     FRONT.IDX=NULL, SLACK=FALSE, DUAL=FALSE, DIRECT=NULL, param=NULL,
     TRANSPOSE=FALSE, FAST=FALSE, LP=FALSE, CONTROL=NULL, LPK=NULL)
-
-% deaSlack(X, Y, RTS="vrs", ORIENTATION="in", XREF=NULL, YREF=NULL,
-%     FRONT.IDX=NULL, SLACK=FALSE, DUAL=FALSE, DIRECT=NULL, param=NULL,
-%     TRANSPOSE=FALSE, FAST=FALSE, LP=FALSE, CONTROL=NULL, LPK=NULL, delta=1e-6)
 
 \method{print}{Farrell}(x, digits=4, ...) 
 \method{summary}{Farrell}(object, digits=4, ...)
@@ -161,17 +156,6 @@ via \code{param}
    \code{k}; it can be used as input to an alternative LP solver
    to check the results.}
 
-   %\item{delta}{Penalty for slack in the optimal solution, a suggested
-   %   value to penalize slack is \code{delta=e-6}; depends on the
-   %   scaling of X.  Default is no penalty.  If \code{delta} is an
-   %   array it must be of length as the number of inputs and the
-   %   number of outputs and it then uses a different penalty for each
-   %   input and output.}
-   
-   %\item{DELTA}{When \code{TRUE} each slack is penalized relative to
-   %   the value of the input and output for the unit in question,
-   %   i.e. different penalties for different units.}
-
 }
 
 
@@ -227,9 +211,6 @@ units of measurements, i.e. \eqn{x-e d}, and for output orientation
 directions (\code{ORIENTAION="in-out"}). Dirctional efficiency is
 discussed on pages 31--35 and 121--127 in Bogetoft and Otto (2011).
 
-% When using the option \code{delta} the underlying LP problem might 
-% be unbounded; i.e. the efficiency is returned as NA. In this case 
-% use a lower value of \code{delta}.
 }
 
 
@@ -325,6 +306,13 @@ package \pkg{FEAR} (Wilson 2008) set the options
 \code{TRANSPOSE=TRUE}; for consistency with \pkg{FEAR} the options
 \code{RTS} and \code{ORIENTATION} also accepts numbers as in
 \pkg{FEAR}.
+
+The tolerance that lambda is zero or one is 1e-7, the default value of
+'epsint' in the package \code{lpSolveAPI}, i.e. values closer than
+1e-7 from zero or one are set to respective integer value. The 'epsint'
+is the tolerance that is used to determine whether a floating-point
+number is in fact an in teger. The same tolerance is used for
+efficiency value near one.
 
 }
 

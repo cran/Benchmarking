@@ -1,4 +1,4 @@
-# $Id: profit.R 140 2015-05-15 21:48:02Z B002961 $
+# $Id: profit.R 203 2019-01-21 13:21:47Z lao $
 
 # Calculates optimal input and output to maximize profit for given
 # input and output prices.
@@ -47,6 +47,11 @@ profit.opt <- function(XREF, YREF, W, P, RTS="vrs", param=NULL,
       rlamb <- 0
 
    lps <- make.lp(m+n +rlamb,m+n+Kr)
+	# Saet lp options
+	lp.control(lps,
+		scaling=c("range", "equilibrate", "integers")  # default scalering er 'geometric'
+	)					# og den giver ikke altid tilfredsstillende resultat;
+						# curtisreid virker i mange tilfaelde slet ikke
    name.lp(lps, paste("DEA profit,",RTS,"technology"))
 
    set.objfn(lps, c(-W[,1],P[,1], rep(0,Kr)))

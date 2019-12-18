@@ -1,4 +1,4 @@
-% $Id: excess.Rd 118 2011-07-22 23:28:53Z Lars $
+% $Id: excess.Rd 206 2019-07-11 14:15:27Z lao $
 \name{excess}
 \alias{excess}
 
@@ -31,6 +31,10 @@ excess(object, X = NULL, Y = NULL)
 
   For Farrell input efficiency E the exess input is \eqn{(1-E) X} and
   for Farrell ouput efficiency F the missing output is \eqn{(F-1) Y}.
+  
+  Notice that the excess calculated does not include any slackvalues. In 
+  case slacks are present and calculated it might be more appropriate 
+  to add slack; i.e. to use \code{excess(object, X, Y) + slack(X, Y, object)}.
 
   For directional efficiency e in the direction D the excess input is
   \eqn{e D}.

@@ -1,4 +1,4 @@
-# $Id: cost.R 125 2013-01-20 16:54:54Z Lars $
+# $Id: cost.R 203 2019-01-21 13:21:47Z lao $
 
 # Function to calculate minimum cost input.
 
@@ -45,6 +45,11 @@ cost.opt <- function(XREF, YREF, W, YOBS=NULL, RTS="vrs", param=NULL,
       rlamb <- 0
 
    lps <- make.lp(m+n +rlamb,m+Kr)
+	# Saet lp options
+	lp.control(lps,
+		scaling=c("range", "equilibrate", "integers")  # default scalering er 'geometric'
+	)					# og den giver ikke altid tilfredsstillende resultat;
+						# curtisreid virker i mange tilfaelde slet ikke
    name.lp(lps, paste("DEA cost,",RTS,"technology"))
 
    # saet raekker i matrix med restriktioner, saet 0'er for den foerste

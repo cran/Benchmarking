@@ -1,4 +1,4 @@
-# $Id: fdh.R 160 2015-12-22 13:58:31Z b018694 $
+# $Id: fdh.R 207 2019-12-16 20:14:51Z lao $
 
 # FDH efficiency uden brug af LP.
 # Der er ingen kontrol af argumenter, den taenkes at blive kaldt fra dea.R
@@ -24,7 +24,7 @@ fdh <- function(X,Y, ORIENTATION="in", XREF=NULL, YREF=NULL,
       Y <- t(Y)
       XREF <- t(XREF)
       YREF <- t(YREF)
-      if ( !is.null(DIRECT) & class(DIRECT)=="matrix" )
+      if ( !is.null(DIRECT) & is(DIRECT, "matrix") )
          DIRECT <- t(DIRECT)
    }
    orgKr <- dim(XREF)
@@ -54,7 +54,7 @@ fdh <- function(X,Y, ORIENTATION="in", XREF=NULL, YREF=NULL,
 # Directional efficiency
 if ( !is.null(DIRECT) )  {
 
-   if ( class(DIRECT)=="matrix" && dim(DIRECT)[1] > 1 ) {
+   if ( is(DIRECT, "matrix") && dim(DIRECT)[1] > 1 ) {
       if ( ORIENTATION=="in" )  {
          dirX <- DIRECT  # matrix(DIRECT, nrow=K, ncol=m)
          # dirY <- matrix(.Machine$double.xmin, nrow=K, ncol=n)

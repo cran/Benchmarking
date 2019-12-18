@@ -1,4 +1,4 @@
-# $Id: dea.plot.R 174 2017-03-23 17:13:15Z lao $
+# $Id: dea.plot.R 207 2019-12-16 20:14:51Z lao $
 "dea.plot" <-
 function(x, y, RTS="vrs", ORIENTATION="in-out", txt=NULL, add=FALSE, 
             wx=NULL, wy=NULL, TRANSPOSE = FALSE, fex=1, GRID=FALSE,
@@ -37,14 +37,14 @@ function(x, y, RTS="vrs", ORIENTATION="in-out", txt=NULL, add=FALSE,
 
    # Hvis data er en data.frame saa tjek om det er numerisk data og lav
    # dem i saa fald om til en matrix
-   if ( class(x)=="data.frame" && data.kontrol(x) || is.numeric(x) ) 
+   if ( is(x, "data.frame") && data.kontrol(x) || is.numeric(x) ) 
       { x <- as.matrix(x) }
-   if ( class(y)=="data.frame" && data.kontrol(y) || is.numeric(y) ) 
+   if ( is(y, "data.frame") && data.kontrol(y) || is.numeric(y) ) 
       { y <- as.matrix(y) }
 
-   if ( class(x)!="matrix" || !is.numeric(x) )
+   if ( !is(x, "matrix") || !is.numeric(x) )
       stop("x is not a numeric matrix (or data.frame)")
-   if ( class(y)!="matrix" || !is.numeric(y) )
+   if ( !is(y, "matrix") || !is.numeric(y) )
       stop("y is not a numeric matrix (or data.frame)")
 
 
@@ -109,7 +109,7 @@ function(x, y, RTS="vrs", ORIENTATION="in-out", txt=NULL, add=FALSE,
          box(col="grey")
       }
       if ( class(txt)=="logical" && txt )  {
-         if ( class(x)=="matrix" )  {
+         if ( is(x, "matrix") )  {
             if ( !is.null(rownames(x)) )  {
                txt <- rownames(x)
             } else if ( !is.null(rownames(y)) )  {

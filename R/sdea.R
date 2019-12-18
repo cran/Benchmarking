@@ -1,4 +1,4 @@
-# $Id: sdea.R 125 2013-01-20 16:54:54Z Lars $
+# $Id: sdea.R 207 2019-12-16 20:14:51Z lao $
 
 
 # Calculates super efficiency
@@ -7,21 +7,21 @@ sdea <- function(X,Y, RTS="vrs", ORIENTATION="in", DIRECT=NULL, param=NULL,
 {
    # Input is as for the method eff
 
-   if ( class(X)=="data.frame" && data.kontrol(X) || is.numeric(X) ) 
+   if ( is(X, "data.frame") && data.kontrol(X) || is.numeric(X) ) 
       { X <- as.matrix(X) }
-   if ( class(Y)=="data.frame" && data.kontrol(Y) || is.numeric(Y) ) 
+   if ( is(Y, "data.frame") && data.kontrol(Y) || is.numeric(Y) ) 
       { Y <- as.matrix(Y) }
 
-   if ( class(X)!="matrix" || !is.numeric(X) )
+   if ( !is(X, "matrix") || !is.numeric(X) )
       stop("X is not a numeric matrix (or data.frame)")
-   if ( class(Y)!="matrix" || !is.numeric(X) )
+   if ( !is(Y, "matrix") || !is.numeric(X) )
       stop("Y is not a numeric matrix (or data.frame)")
 
    # Antal firmaer i data er K
    if ( TRANSPOSE )  {
       X <- t(X)
       Y <- t(Y)
-      if ( !is.null(DIRECT) & class(DIRECT)=="matrix" )
+      if ( !is.null(DIRECT) & is(DIRECT, "matrix") )
          DIRECT <- t(DIRECT)
    }
    K = dim(X)[1]
@@ -63,7 +63,7 @@ sdea <- function(X,Y, RTS="vrs", ORIENTATION="in", DIRECT=NULL, param=NULL,
    direct <- NULL
    directMatrix <- FALSE
    if ( !is.null(DIRECT) )  {
-      if ( class(DIRECT) == "matrix" )
+      if ( is(DIRECT, "matrix") )
          directMatrix <- TRUE
       else
          direct <- DIRECT
@@ -97,7 +97,7 @@ sdea <- function(X,Y, RTS="vrs", ORIENTATION="in", DIRECT=NULL, param=NULL,
    rownames(lambda) <- rownames(X)
    if (TRANSPOSE)  {
       lambda <- t(lambda)
-      if ( !is.null(DIRECT) & class(DIRECT)=="matrix" )
+      if ( !is.null(DIRECT) & is(DIRECT, "matrix") )
          DIRECT <- t(DIRECT)
    }
 

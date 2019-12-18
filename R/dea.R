@@ -1,4 +1,4 @@
-# $Id: dea.R 182 2018-05-10 11:52:55Z lao $
+# $Id: dea.R 207 2019-12-16 20:14:51Z lao $
 
 # DEA beregning via brug af lp_solveAPI. Fordelene ved lp_solveAPI er
 # faerre kald fra R med hele matricer for hver unit og dermed skulle
@@ -53,22 +53,22 @@ dea  <-  function(X,Y, RTS="vrs", ORIENTATION="in", XREF=NULL,YREF=NULL,
 
 	# Hvis data er en data.frame saa tjek om det er numerisk data og lav
 	# dem i saa fald om til en matrix
-   if ( class(X)=="data.frame" && data.kontrol(X) || is.numeric(X) ) 
+   if ( is(X, "data.frame") && data.kontrol(X) || is.numeric(X) ) 
       { X <- as.matrix(X) }
-   if ( class(Y)=="data.frame" && data.kontrol(Y) || is.numeric(Y) ) 
+   if ( is(Y, "data.frame") && data.kontrol(Y) || is.numeric(Y) ) 
       { Y <- as.matrix(Y) }
-   if ( class(XREF)=="data.frame" && data.kontrol(XREF)||is.numeric(XREF))
+   if ( is(XREF, "data.frame") && data.kontrol(XREF)||is.numeric(XREF))
       { XREF <- as.matrix(XREF) }
-   if ( class(YREF)=="data.frame" && data.kontrol(YREF)||is.numeric(YREF)) 
+   if ( is(YREF, "data.frame") && data.kontrol(YREF)||is.numeric(YREF)) 
       { YREF <- as.matrix(YREF) }
 
-   if ( class(X)!="matrix" || !is.numeric(X) )
+   if ( !is(X, "matrix") || !is.numeric(X) )
       stop("X is not a numeric matrix (or data.frame)")
-   if ( class(Y)!="matrix" || !is.numeric(Y) )
+   if ( !is(Y, "matrix") || !is.numeric(Y) )
       stop("Y is not a numeric matrix (or data.frame)")
-   if ( !is.null(XREF) && (class(XREF)!="matrix" || !is.numeric(XREF)) )
+   if ( !is.null(XREF) && (!is(XREF, "matrix") || !is.numeric(XREF)) )
       stop("XREF is not a numeric matrix (or data.frame)")
-   if ( !is.null(YREF) && (class(YREF)!="matrix" || !is.numeric(YREF)) )
+   if ( !is.null(YREF) && (!is(YREF, "matrix") || !is.numeric(YREF)) )
       stop("YREF is not a numeric matrix (or data.frame)")
 
    .xyref.missing <- FALSE
@@ -86,7 +86,7 @@ dea  <-  function(X,Y, RTS="vrs", ORIENTATION="in", XREF=NULL,YREF=NULL,
       Y <- t(Y)
       XREF <- t(XREF)
       YREF <- t(YREF)
-      if ( !is.null(DIRECT) & class(DIRECT)=="matrix" )
+      if ( !is.null(DIRECT) & is(DIRECT, "matrix") )
          DIRECT <- t(DIRECT)
    }
 
@@ -95,8 +95,8 @@ dea  <-  function(X,Y, RTS="vrs", ORIENTATION="in", XREF=NULL,YREF=NULL,
    if ( length(FRONT.IDX) > 0 )  {
       if (LP) print("FRONT.IDX")
       if (LP) print(FRONT.IDX)
-      if ( !is.vector(FRONT.IDX) )
-         stop("FRONT.IDX is not a vector in 'dea'")
+      if ( !is.vector(FRONT.IDX)  & !(ifelse(is.matrix(FRONT.IDX), dim(FRONT.IDX)[2]==1, FALSE) ))
+         stop("FRONT.IDX is not a vector or collumn matrix in 'dea'")
       XREF <- XREF[FRONT.IDX,, drop=FALSE]
       YREF <- YREF[FRONT.IDX,, drop=FALSE]
    }
@@ -109,9 +109,9 @@ dea  <-  function(X,Y, RTS="vrs", ORIENTATION="in", XREF=NULL,YREF=NULL,
    K <- dim(X)[1]  # number of units, units, DMUs
    Ky <- dim(Y)[1]  
    Kr <- dim(XREF)[1] # number of units,units in the reference technology
-   oKr <- orgKr[1]
+   oKr <- orgKr[1]    # number of units in reference before use of FRONT.IDX
    if ( !is.null(DIRECT) )  {
-      if ( class(DIRECT)=="matrix" ) {
+      if ( is(DIRECT, "matrix") ) {
          md <- dim(DIRECT)[2]
          Kd <- dim(DIRECT)[1]
       } else {
@@ -133,7 +133,7 @@ dea  <-  function(X,Y, RTS="vrs", ORIENTATION="in", XREF=NULL,YREF=NULL,
    if ( Kr != dim(YREF)[1] )
       stop("Number of units must be the same in XREF and YREF")
 
-   if ( !is.null(DIRECT) & isTRUE(DIRECT=="min") & ORIENTATION=="graph" )
+   if ( !is.null(DIRECT) & all(DIRECT=="min") & ORIENTATION=="graph" )
 		# Kaldet kommer fra 'mea' og stop vil vise 'dea' kaldet som mea laver; derfor call.=FALSE
 		stop("The option 'ORIENTATION=\"graph\"' cannot be used for 'mea'", call.=FALSE)
  
@@ -144,7 +144,7 @@ dea  <-  function(X,Y, RTS="vrs", ORIENTATION="in", XREF=NULL,YREF=NULL,
          stop("Length of DIRECT must be the number of outputs")
       else if ( ORIENTATION=="in-out" & md!=m+n )
          stop("Length of DIRECT must be the number of inputs plus outputs")
-      if ( class(DIRECT)=="matrix" & (Kd>0 & Kd!=K) )
+      if ( is(DIRECT, "matrix") & (Kd>0 & Kd!=K) )
          stop("Number of units in DIRECT must equal units in X and Y") 
    }
    if ( !is.null(DIRECT) & length(DIRECT) == 1 )  {
@@ -158,7 +158,7 @@ dea  <-  function(X,Y, RTS="vrs", ORIENTATION="in", XREF=NULL,YREF=NULL,
 
 
    if ( RTS=="fdh" && ORIENTATION!="graph" && !FAST && DUAL==FALSE
-        && isTRUE(DIRECT!="min") )  {
+        && all(DIRECT!="min") )  {
       e <- fdh(X,Y, ORIENTATION=ORIENTATION, XREF=XREF, YREF=YREF, 
                FRONT.IDX=FRONT.IDX, DIRECT=DIRECT, TRANSPOSE=FALSE, oKr)
       if ( SLACK )  {
@@ -185,14 +185,19 @@ dea  <-  function(X,Y, RTS="vrs", ORIENTATION="in", XREF=NULL,YREF=NULL,
 
    # Initialiser LP objekt
    lps <- make.lp(m+n +rlamb,1+Kr)
+	# Saet lp options
+	lp.control(lps,
+		scaling=c("range", "equilibrate", "integers")  # default scalering er 'geometric'
+	)					# og den giver ikke altid tilfredsstillende resultat;
+						# curtisreid virker i mange tilfaelde slet ikke
    if ( is.null(DIRECT) ) dirStreng<-"" else dirStreng<-"Dir"
-   name.lp(lps, paste(ifelse(is.null(DIRECT)||DIRECT!="min","Dea","Mea"),
+   name.lp(lps, paste(ifelse(is.null(DIRECT)|(DIRECT!="min"), "Dea", "Mea"),
                             ORIENTATION,RTS,dirStreng,sep="-"))
-
+	
    # saet raekker i matrix med restriktioner, saet 0'er for den foerste
    # soejle for den skal alligevel aendres for hver unit.
    # Bemaerk X og Y transponeres implicit naar de saettes i lp_solveAPI; 
-   # soejler i X og Y saettes so raekker i lp_solveAPI.
+   # soejler i X og Y saettes som raekker i lp_solveAPI.
    # Foerste 'm' raekker med input
    for ( h in 1:m )
        set.row(lps,h, c(0,-XREF[,h]))
@@ -205,6 +210,7 @@ dea  <-  function(X,Y, RTS="vrs", ORIENTATION="in", XREF=NULL,YREF=NULL,
       set.row(lps, m+n+2, c(0,rep( 1,Kr)))
    }
 
+   # Saet restriktioner for lambda, dvs. for RTS
    if ( RTS == "fdh" || RTS == "fdh0" ) {
       set.type(lps,2:(1+Kr),"binary")
       set.rhs(lps,-1, m+n+1)
@@ -267,7 +273,7 @@ dea  <-  function(X,Y, RTS="vrs", ORIENTATION="in", XREF=NULL,YREF=NULL,
       add.SOS(lps,"lambda", 1,1, 2:(1+Kr), rep(1, Kr))
    }
 
-   if ( !is.null(DIRECT) && Kd<=1 && DIRECT[1] != "min" )  {
+   if ( !is.null(DIRECT) & Kd<=1 & all(DIRECT!="min") )  {
       # print(Kd)
       # print(DIRECT)
       # Samme retning for alle enheder
@@ -337,7 +343,7 @@ dea  <-  function(X,Y, RTS="vrs", ORIENTATION="in", XREF=NULL,YREF=NULL,
       }
    }
 
-   if ( !is.null(DIRECT) && DIRECT[1] == "min" )  {
+   if ( !is.null(DIRECT) & all(DIRECT == "min") )  {
       directMin <- TRUE
       if ( ORIENTATION=="in" )  {
          directMatrix <- matrix(NA, nrow=K, ncol=m)
@@ -384,8 +390,8 @@ dea  <-  function(X,Y, RTS="vrs", ORIENTATION="in", XREF=NULL,YREF=NULL,
          lpcontr <- lp.control(lps)
          eps <- sqrt(lpcontr$epsilon["epsint"])
          if (LP) print(paste("eps for minDirectin",eps), quote=FALSE)
-# Daarligt test for om direction er 0, tager ikke hensyn at X og Y kan
-# vaere forskellig stoerrelse
+# Daarligt test for om direction er 0, tager ikke hensyn at X'er og
+# Y'er indbyrdes kan vaere forskellig stoerrelse
          if ( ORIENTATION=="in" )  {
             deltaDir <- DIRECT/( X[k,] + .Machine$double.xmin )
          } else if ( ORIENTATION=="out" )  {
@@ -449,11 +455,13 @@ dea  <-  function(X,Y, RTS="vrs", ORIENTATION="in", XREF=NULL,YREF=NULL,
       if (LP)  print(paste("Status =",status))
       if ( status != 0 )  {
         if ( status == 2 || status == 3 ) {
-	       print(paste("Unit",k,"is not in the technology set.", 
-				" Status =",status), quote=F)
-           objval[k] <- ifelse(ORIENTATION=="in",Inf,-Inf)
+		  # At unit ikke er i teknologimaengden svarer til 'Inf', det
+		  # er derfor unoedvendigt at give en advarsel.
+		  # print(paste("Unit",k,"is not in the technology set.", 
+		  #	" Status =",status), quote=F)
+          objval[k] <- ifelse(ORIENTATION=="in",Inf,-Inf)
         } else {
-	        print(paste("Error in solving for unit",k,":  Status =",status), 
+	       print(paste("Error in solving for unit",k,":  Status =",status), 
              quote=F)
            objval[k] <- NA
         }
@@ -489,13 +497,14 @@ dea  <-  function(X,Y, RTS="vrs", ORIENTATION="in", XREF=NULL,YREF=NULL,
 
    e <- objval
 
-
    lpcontr <- lp.control(lps)
    eps <- lpcontr$epsilon["epsint"]
-   e[abs(e-1) < eps] <- 1
+   e[abs(e-1) < eps] <- 1      # 'e' taet ved 1 skal vaere 1
    if ( !is.null(dimnames(X)[[1]]) )  {
       names(e) <- dimnames(X)[[1]]
    }
+   lambda[abs(lambda-1) < eps] <- 1   # taet ved 1
+   lambda[abs(lambda) < eps] <- 0     # taet ved 0
 
    # Faerdig med at bruge lps
    # delete.lp(lps)
@@ -546,7 +555,7 @@ dea  <-  function(X,Y, RTS="vrs", ORIENTATION="in", XREF=NULL,YREF=NULL,
  
    
    if ( TRANSPOSE ) {
-      if ( class(e)=="matrix" )
+      if ( is(e, "matrix") )
          e <- t(e)
       lambda <- t(lambda)
       if (DUAL)  {
@@ -556,7 +565,7 @@ dea  <-  function(X,Y, RTS="vrs", ORIENTATION="in", XREF=NULL,YREF=NULL,
          dual <- t(dual)
          if ( !is.null(gamma) ) gamma <- t(gamma)
       }
-      if ( !is.null(DIRECT) & class(DIRECT)=="matrix" )
+      if ( !is.null(DIRECT) & is(DIRECT, "matrix") )
          DIRECT <- t(DIRECT)
    }
 

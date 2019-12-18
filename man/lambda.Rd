@@ -1,4 +1,4 @@
-% $Id: lambda.Rd 118 2011-07-22 23:28:53Z Lars $
+% $Id: lambda.Rd 205 2019-07-10 14:22:51Z lao $
 \name{lambda}
 \alias{lambda}
 \alias{lambda.print}
@@ -59,7 +59,3 @@ columns.  }
 ##--	or do  help(data=index)  for the standard data sets.
 
 }
-
-
-\keyword{ ~kwd1 }
-\keyword{ ~kwd2 }% __ONLY ONE__ keyword per line

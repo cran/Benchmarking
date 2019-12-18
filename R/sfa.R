@@ -1,4 +1,4 @@
-# $Id: sfa.R 156 2015-07-08 13:34:15Z b002961 $
+# $Id: sfa.R 207 2019-12-16 20:14:51Z lao $
 # \encoding{latin1}
 
 
@@ -26,7 +26,7 @@ loglik <- function(parm) {
    return(l)
 } # loglik
 
-   if ( class(x) == "data.frame" )  {
+   if ( is(x, "data.frame") )  {
       x <- as.matrix(x)
    }
 
@@ -53,7 +53,7 @@ loglik <- function(parm) {
       stop("Number of observations on x and y differ")
    }
 
-if ( missing(beta0) )  {
+if ( missing(beta0) | is.null(beta0) )  {
    # 1. OLS estimate
    m <- lm( y ~ x)      # OLS estimate; linear model
 	# print(logLik(m))
@@ -85,19 +85,19 @@ if ( missing(beta0) )  {
 		}
 		control <- kontrol
    }
-   if (DEBUG) {print("Efter control er sat"); print(control)}
-   if (DEBUG) print("ucminf bliver kaldt")
+   if (DEBUG) {print("Efter control er sat",quote=F); print(control)}
+   if (DEBUG) print("ucminf bliver kaldt",quote=F)
    o <- ucminf(parm, loglik, control=control, hessian=hessian)
    if (DEBUG) {
-      print("ucminf er slut")
-      print(paste("Antal funktionskald",o$info["neval"]))
+      print("ucminf er slut",quote=F)
+      print(paste("Antal funktionskald",o$info["neval"]),quote=F)
       print(o$info)
       if ( hessian!= 0 & !is.null(o$hessian) )  {
-      	print("Hessian:")
+      	print("Hessian:",quote=F)
       	print(o$hessian)
       }
       if ( hessian!= 0 & !is.null(o$invhessian) )  {
-      	print("Inverse hessian")
+      	print("Inverse hessian",quote=F)
    		print(o$invhessian)
    	}
    }
@@ -156,6 +156,26 @@ if ( missing(beta0) )  {
    return(sf)
 } ## sfa
 
+
+
+sfa.cost <- function(W, Y, COST, beta0 = NULL, lambda0 = 1, resfun = ebeta, 
+    TRANSPOSE = FALSE, DEBUG=FALSE,
+    control=list(), hessian=2)
+{
+	if ( missing(beta0) | is.null(beta0) )  {
+	   # 1. OLS estimate
+	   m <- lm( COST ~ W + Y)      # OLS estimate; linear model
+	   beta0 <- m$coef
+	}
+	cWY <- -1 * cbind(W,Y)
+	cCOST <- -1 * COST
+	sol <- sfa(x=cWY, y=cCOST, beta0=beta0, lambda0=lambda0, resfun=resfun, 
+				TRANSPOSE=TRANSPOSE, DEBUG=DEBUG, control=control, hessian=hessian)
+	return( sol )
+}  ## sfa.cost
+    
+    
+    
 
 
 ebeta <- function(x,y,beta)  {

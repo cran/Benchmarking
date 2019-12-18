@@ -1,4 +1,4 @@
-# $Id: dea.boot.R 159 2015-12-21 09:06:54Z b018694 $
+# $Id: dea.boot.R 207 2019-12-16 20:14:51Z lao $
 
 # Boot No FEAR: boot.nf
 # Bootstrap af dea model a la Simar Wilson 1998.
@@ -6,7 +6,7 @@
 
 
 dea.boot <- function(X,Y, NREP=200, EFF=NULL, RTS="vrs", 
-       ORIENTATION="in", alpha=0.05, XREF=NULL, YREF=NULL, 
+       ORIENTATION="in", alpha=0.05, XREF=NULL, YREF=NULL, FRONT.IDX=NULL,
        EREF=NULL, DIRECT=NULL, TRANSPOSE=FALSE, SHEPHARD.INPUT=TRUE, LP=FALSE)
 {
 
@@ -19,8 +19,7 @@ dea.boot <- function(X,Y, NREP=200, EFF=NULL, RTS="vrs",
       RTS <- RTStemp
    }
    RTS <- tolower(RTS)
-   rts <- which(RTS == rts_) -1 
-   # if ( !(RTS %in% rts) ) 
+   rts <- which(RTS == rts_) -1 # Foerste i RTS 'fdh' er 0
  
    if ( rts < 1 || rts > 4 )
       stop(paste("Invalid value of RTS in call to boot:",RTS))
@@ -39,13 +38,13 @@ dea.boot <- function(X,Y, NREP=200, EFF=NULL, RTS="vrs",
    if (LP) print(paste("rts =",RTS,"   orientation=",ORIENTATION), quote=FALSE)
    if (LP) print(paste("rts =",rts,"     orientation=",orientation), quote=FALSE)
 
-   if ( class(X)!="matrix" )
+   if ( !is(X, "matrix") )
       stop("X is not a matrix")
-   if ( class(Y)!="matrix" )
+   if ( !is(Y, "matrix") )
       stop("Y is not a matrix")
-   if ( !is.null(XREF) && class(XREF)!="matrix" )
+   if ( !is.null(XREF) && !is(XREF, "matrix") )
       stop("XREF is not a matrix")
-   if ( !is.null(YREF) && class(YREF)!="matrix" )
+   if ( !is.null(YREF) && !is(YREF, "matrix") )
       stop("YREF is not a matrix")
 
    if ( !is.null(EREF) && (is.null(XREF) || is.null(YREF)) )
@@ -66,8 +65,15 @@ dea.boot <- function(X,Y, NREP=200, EFF=NULL, RTS="vrs",
       Y <- t(Y)
       XREF <- t(XREF)
       YREF <- t(YREF)
-      if ( !is.null(DIRECT) & class(DIRECT)=="matrix" )
+      if ( !is.null(DIRECT) & is(DIRECT, "matrix") )
          DIRECT <- t(DIRECT)
+   }
+
+   if ( length(FRONT.IDX) > 0 )  {
+      if ( !is.vector(FRONT.IDX)  & !(ifelse(is.matrix(FRONT.IDX), dim(FRONT.IDX)[2]==1, FALSE) ))
+         stop("FRONT.IDX is not a vector or collumn matrix in 'dea'")
+      XREF <- XREF[FRONT.IDX,, drop=FALSE]
+      YREF <- YREF[FRONT.IDX,, drop=FALSE]
    }
 
    rNames <- rownames(XREF)
@@ -75,25 +81,32 @@ dea.boot <- function(X,Y, NREP=200, EFF=NULL, RTS="vrs",
       rNames <- rownames(YREF)
 
    K <- dim(X)[1]  # number of units, firms, DMUs
+   Kr <- dim(XREF)[1] # number of units,units in the reference technology
  
-   if ( is.null(EFF) )
+   if ( is.null(EFF) )  
       eff <- dea(X,Y, RTS, ORIENTATION, XREF, YREF, FAST=TRUE)
-   else if ( class(EFF)=="Farrell" )
+   else if ( is(EFF, "Farrell") )
       eff <- EFF$eff
    else 
       eff <- EFF
-   # if (LP) print(eff)
 
    if ( length(eff) != K ) 
       stop("The length of EFF must be the number of firms in X and Y")
 
-   if ( !.xyref.missing && is.null(EREF) )
-      EREF <- dea(XREF, YREF, RTS, ORIENTATION, FAST=TRUE)
+   if ( is.null(EREF) ) {
+   	if ( identical(X, XREF) & identical(Y, YREF) )  {
+   		EREF <- eff
+   	} else {
+      	EREF <- dea(XREF, YREF, RTS, ORIENTATION, FAST=TRUE)
+      }
+	}
 
+if (0)  {  ## Er eff ikke allerede defineret?
    # Hvis XREF ikke er defineret i kald
    if ( !.xyref.missing && !is.null(EREF) )
       eff <- EREF
-   # if (LP) print(eff)
+}
+
 
 	# Bootstrap noget der er over 1, dvs. Farrel output eller Shephard input
    if (ORIENTATION=="out")  farrell<-TRUE else farrell<-FALSE
@@ -107,9 +120,6 @@ dea.boot <- function(X,Y, NREP=200, EFF=NULL, RTS="vrs",
    # Daraio and Simar (2007, 61) ligning (3.23) og (3.26)
    dist <- eff
    if ( !farrell )  dist <- 1/dist
-      # print("Range of dist: ")
-      # print(range(dist))
-      # print(dist)
    # Behold efficiencer over 1, drop 1-erne naar bredden beregnes
    zeff <- eff[ dist > 1 + 1e-6 ]
    if ( length(zeff) == 0 )  {
@@ -125,6 +135,8 @@ dea.boot <- function(X,Y, NREP=200, EFF=NULL, RTS="vrs",
    std <- sd(neff) 
    iqr <- IQR(neff)/1.349
    # Hvis bredden er for lille kan IQR vaere 0 og saa skal std bruges
+   # Hvorfor '0.9' og ikke '1.06' som staar i Daraio and  Simar (2007, 61)
+   # ligning (3.23)?  Fordi Silverman side 48 anbefaler 0.9.
    if ( iqr > 1e-6 && iqr < std  ) std <- iqr
    h0 <- .9 * std * length(neff)^(-1/5)
    # h0 <- 1.06 * std * length(neff)^(-1/5)
@@ -132,34 +144,32 @@ dea.boot <- function(X,Y, NREP=200, EFF=NULL, RTS="vrs",
    if (LP) cat("Bandwidth =",h,"\n")
 
 	# matrix til at gemme de bootstrappede efficiencer
-   boot <- matrix(NA, nrow=K, ncol=NREP)
+	boot <- matrix(NA, nrow=K, ncol=NREP)
 
 
 if ( ORIENTATION == "in" )  {
    for ( b in 1:NREP )  {
       # if (LP) print(paste(b," -----"))
-      estar <- dea.sample(eff, h, K)
-      # if (LP) print(estar)
-      # if (LP) print(eff/estar)
+      estar <- dea.sample(eff, h, Kr)
       # estar/eff ganges paa hver soejle i X; benytter at R har data
       # efter soejler, byrow=FALSE er default i R.
       # eff*XREF er paa randen, og eff/estar*XREF bliver indre punkt
-      xstar <- eff/estar * XREF
+      xstar <- EREF/estar * XREF
+      #### xstar <- eff/estar * XREF
       boot[,b] <- dea(X,Y, RTS, ORIENTATION, XREF=xstar, YREF, FAST=TRUE)
-      # if (LP) print(boot[,b])
    }  # b in 1:NREP
 } else if ( ORIENTATION == "out" )  {   # farrel er TRUE
    for ( b in 1:NREP )  {
       # Farrell output efficiencer
-      estar <- dea.sample(eff, h, K)
-      ystar <- eff/estar * YREF
+      estar <- dea.sample(eff, h, Kr)
+      ystar <- EREF/estar * YREF
       boot[,b] <- dea(X,Y, RTS, ORIENTATION, XREF, YREF=ystar, FAST=TRUE)
    }  # b in 1:NREP
 } else if ( ORIENTATION == "graph" )  {
    for ( b in 1:NREP )  {
-      estar <- dea.sample(eff, h, K)
-      xstar <- eff/estar * XREF
-      ystar <- estar/eff * YREF
+      estar <- dea.sample(eff, h, Kr)
+      xstar <- EREF/estar * XREF
+      ystar <- estar/EREF * YREF
       boot[,b] <- dea(X,Y, RTS, ORIENTATION, XREF=xstar, YREF=ystar,
                       FAST=TRUE)
    }  # b in 1:NREP
@@ -184,7 +194,7 @@ if ( ORIENTATION == "in" )  {
 	ci <- eff + ci_
 
 	if (SHEPHARD.INPUT & ORIENTATION!="out")  {
-		# Lan efficiencer mm. tilbage til under 1
+		# Lav efficiencer mm. tilbage til under 1
 		eff <- 1/eff
 		boot <- 1/boot
 		eff.bc <- 1/eff.bc
@@ -192,11 +202,6 @@ if ( ORIENTATION == "in" )  {
 		bias <- eff - eff.bc
 	}
 	var <- apply(boot,1,var)
-
-   # Sorter boot efficiencerne, det goer FEAR::boot.sw98; men er det
-   # ikke taabeligt at goere det?
-   # sboot <- t(apply(boot,1,sort))
-   # boot <- sboot
 
    bb <- list(eff=eff, eff.bc=eff.bc,
            bias=bias,
@@ -229,12 +234,10 @@ dea.sample <- function(e, h, K=NULL)  {
    etilde <- beta + h * rnorm(K)
    # Juster saa varians bliver rigtig, Daraio and Simar (2007, 62) [3]
    estar <- mean(beta) + (etilde-mean(beta)) / sqrt(1+h^2/var(espejl))
-   # estar <- 1 + (etilde-1) / sqrt(1+h^2/var(espejl))
    # Genspejl for at faa alle vaerdier storre end 1
    estar <- ifelse(estar < 1, 2-estar, estar)
-   # estar[estar < 1] <- 2 - estar[estar < 1]
    if ( farrell )  {
-      # print("Omsaet til Farrell")
+      # Omsaet til Farrell
       estar <- 1/estar
    }
    return(estar)

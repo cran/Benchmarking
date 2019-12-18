@@ -1,7 +1,9 @@
+% $Id: peers.Rd 205 2019-07-10 14:22:51Z lao $
 \name{peers}
 \alias{peers}
 \alias{get.number.peers}
 \alias{get.which.peers}
+\alias{get.peers.lambda}
 
 
 \title{
@@ -12,16 +14,17 @@ Find peer firms and units
 \description{ The function \code{peers} finds for each firm its peers,
    \code{get.number.peers} finds for each peer the number of times
    this peer apears as a peer, and \code{get.which.peers} determines
-   for one or more peers the firms they apear as peers for.  % Also
-   % include a function to calculate the importances (lambdas) of peers.
+   for one or more peers the firms they apear as peers for.   Also
+   include a function \code{get.peers.lambda} to calculate for fimrs the 
+   importances (lambdas) of peers.
    }
 
 
 \usage{
-  peers(object, NAMES = FALSE)
-  get.number.peers(object, NAMES = FALSE)
-  get.which.peers(object, N = 1:dim(object$lambda)[2])
-  % peerslambda(object)
+  peers(object, NAMES = FALSE, N=1:dim(object$lambda)[1], LAMBDA=0)
+  get.number.peers(object, NAMES = FALSE, N=1:dim(object$lambda)[2], LAMBDA=0)
+  get.which.peers(object, N = 1:dim(object$lambda)[2], LAMBDA=0)
+  get.peers.lambda(object,  N=1:dim(object$lambda)[1], LAMBDA=0)
 }
 
 
@@ -35,11 +38,12 @@ Find peer firms and units
 		is a list of names with length equal to the number of units then it is 
 		used as names for peers. }
 
-  \item{N}{The peer(s) for which  }
+  \item{N}{The firm(s) or peer(s) for which to get the results.}
+  
+  \item{LAMBDA}{Minimum weight for extracted peers, i.e. the extracted peers have 
+  lambda values larger than \code{LAMBDA}. }
 
 }
-
-
 
 
 \details{ The returned values are index of the firms and can be used
@@ -55,7 +59,9 @@ Find peer firms and units
 
    The \code{get.number.peers} returns the number of firms that a peer
    serves as a peer for.
-
+   
+   The \code{get.peers.lambda} returns a list of firms with the peers 
+   and corresponding value af lambda.
 }
 
 
@@ -103,5 +109,3 @@ get.which.peers(e, c(1,4))
 
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.
-\keyword{ ~kwd1 }
-\keyword{ ~kwd2 }% __ONLY ONE__ keyword per line

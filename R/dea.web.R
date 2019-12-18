@@ -1,4 +1,4 @@
-# $Id: dea.web.R 141 2015-06-12 13:29:10Z b002961 $
+# $Id: dea.web.R 207 2019-12-16 20:14:51Z lao $
 
 # Foerste forsoeg med en web-graf for efficiens og tilhoerende input/output
 
@@ -26,7 +26,7 @@ function(X, E, N=NULL, txt=NULL, add=FALSE,
    if ( length(E) != dim(X)[1] )
       stop("Firms in X and E must be the same")
 
-   if ( class(X) == "matrix" )  {
+   if ( is(X, "matrix") )  {
       m <- dim(X)[2]
       X <- X[N,]
       E <- E[N]
@@ -58,7 +58,7 @@ function(X, E, N=NULL, txt=NULL, add=FALSE,
        box(col="grey")
   }
   if ( class(txt)=="logical" && txt )  {
-      if ( class(X)=="matrix" )  {
+      if ( !is(X, "matrix") )  {
          if ( !is.null(rownames(X)) )  {
             txt <- rownames(X)
          } else {

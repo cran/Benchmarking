@@ -1,4 +1,4 @@
-# $Id: NAMESPACE 175 2017-05-22 09:12:40Z lao $
+# $Id: NAMESPACE 197 2019-01-17 14:07:17Z lao $
 export(dea, sdea,   # efficiency, eff,
 excess, eladder, eladder.plot,
 dea.dual,
@@ -7,9 +7,9 @@ dea.direct, dea.boot, boot.fear,
 dea.add,
 # print.Farrell, summary.Farrell,
 slack, # print.slack, summary.slack,
-# deaSlack,
 lambda,
 peers, get.number.peers, get.which.peers,
+get.peers.lambda,
 # print.peers, 
 lambda.print, 
 dea.plot, dea.plot.frontier, dea.plot.isoquant, dea.plot.transform,
@@ -17,7 +17,7 @@ cost.opt, print.cost.opt, summary.cost.opt,
 revenue.opt, print.revenue.opt, summary.revenue.opt,
 profit.opt, print.profit.opt, summary.profit.opt,
 dea.merge, make.merge,
-sfa,  # print.sfa, summary.sfa, residuals.sfa, logLik.sfa, coef.sfa, 
+sfa,  sfa.cost, # print.sfa, summary.sfa, residuals.sfa, logLik.sfa, coef.sfa, 
 te.sfa, 
 # te1.sfa, te2.sfa, 
 te.add.sfa, sigma2u.sfa, sigma2v.sfa, sigma2.sfa,
@@ -26,8 +26,9 @@ lambda.sfa,
 critValue, typeIerror,
 outlier.ap, outlier.ap.plot,
 eff.dens, eff.dens.plot,
-mea, mea.lines
-, malmq, malmquist
+mea, mea.lines, 
+malmq, malmquist
+# , stoned
 )
 
 S3method("print", "Farrell")
@@ -77,3 +78,7 @@ importFrom(graphics, abline, arrows, axis, box, grid, hist, lines, mtext, par, p
 importFrom(grDevices, chull)
 importFrom(methods, is)
 importFrom("utils", "flush.console")
+# importFrom(limSolve, lsei)
+# importFrom(bbmle, mle2)
+# importFrom(bbmle, coef)
+# importFrom(quadprog, solve.QP)

@@ -1,3 +1,4 @@
+% $Id: outlier.Rd 192 2018-07-31 12:50:56Z lao $
 \name{outlier.ap}
 \alias{outlier.ap}
 \alias{outlier.ap.plot}

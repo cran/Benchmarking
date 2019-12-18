@@ -1,4 +1,4 @@
-# $Id: malmquist.R 178 2017-12-20 15:05:12Z lao $
+# $Id: malmquist.R 190 2018-07-27 10:33:02Z lao $
 
 # Beregner Malmquist indeks for enhederne ID over tidspunkterne i TIME
 
@@ -35,7 +35,7 @@ malmquist <- function(X, Y, ID, TIME,
 
    # Loeb perioderne igennem og beregn Malmquist for parvise perioder
    for ( t in 2:length(time) )  {
-   	cat("\n Periode ",t,"\n")
+   	cat("Period ",t,"\n")
 		flush.console()
        # Find units i periode 0 og periode 1
        id0 <- ID[time[t-1]==TIME]

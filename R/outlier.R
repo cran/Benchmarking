@@ -1,14 +1,14 @@
-# $Id: outlier.R 140 2015-05-15 21:48:02Z B002961 $
+# $Id: outlier.R 207 2019-12-16 20:14:51Z lao $
 
 
 outlier.ap <- function(X, Y, NDEL = 3, NLEN = 25, TRANSPOSE = FALSE)  
 {
    xy <- cbind(X,Y)
    S <- det(t(xy)%*%xy)
-   R <- NDEL
+   R <- NDEL        # hoejeste antal udeladte units
    K <- dim(X)[1]   # number of firms/observations
-   Kset <- seq.int(K)
-   n <- length(Kset)
+   Kset <- seq.int(K) # Maengde af indeks for alle units
+   n <- length(Kset)  # Antal units; dim(X)[1]
    last = min(NLEN, K)   # gem 25 mindste vaerdier af RX
    ratio <- array(Inf, c(last,R) )
    imat <- matrix(NA, nrow=R, ncol=R)
@@ -22,8 +22,8 @@ outlier.ap <- function(X, Y, NDEL = 3, NLEN = 25, TRANSPOSE = FALSE)
       if (n < r) 
           stop("n < r")
       e <- 0
-      h <- r
-      a <- 1L:r
+      h <- r     # antal udeladte units
+      a <- 1L:r  # Maengde af udeladte; foerste maengde er de 'r' foerste units
       del <- Kset[a]
    
       Dxy = xy[-del,]
@@ -34,9 +34,10 @@ outlier.ap <- function(X, Y, NDEL = 3, NLEN = 25, TRANSPOSE = FALSE)
       # count <- as.integer(round(choose(n, r)))
       # print( paste("Number of combinations", count), quote=FALSE )
       # i <- 2L
-      nmmp1 <- n - r + 1L
+      nmmp1 <- n - r + 1L   # Indeks for unit een efter sidst mulige medtagne unit 
       while (a[1L] != nmmp1) {
           if (e < n - h) {
+              # der er flere der mangler at blive udeladt
               h <- 1L
               e <- a[r]
               j <- 1L
