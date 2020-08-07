@@ -1,4 +1,4 @@
-$Id: NEWS 208 2019-12-17 22:39:13Z lao $
+$Id: NEWS 232 2020-08-07 08:47:59Z lao $
 
 Upcoming
 
@@ -6,7 +6,17 @@ Upcoming
 
 * A fast version of dea.boot
 
-* An implementation of the StoNED estimator which combines the axiomatic and non-parametric frontier (the DEA aspect) with a stochastic noise term (the SFA aspect); a contribution from Stefan Seifert.
+
+
+Changes to Benchmarking version 0.29
+
+* An implementation of the StoNED estimator which combines the axiomatic and non-parametric frontier (the DEA aspect) with a stochastic noise term (the SFA aspect); we appreciate the help from from Stefan Seifert in implementing StoNED.
+
+* The function outlier.ap is much faster, and a version aoulierC.ap written in C++, but still not fast enough.
+
+* Options for the LP solver can now also be used in dea.boot. This can be used to solve problems to find a solution for the dea LP problem when bootstrapping.
+
+* The sign of the fitted values in sfa.cost is now positive just as the variable cost i positive; as a consequence the sign of the residuals is changed and has the calculation for effciencies when the function is a cost function.
 
 
 

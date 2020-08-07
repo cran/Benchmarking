@@ -1,8 +1,9 @@
-# $Id: dea.merge.R 125 2013-01-20 16:54:54Z Lars $
+# $Id: dea.merge.R 229 2020-07-04 13:39:18Z lao $
 
 
 dea.merge <- function(X, Y, M, RTS = "vrs", ORIENTATION = "in", 
-    XREF = NULL, YREF = NULL, FRONT.IDX = NULL, TRANSPOSE = FALSE)
+    XREF = NULL, YREF = NULL, FRONT.IDX = NULL, TRANSPOSE = FALSE, 
+    CONTROL = NULL)
 {
 
    rts <- c("fdh","vrs","drs","crs","irs","irs","add")
@@ -11,7 +12,7 @@ dea.merge <- function(X, Y, M, RTS = "vrs", ORIENTATION = "in",
       RTS <- RTStemp
    }
    RTS <- tolower(RTS)
-   if ( !(RTS %in% rts) )  stop(paste("Unknown scale of returns:", RTS))
+   if ( !(RTS %in% rts) )  stop("Unknown scale of returns: ", RTS)
 
    orientation <- c("in-out","in","out","graph")
    if ( is.numeric(ORIENTATION) )  {
@@ -20,7 +21,7 @@ dea.merge <- function(X, Y, M, RTS = "vrs", ORIENTATION = "in",
    }
    ORIENTATION <- tolower(ORIENTATION)
    if ( !(ORIENTATION %in% orientation) ) {
-      stop(paste("Unknown value for ORIENTATION:",ORIENTATION),quote=F)
+      stop("Unknown value for ORIENTATION: ", ORIENTATION)
    }
 
 
@@ -43,14 +44,14 @@ Ymerger <- M %*% Y
 
 # Potential gains
 E <- dea(Xmerger, Ymerger, RTS=RTS, ORIENTATION=ORIENTATION, 
-    XREF = XREF, YREF = YREF,
+    XREF = XREF, YREF = YREF, CONTROL = CONTROL,
     FRONT.IDX = FRONT.IDX, TRANSPOSE = TRANSPOSE, FAST = TRUE)
 
 
 # Individual efficiencies
 e <- dea(X, Y, RTS=RTS, ORIENTATION=ORIENTATION, 
       XREF = XREF, YREF = YREF, FRONT.IDX = FRONT.IDX, 
-      TRANSPOSE = TRANSPOSE, FAST = TRUE)
+      TRANSPOSE = TRANSPOSE, FAST = TRUE, CONTROL = CONTROL)
 
 
 # Inputs of individual firms projected on efficient frontier and
@@ -69,14 +70,13 @@ if ( ORIENTATION == "in" )  {
    Xmerger_proj <- M %*% Xeff
    Ymerger_proj <- M %*% Yeff
 } else  {
-   stop(paste("Unknown ORIENTATION:",ORIENTATION,
-              " The function dea.merge stops"))
+   stop("Unknown ORIENTATION: ", ORIENTATION, ". The function dea.merge stops.")
 }
 
 # Pure gains from mergers
 Estar <- dea(Xmerger_proj, Ymerger_proj, RTS=RTS, ORIENTATION=ORIENTATION, 
       XREF = XREF, YREF = YREF, FRONT.IDX = FRONT.IDX, 
-      TRANSPOSE = TRANSPOSE, FAST = TRUE)
+      TRANSPOSE = TRANSPOSE, FAST = TRUE, CONTROL = CONTROL)
 
 
 # Learning effect
@@ -89,7 +89,7 @@ Yharm <- diag(1/rowSums(M), nrow=dim(M)[1]) %*% Ymerger_proj
 # Harmony effect
 HA <- dea(Xharm,Yharm, RTS=RTS, ORIENTATION=ORIENTATION, 
       XREF = XREF, YREF = YREF, FRONT.IDX = FRONT.IDX, 
-      TRANSPOSE = TRANSPOSE, FAST = TRUE) 
+      TRANSPOSE = TRANSPOSE, FAST = TRUE, CONTROL = CONTROL) 
 
 
 # Size effect

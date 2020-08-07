@@ -1,4 +1,4 @@
-# $Id: rev.R 203 2019-01-21 13:21:47Z lao $
+# $Id: rev.R 229 2020-07-04 13:39:18Z lao $
 
 # Function to calculate maximun revenue for given input and given
 # output prices.
@@ -10,9 +10,9 @@
 # confused with the method rev from base R.
 
 revenue.opt <- function(XREF, YREF, P, XOBS=NULL, RTS="vrs", param=NULL,
-            TRANSPOSE=FALSE, LP=FALSE, LPK=NULL)  {
+            TRANSPOSE=FALSE, LP=FALSE, CONTROL=NULL, LPK=NULL)  {
    if ( missing(XOBS) )  {
-   	XOBS <- XREF
+    XOBS <- XREF
    }
    if (!TRANSPOSE) {
       XREF <- t(XREF)
@@ -55,11 +55,11 @@ revenue.opt <- function(XREF, YREF, P, XOBS=NULL, RTS="vrs", param=NULL,
       rlamb <- 0
 
    lps <- make.lp(m+n +rlamb,n+Kr)
-	# Saet lp options
-	lp.control(lps,
-		scaling=c("range", "equilibrate", "integers")  # default scalering er 'geometric'
-	)					# og den giver ikke altid tilfredsstillende resultat;
-						# curtisreid virker i mange tilfaelde slet ikke
+    # Saet lp options
+    lp.control(lps,
+        scaling=c("range", "equilibrate", "integers")  # default scalering er 'geometric'
+    )                   # og den giver ikke altid tilfredsstillende resultat;
+                        # curtisreid virker i mange tilfaelde slet ikke
    name.lp(lps, paste("DEA rev,",RTS,"technology"))
 
    # saet raekker i matrix med restriktioner, saet 0'er for den foerste
@@ -112,6 +112,7 @@ revenue.opt <- function(XREF, YREF, P, XOBS=NULL, RTS="vrs", param=NULL,
    set.objfn(lps, c(P[,1],rep(0,Kr)))
    set.constr.type(lps, rep("<=",m+n+rlamb))
    lp.control(lps, sense="max")
+   if (!missing(CONTROL)) set_control(lps, CONTROL)
 
    yopt <- matrix(NA,n,K)
    lambda <- matrix(NA,nrow=Kr,ncol=K)
@@ -121,7 +122,7 @@ revenue.opt <- function(XREF, YREF, P, XOBS=NULL, RTS="vrs", param=NULL,
       if (LP) print(paste("===> firm",k),quote=FALSE)
       if ( dim(P)[2] != 1 && k > 1 ) { 
          set.objfn(lps, c(P[,k],rep(0,K)))
-	   }
+       }
       set.rhs(lps, XOBS[,k], 1:m)
 
       if (LP) print(lps)
@@ -129,7 +130,7 @@ revenue.opt <- function(XREF, YREF, P, XOBS=NULL, RTS="vrs", param=NULL,
       set.basis(lps, default=TRUE)
       status <- solve(lps)
       if ( status != 0 ) {
-	      print(paste("Error in solving for firm",k,":  Status =",status),
+          print(paste("Error in solving for firm",k,":  Status =",status),
                quote=FALSE)
       }  else {
          rev[k] <- get.objective(lps)

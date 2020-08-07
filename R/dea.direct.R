@@ -1,4 +1,4 @@
-# $Id: dea.direct.R 207 2019-12-16 20:14:51Z lao $
+# $Id: dea.direct.R 219 2020-05-21 23:58:50Z lao $
 
 
 dea.direct <- function(X,Y, DIRECT, RTS="vrs", ORIENTATION="in", 
@@ -13,13 +13,15 @@ dea.direct <- function(X,Y, DIRECT, RTS="vrs", ORIENTATION="in",
    }
    ORIENTATION <- tolower(ORIENTATION)
 
+    # Hvis data er en data.frame saa tjek om det er numerisk data og lav
+    # dem i saa fald om til en matrix
+    X <- tjek_data(X)
+    Y <- tjek_data(Y)
 
-   if ( missing(XREF) || is.null(XREF) )  {
-      XREF <- X
-   }
-   if ( missing(YREF) || is.null(YREF) )  {
-      YREF <- Y
-   }
+    if ( missing(XREF) || is.null(XREF) )  XREF <- X
+    if ( missing(YREF) || is.null(YREF) )  YREF <- Y
+    XREF <- tjek_data(XREF)
+    YREF <- tjek_data(YREF)
    
    transpose <- FALSE
    if ( TRANSPOSE )  {

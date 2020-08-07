@@ -1,4 +1,4 @@
-# $Id: malmquist.R 190 2018-07-27 10:33:02Z lao $
+# $Id: malmquist.R 222 2020-06-12 18:44:31Z lao $
 
 # Beregner Malmquist indeks for enhederne ID over tidspunkterne i TIME
 
@@ -35,8 +35,8 @@ malmquist <- function(X, Y, ID, TIME,
 
    # Loeb perioderne igennem og beregn Malmquist for parvise perioder
    for ( t in 2:length(time) )  {
-   	cat("Period ",t,"\n")
-		flush.console()
+        cat("Period ",t,"\n")
+        flush.console()
        # Find units i periode 0 og periode 1
        id0 <- ID[time[t-1]==TIME]
        id1 <- ID[time[t]==TIME]
@@ -45,7 +45,7 @@ malmquist <- function(X, Y, ID, TIME,
        Y0 <- Y[time[t-1]==TIME,, drop=FALSE]
        X1 <- X[time[t]==TIME,, drop=FALSE]
        Y1 <- Y[time[t]==TIME,, drop=FALSE]
-
+       
 #print("0. periode")
 #print(cbind(X0=X0, Y0=Y0, id0))
 #print("1. periode")
@@ -65,8 +65,8 @@ malmquist <- function(X, Y, ID, TIME,
        E10[ID %in% m$id & TIME==time[t]] <- m$e10
        E11[ID %in% m$id & TIME==time[t]] <- m$e11
        if ( t==2 )  {
-       	# Foerste aar kan saettes 
-	       E11[ID %in% m$id & TIME==time[t-1]] <- m$e00
+        # Foerste aar kan saettes 
+           E11[ID %in% m$id & TIME==time[t-1]] <- m$e00
        } 
    }  # for (t)
 

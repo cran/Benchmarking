@@ -1,10 +1,10 @@
-# $Id: profit.R 203 2019-01-21 13:21:47Z lao $
+# $Id: profit.R 229 2020-07-04 13:39:18Z lao $
 
 # Calculates optimal input and output to maximize profit for given
 # input and output prices.
 
 profit.opt <- function(XREF, YREF, W, P, RTS="vrs", param=NULL,
-                  TRANSPOSE=FALSE, LP=FALSE, LPK=NULL)
+                  TRANSPOSE=FALSE, LP=FALSE, CONTROL=NULL, LPK=NULL)
 {
    if (!TRANSPOSE) {
       XREF <- t(XREF)
@@ -47,11 +47,11 @@ profit.opt <- function(XREF, YREF, W, P, RTS="vrs", param=NULL,
       rlamb <- 0
 
    lps <- make.lp(m+n +rlamb,m+n+Kr)
-	# Saet lp options
-	lp.control(lps,
-		scaling=c("range", "equilibrate", "integers")  # default scalering er 'geometric'
-	)					# og den giver ikke altid tilfredsstillende resultat;
-						# curtisreid virker i mange tilfaelde slet ikke
+    # Saet lp options
+    lp.control(lps,
+        scaling=c("range", "equilibrate", "integers")  # default scalering er 'geometric'
+    )                   # og den giver ikke altid tilfredsstillende resultat;
+                        # curtisreid virker i mange tilfaelde slet ikke
    name.lp(lps, paste("DEA profit,",RTS,"technology"))
 
    set.objfn(lps, c(-W[,1],P[,1], rep(0,Kr)))
@@ -109,6 +109,7 @@ profit.opt <- function(XREF, YREF, W, P, RTS="vrs", param=NULL,
 
    set.constr.type(lps, rep("<=",m+n+rlamb),  1:(m+n+rlamb))
    lp.control(lps, sense="max")
+   if (!missing(CONTROL)) set_control(lps, CONTROL)
 
    xopt <- matrix(NA,m,K)
    yopt <- matrix(NA,n,K)
@@ -125,15 +126,15 @@ profit.opt <- function(XREF, YREF, W, P, RTS="vrs", param=NULL,
       set.basis(lps, default=TRUE)
       status <- solve(lps)
       if ( status == 3 )  {
-         print(paste("Profit is unbounded for firm ",k), quote=FALSE)
+         cat("\nProfit is unbounded for firm ",k,
+            ". Input and output are not uniquely determined.\n", sep="")
          profit[k] <- Inf
          sol <- get.variables(lps)
          xopt[,k] <- sol[1:m]
          yopt[,k] <- sol[(m+1):(m+n)]
          lambda[,k] <- sol[(m+n+1):(m+n+Kr)]
       } else if ( status != 0 ) {
-	      print(paste("Error in solving for firm ",k,":  Status =",status),
-               quote=FALSE)
+          cat("Error in solving for firm ", k,": Status = ",status, "\n", sep="")
       }  else {
          profit[k] <- get.objective(lps)
          sol <- get.variables(lps)

@@ -1,4 +1,4 @@
-# $Id: slack.R 207 2019-12-16 20:14:51Z lao $
+# $Id: slack.R 229 2020-07-04 13:39:18Z lao $
 
 # Calculate slack at the efficient points.
 
@@ -7,7 +7,8 @@
 # transponeres inden afslut og retur.
 
 slack <- function(X, Y, e, XREF=NULL, YREF=NULL, FRONT.IDX=NULL, 
-                  LP=FALSE)  {       # , CONTROL=NULL, LPK=NULL
+                  LP=FALSE, CONTROL=NULL)
+{
    if ( !methods::is(e,"Farrell") )  {
        stop("In call of slack: argument 'e' must be of class 'Farrell'")
    }
@@ -16,33 +17,16 @@ slack <- function(X, Y, e, XREF=NULL, YREF=NULL, FRONT.IDX=NULL,
    if ( RTS == "fdh0" ) RTS <- "fdh"
    if (LP) print(paste("slack:  RTS =",RTS),quote=F)
    
-	# Hvis data er en data.frame saa tjek om det er numerisk data og lav
-	# dem i saa fald om til en matrix
-   if ( is(X, "data.frame") && data.kontrol(X) || is.numeric(X) ) 
-      { X <- as.matrix(X) }
-   if ( is(Y, "data.frame") && data.kontrol(Y) || is.numeric(Y) ) 
-      { Y <- as.matrix(Y) }
-   if ( is(XREF, "data.frame") && data.kontrol(XREF)||is.numeric(XREF))
-      { XREF <- as.matrix(XREF) }
-   if ( is(YREF, "data.frame") && data.kontrol(YREF)||is.numeric(YREF)) 
-      { YREF <- as.matrix(YREF) }
+   # Hvis data er en data.frame saa tjek om det er numerisk data og lav
+   # dem i saa fald om til en matrix
+   X <- tjek_data(X)
+   Y <- tjek_data(Y)
 
-	if ( !is(X, "matrix") || !is.numeric(X) )
-      stop("X is not a numeric matrix (or data.frame)")
-   if ( !is(Y, "matrix") || !is.numeric(Y) )
-      stop("Y is not a numeric matrix (or data.frame)")
-   if ( !is.null(XREF) && (!is(XREF, "matrix") || !is.numeric(XREF)) )
-      stop("XREF is not a numeric matrix (or data.frame)")
-   if ( !is.null(YREF) && (!is(YREF, "matrix") || !is.numeric(YREF)) )
-      stop("YREF is not a numeric matrix (or data.frame)")
-
-
-	if ( missing(XREF) || is.null(XREF) )  {
-      XREF <- X
-   }
-   if ( missing(YREF) || is.null(YREF) )  {
-      YREF <- Y
-   }
+    if ( missing(XREF) || is.null(XREF) )  XREF <- X
+    if ( missing(YREF) || is.null(YREF) )  YREF <- Y
+    XREF <- tjek_data(XREF)
+    YREF <- tjek_data(YREF)
+ 
    if ( e$TRANSPOSE ) {
       if (LP) print("X and Y are transposed")
       X <- t(X)
@@ -86,7 +70,7 @@ slack <- function(X, Y, e, XREF=NULL, YREF=NULL, FRONT.IDX=NULL,
    mmm <- (colMeans(X))
    nnn <- (colMeans(Y))
    if ( min(mmm) < 1e-4 || max(mmm) > 1e4 || 
-			min(nnn) < 1e-4 || max(nnn) > 1e4 )  {
+            min(nnn) < 1e-4 || max(nnn) > 1e4 )  {
       SKALERING <- TRUE
       X <- X / matrix(mmm, nrow=K, ncol=m, byrow=TRUE)
       XREF <- XREF / matrix(mmm, nrow=Kr, ncol=m, byrow=TRUE)
@@ -118,7 +102,7 @@ slack <- function(X, Y, e, XREF=NULL, YREF=NULL, FRONT.IDX=NULL,
          E <- eff
          FF <- 1/eff
       } else {
-        stop(paste("Unknown orientation in slack:", e$ORIENTATION))
+        stop("Unknown orientation in slack: ", e$ORIENTATION)
       }
    } else {
       mmd <- switch(e$ORIENTATION, "in"=m, "out"=n, "in-out"=m+n) 
@@ -146,10 +130,10 @@ slack <- function(X, Y, e, XREF=NULL, YREF=NULL, FRONT.IDX=NULL,
 
    # Initialiser LP objekt
    lps <- make.lp(m+n +rlamb, m+n+Kr)
-	lp.control(lps,
-		scaling=c("range", "equilibrate", "integers")  # default scalering er 'geometric'
-	)					# og den giver ikke altid tilfredsstillende resultat;
-						# curtisreid virker i mange tilfaelde slet ikke
+    lp.control(lps,
+        scaling=c("range", "equilibrate", "integers")  # default scalering er 'geometric'
+    )                   # og den giver ikke altid tilfredsstillende resultat;
+                        # curtisreid virker i mange tilfaelde slet ikke
    name.lp(lps, 
           paste("DEA-slack",RTS,",",e$ORIENTATION,"orientated",sep="-"))
 
@@ -213,9 +197,8 @@ slack <- function(X, Y, e, XREF=NULL, YREF=NULL, FRONT.IDX=NULL,
    sy <- matrix(NA,K,n)
    lambda <- matrix(NA,K,Kr)
 
-   # if ( !is.null(CONTROL) )  {
-   #    lp.control(lps,CONTROL)
-   # }
+   if (!missing(CONTROL)) set_control(lps, CONTROL)
+
    for ( k in 1:K )  { # beregn for hver enhed
       if (LP) cat("\n---\nFirm",k,"\n")
 
@@ -247,13 +230,13 @@ slack <- function(X, Y, e, XREF=NULL, YREF=NULL, FRONT.IDX=NULL,
       status <- solve(lps)
       if ( status != 0 ) {
          if ( status == 2 || status == 3 ) {
-	        # print(paste("Firm",k,"not in the technology set"), quote=F)
+            # print(paste("Firm",k,"not in the technology set"), quote=F)
            # print(paste("Status =",status))
            objval[k] <- 0
            sol <- rep(0,m+n+Kr)
            sol[m+n+k] <- 1
          } else {
-	        print(paste("Error in solving for firm",k,":  Status =",status), 
+            print(paste("Error in solving for firm",k,":  Status =",status), 
               quote=F)
            objval[k] <- NA
            sol <- NA
@@ -287,8 +270,8 @@ slack <- function(X, Y, e, XREF=NULL, YREF=NULL, FRONT.IDX=NULL,
    # regneunoejagtighed som giver en forskel hvis X er meget stoerre
    # eller mindre end 1.
 
-	lpcontr <- lp.control(lps)
-	eps <- lpcontr$epsilon["epsint"]
+    lpcontr <- lp.control(lps)
+    eps <- lpcontr$epsilon["epsint"]
    sx[abs(sx) < eps ] <- 0
    sy[abs(sy) < eps ] <- 0
    if ( SKALERING )  {
@@ -296,8 +279,8 @@ slack <- function(X, Y, e, XREF=NULL, YREF=NULL, FRONT.IDX=NULL,
       sy <- sy * matrix(nnn, nrow=K, ncol=n, byrow=TRUE)
    } 
    sum <- rowSums(sx) + rowSums(sy)
-	lambda[abs(lambda-1) < eps] <- 1   # taet ved 1
-	lambda[abs(lambda) < eps] <- 0     # taet ved 0
+    lambda[abs(lambda-1) < eps] <- 1   # taet ved 1
+    lambda[abs(lambda) < eps] <- 0     # taet ved 0
 
 
    if ( length(FRONT.IDX)>0 )  {
@@ -308,9 +291,9 @@ slack <- function(X, Y, e, XREF=NULL, YREF=NULL, FRONT.IDX=NULL,
 
 
    if (FALSE && LP)  {
-   	print("Done with loop\nColumn names for lambda:")
-	   print(colnames(lambda))
-	   print(lambda)
+    print("Done with loop\nColumn names for lambda:")
+       print(colnames(lambda))
+       print(lambda)
    }
 
    if ( e$TRANSPOSE ) {
@@ -321,7 +304,7 @@ slack <- function(X, Y, e, XREF=NULL, YREF=NULL, FRONT.IDX=NULL,
 
    if ( FALSE && LP ) {
       print("Faerdig med slack: lambda")
-	   print(colnames(lambda))
+       print(colnames(lambda))
       print(lambda)
       print("slack:")
       print(paste("laengden af objval:",length(objval)))
@@ -335,7 +318,7 @@ slack <- function(X, Y, e, XREF=NULL, YREF=NULL, FRONT.IDX=NULL,
 
    class(oe) <- "slack"
 
-	return(oe)
+    return(oe)
 } # slack
 
 
@@ -384,8 +367,8 @@ summary.slack <- function(object, digits=4, ...)  {
    cat("\n  x slacks: ", sum(SX, na.rm=TRUE), "\n")
    cat(   "  y slacks: ", sum(SY, na.rm=TRUE), "\n")
    cat(   "all slacks: ", sum(SX | SY, na.rm=TRUE), "\n")
-	if (sum(is.na(SX) | is.na(SY)))  cat("Number of firms Not Available for slacks: ", 
-												sum(is.na(SX)|is.na(SY)),"\n")
+    if (sum(is.na(SX) | is.na(SY)))  cat("Number of firms Not Available for slacks: ", 
+                                                sum(is.na(SX)|is.na(SY)),"\n")
 
 
    # invisible(a)

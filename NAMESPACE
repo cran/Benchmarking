@@ -1,12 +1,11 @@
-# $Id: NAMESPACE 197 2019-01-17 14:07:17Z lao $
+# $Id: NAMESPACE 231 2020-07-26 20:56:26Z lao $
 export(dea, sdea,   # efficiency, eff,
 excess, eladder, eladder.plot,
 dea.dual,
 dea.direct, dea.boot, boot.fear, 
 #  dea.mat, dea.dual.mat,
 dea.add,
-# print.Farrell, summary.Farrell,
-slack, # print.slack, summary.slack,
+slack,
 lambda,
 peers, get.number.peers, get.which.peers,
 get.peers.lambda,
@@ -24,12 +23,13 @@ te.add.sfa, sigma2u.sfa, sigma2v.sfa, sigma2.sfa,
 teJ.sfa, teBC.sfa, teMode.sfa,
 lambda.sfa,
 critValue, typeIerror,
-outlier.ap, outlier.ap.plot,
+outlier.ap, outlier.ap.plot, outlierC.ap,
 eff.dens, eff.dens.plot,
 mea, mea.lines, 
-malmq, malmquist
-# , stoned
+malmq, malmquist,
+stoned
 )
+
 
 S3method("print", "Farrell")
 S3method("summary", "Farrell")
@@ -66,19 +66,17 @@ S3method( "print", "sfa" )
 S3method( "residuals", "sfa" )
 S3method( "fitted", "sfa" )
 S3method( "summary", "sfa" )
-# S3method( "print", "summary.sfa" )
 S3method( "vcov", "sfa" )
 
 
 # importFrom(FEAR,boot.sw98)
 import(lpSolveAPI)
 importFrom(ucminf, ucminf)
+importFrom(quadprog, solve.QP)
 importFrom(stats, IQR, coef, complete.cases, density, dnorm, lm, na.omit, pnorm, pt, quantile, residuals, rnorm, sd, uniroot, var) 
 importFrom(graphics, abline, arrows, axis, box, grid, hist, lines, mtext, par, plot, points, segments, text)
 importFrom(grDevices, chull)
 importFrom(methods, is)
 importFrom("utils", "flush.console")
-# importFrom(limSolve, lsei)
-# importFrom(bbmle, mle2)
-# importFrom(bbmle, coef)
-# importFrom(quadprog, solve.QP)
+useDynLib(Benchmarking, .registration=TRUE)
+importFrom(Rcpp, evalCpp)

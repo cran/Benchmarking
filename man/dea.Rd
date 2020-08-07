@@ -1,4 +1,4 @@
-% $Id: dea.Rd 201 2019-01-20 20:39:57Z lao $
+% $Id: dea.Rd 229 2020-07-04 13:39:18Z lao $
 \name{dea}
 \alias{dea}
 % \alias{dea.mat}
@@ -95,9 +95,9 @@ via \code{param}
 \item{FRONT.IDX}{Index for firms determining the technology}
 
 \item{SLACK}{Calculate slack in a phase II calculation by an intern 
-	call of the function \code{\link{slack}}. Note that the precision
+    call of the function \code{\link{slack}}. Note that the precision
     for calculating slacks for orientation graph is low. }
-	 
+     
 \item{DUAL}{Calculate dual variables, i.e. shadow prices; not
     calculated for orientation graph as that is not an LP problem.}
 
@@ -118,7 +118,7 @@ via \code{param}
     number of firms in \code{X} and \code{Y}.
 
     \code{DIRECT} must not be used in connection with
-    \code{DIRECTION="graph"}.
+    \code{ORIENTATION="graph"}.
 
    }
 
@@ -313,6 +313,21 @@ The tolerance that lambda is zero or one is 1e-7, the default value of
 is the tolerance that is used to determine whether a floating-point
 number is in fact an in teger. The same tolerance is used for
 efficiency value near one.
+
+Some scaling is done in the function, but this does not always work 
+satisfactory, i.e. sometime, a solution cannot always be found -- the 
+program prints a warning and the efficiency for the firm is set to NA. 
+Often this is due to a bad scaling of the data. Either the user can try 
+a different scaling of data when calling the function or one can use the
+option \code{CONTROL} to try a different scaling I the program. For 
+instance one can try \code{CONTROL=list(scaling=c("geometric", "equilibrate")}
+or \code{CONTROL=list(scaling=c("curtisreid", "equilibrate")} in the 
+option list for the function call.
+
+If a numerical problem occurs, status=5, the best solution is probably to
+scale the input \code{X} and output \code{Y} yourself. The best results are
+obtained when the variables are close to 1. If the some variable are in the
+millions, then let the unit of measure be a million units.
 
 }
 

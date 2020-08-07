@@ -1,4 +1,4 @@
-# $Id: addModel.R 125 2013-01-20 16:54:54Z Lars $
+# $Id: addModel.R 218 2020-05-21 21:28:28Z lao $
 
 # Additive model, corresponds to eqs. 4.34-4.38 in Cooper et al., 2007 
 dea.add <- function(X, Y, RTS="vrs", XREF=NULL, YREF=NULL, 
@@ -12,13 +12,13 @@ dea.add <- function(X, Y, RTS="vrs", XREF=NULL, YREF=NULL,
       if (LP) print(paste("' is '",RTS,"'\n",sep=""),quote=F)
    }
    RTS <- tolower(RTS)
-   if ( !(RTS %in% rts) ) stop(paste("Unknown scale of returns:", RTS))
+   if ( !(RTS %in% rts) ) stop("Unknown scale of returns:", RTS)
 
-	if ( TRANSPOSE ) {
-		K <- dim(X)[2]
-	} else {
-		K <- dim(X)[1]
-	}
+    if ( TRANSPOSE ) {
+        K <- dim(X)[2]
+    } else {
+        K <- dim(X)[1]
+    }
 
    if ( RTS == "fdh+" )  {
       # Saet parametrene low og high
@@ -35,18 +35,18 @@ dea.add <- function(X, Y, RTS="vrs", XREF=NULL, YREF=NULL,
       param <- c(low=low, high=high)
    }
 
-	e <- list(eff=rep(1,K), objval=NULL, RTS=RTS, 
+    e <- list(eff=rep(1,K), objval=NULL, RTS=RTS, 
         ORIENTATION="in", TRANSPOSE=TRANSPOSE, param=param)
    class(e) <- "Farrell"
-	sl <- slack(X,Y,e, XREF=XREF, YREF=YREF, FRONT.IDX=FRONT.IDX, LP=LP)
+    sl <- slack(X,Y,e, XREF=XREF, YREF=YREF, FRONT.IDX=FRONT.IDX, LP=LP)
 
-	# Make slack the sum of slacks, not a logical variable 
-	# wether there is slack or not
-# 	if (TRANSPOSE)
+    # Make slack the sum of slacks, not a logical variable 
+    # wether there is slack or not
+#   if (TRANSPOSE)
 #      sl$sum2 <- colSums(sl$sx) + colSums(sl$sy)
-# 	else 
+#   else 
 #      sl$sum2 <- rowSums(sl$sx) + rowSums(sl$sy)
 
-	return(sl)
+    return(sl)
 }  # dea.aff
 

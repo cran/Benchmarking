@@ -1,4 +1,4 @@
-# $Id: cost.R 203 2019-01-21 13:21:47Z lao $
+# $Id: cost.R 229 2020-07-04 13:39:18Z lao $
 
 # Function to calculate minimum cost input.
 
@@ -6,9 +6,10 @@
 # standards, but according to LP practice
 
 cost.opt <- function(XREF, YREF, W, YOBS=NULL, RTS="vrs", param=NULL,
-                     TRANSPOSE=FALSE, LP=FALSE, LPK=NULL)  {
+                     TRANSPOSE=FALSE, LP=FALSE, CONTROL=NULL, LPK=NULL)
+{
    if ( missing(YOBS) )  {
-   	YOBS <- YREF
+    YOBS <- YREF
    }
    if (!TRANSPOSE) {
       XREF <- t(XREF)
@@ -37,7 +38,7 @@ cost.opt <- function(XREF, YREF, W, YOBS=NULL, RTS="vrs", param=NULL,
       RTS <- RTStemp
       if (LP) cat(paste("' is '",RTS,"'\n",sep=""),quote=F)
    }
-   if ( !(RTS %in% rts) ) stop(paste("Unknown scale of returns:", RTS))
+   if ( !(RTS %in% rts) ) stop("Unknown scale of returns:", RTS)
 
    if ( RTS != "crs" && RTS != "add" )  {
       rlamb <- 2
@@ -45,11 +46,11 @@ cost.opt <- function(XREF, YREF, W, YOBS=NULL, RTS="vrs", param=NULL,
       rlamb <- 0
 
    lps <- make.lp(m+n +rlamb,m+Kr)
-	# Saet lp options
-	lp.control(lps,
-		scaling=c("range", "equilibrate", "integers")  # default scalering er 'geometric'
-	)					# og den giver ikke altid tilfredsstillende resultat;
-						# curtisreid virker i mange tilfaelde slet ikke
+    # Saet lp options
+    lp.control(lps,
+        scaling=c("range", "equilibrate", "integers")  # default scalering er 'geometric'
+    )                   # og den giver ikke altid tilfredsstillende resultat;
+                        # curtisreid virker i mange tilfaelde slet ikke
    name.lp(lps, paste("DEA cost,",RTS,"technology"))
 
    # saet raekker i matrix med restriktioner, saet 0'er for den foerste
@@ -102,15 +103,16 @@ cost.opt <- function(XREF, YREF, W, YOBS=NULL, RTS="vrs", param=NULL,
    set.objfn(lps, c(W[,1],rep(0,Kr)))
    set.constr.type(lps, rep(">=",m+n+rlamb))
    lp.control(lps, sense="min")
+   if (!missing(CONTROL)) set_control(lps, CONTROL)
 
    xopt <- matrix(NA,m,K)
    lambda <- matrix(NA,nrow=Kr,ncol=K)
    cost <- rep(NA,K)
-
+   
    for ( k in 1:K )  {
       if ( dim(W)[2] != 1 && k > 1 ) { 
          set.objfn(lps, c(W[,k],rep(0,K)))
-	   }
+       }
       set.rhs(lps, YOBS[,k], (m+1):(m+n))
 
       if (LP) print(lps)
@@ -118,7 +120,7 @@ cost.opt <- function(XREF, YREF, W, YOBS=NULL, RTS="vrs", param=NULL,
       set.basis(lps, default=TRUE)
       status <- solve(lps)
       if ( status != 0 ) {
-	      print(paste("Error in solving for firm",k,":  Status =",status),
+          print(paste("Error in solving for firm",k,":  Status =",status),
                quote=FALSE)
       }  else {
          cost[k] <- get.objective(lps)

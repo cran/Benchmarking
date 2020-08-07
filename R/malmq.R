@@ -1,4 +1,4 @@
-# $Id: malmq.R 178 2017-12-20 15:05:12Z lao $
+# $Id: malmq.R 222 2020-06-12 18:44:31Z lao $
 
 # Beregner Malmquist indeks og dekomponering af samme ud fra to perioder
 
@@ -25,7 +25,7 @@
       if (LP) print(paste("' is '",RTS,"'\n",sep=""),quote=F)
    }
    RTS <- tolower(RTS)
-   if ( !(RTS %in% rts) )  stop(paste("Unknown scale of returns:", RTS))
+   if ( !(RTS %in% rts) )  stop("Unknown scale of returns: ", RTS)
 
    orientation <- c("in-out","in","out","graph")
    if ( is.numeric(ORIENTATION) )  {
@@ -34,7 +34,7 @@
    }
    ORIENTATION <- tolower(ORIENTATION)
    if ( !(ORIENTATION %in% orientation) ) {
-      stop(paste("Unknown value for ORIENTATION:",ORIENTATION))
+      stop("Unknown value for ORIENTATION: ", ORIENTATION)
    }
 
    m0<- dim(X0)[2]  # number of inputs
@@ -68,16 +68,16 @@
 # print(length(unique(ID0[id0])))
 # print(sum(id1))
 # print(length(unique(ID1[id1])))
-	# Er der gengangere, og er der samme antal i de to perioder
-	if ( sum(id0) != length(unique(ID0[id0])) || sum(id1) != length(unique(ID1[id1])) || 
-			sum(id0)!=sum(id1) )
-		stop("Units in ID are not unique for each period")
+    # Er der gengangere, og er der samme antal i de to perioder
+    if ( sum(id0) != length(unique(ID0[id0])) || sum(id1) != length(unique(ID1[id1])) || 
+            sum(id0)!=sum(id1) )
+        stop("Units in ID are not unique for each period")
 
    # Input og output for faellesmaengden af units
-   x0 <- X0[id0,]   
-   y0 <- Y0[id0,]
-   x1 <- X1[id1,]   
-   y1 <- Y1[id1,]
+   x0 <- X0[id0,,drop=FALSE]   
+   y0 <- Y0[id0,,drop=FALSE]
+   x1 <- X1[id1,,drop=FALSE]   
+   y1 <- Y1[id1,,drop=FALSE]
 
 
    # Skal teknologien i en periode bestemmes af alle dem der i

@@ -1,4 +1,4 @@
-% $Id: dea.boot.Rd 189 2018-07-15 12:16:41Z lao $
+% $Id: dea.boot.Rd 228 2020-07-03 15:06:03Z lao $
 \name{dea.boot}
 \alias{dea.boot}
 \alias{boot.fear}
@@ -16,8 +16,9 @@ the package \pkg{FEAR} returning results directly as Farrell measures.
 
 \usage{
 dea.boot(X, Y, NREP = 200, EFF = NULL, RTS = "vrs", ORIENTATION="in", 
-         alpha = 0.05, XREF = NULL, YREF = NULL, FRONT.IDX=NULL, EREF = NULL, 
-         DIRECT = NULL, TRANSPOSE = FALSE, SHEPHARD.INPUT = TRUE, LP)
+         alpha = 0.05, XREF = NULL, YREF = NULL, FRONT.IDX=NULL, 
+         EREF = NULL, DIRECT = NULL, TRANSPOSE = FALSE, 
+         SHEPHARD.INPUT = TRUE, LP, CONTROL=NULL)
 
 boot.fear(X, Y, NREP = 200, EFF = NULL, RTS = "vrs", ORIENTATION = "in", 
          alpha = 0.05, XREF = NULL, YREF = NULL, EREF = NULL)
@@ -63,11 +64,15 @@ boot.fear(X, Y, NREP = 200, EFF = NULL, RTS = "vrs", ORIENTATION = "in",
       matrices are m x K and n x K.}
       
   \item{SHEPHARD.INPUT}{The bootstrap of the Farrell input
-	efficiencies is done as a Shephard input distance function,
-	the inverse Farrell input efficiency. The option is only
-	relevant for input and graph directions. }
+    efficiencies is done as a Shephard input distance function,
+    the inverse Farrell input efficiency. The option is only
+    relevant for input and graph directions. }
 
   \item{LP}{Only for debugging purposes.}
+  
+  \item{CONTROL}{Possible controls to \pkg{lpSolveAPI}, see the
+      documentation for that package. For examples of use see the
+      function \code{\link{dea}}.}
 
 }
 

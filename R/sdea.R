@@ -1,21 +1,16 @@
-# $Id: sdea.R 207 2019-12-16 20:14:51Z lao $
+# $Id: sdea.R 229 2020-07-04 13:39:18Z lao $
 
 
 # Calculates super efficiency
 sdea <- function(X,Y, RTS="vrs", ORIENTATION="in", DIRECT=NULL, param=NULL,
-                 TRANSPOSE=FALSE, LP=FALSE)
+                 TRANSPOSE=FALSE, LP=FALSE, CONTROL=NULL)
 {
    # Input is as for the method eff
 
-   if ( is(X, "data.frame") && data.kontrol(X) || is.numeric(X) ) 
-      { X <- as.matrix(X) }
-   if ( is(Y, "data.frame") && data.kontrol(Y) || is.numeric(Y) ) 
-      { Y <- as.matrix(Y) }
-
-   if ( !is(X, "matrix") || !is.numeric(X) )
-      stop("X is not a numeric matrix (or data.frame)")
-   if ( !is(Y, "matrix") || !is.numeric(X) )
-      stop("Y is not a numeric matrix (or data.frame)")
+    # Hvis data er en data.frame saa tjek om det er numerisk data og lav
+    # dem i saa fald om til en matrix
+    X <- tjek_data(X)
+    Y <- tjek_data(Y)
 
    # Antal firmaer i data er K
    if ( TRANSPOSE )  {
@@ -80,7 +75,7 @@ sdea <- function(X,Y, RTS="vrs", ORIENTATION="in", DIRECT=NULL, param=NULL,
       if ( directMatrix ) direct <- DIRECT[i,]
       e <- dea(X[i,,drop=FALSE], Y[i,,drop=FALSE],
          RTS,ORIENTATION, XREF=X[-i,,drop=FALSE], YREF=Y[-i,,drop=FALSE],
-         TRANSPOSE=FALSE, DIRECT=direct, param=param, LP=LP)
+         TRANSPOSE=FALSE, DIRECT=direct, param=param, LP=LP, CONTROL=CONTROL)
       supereff[i] <- e$eff
       # print(dim(lambda))
       if (LP) print(dim(e$lambda))

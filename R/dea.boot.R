@@ -1,4 +1,4 @@
-# $Id: dea.boot.R 207 2019-12-16 20:14:51Z lao $
+# $Id: dea.boot.R 229 2020-07-04 13:39:18Z lao $
 
 # Boot No FEAR: boot.nf
 # Bootstrap af dea model a la Simar Wilson 1998.
@@ -7,7 +7,8 @@
 
 dea.boot <- function(X,Y, NREP=200, EFF=NULL, RTS="vrs", 
        ORIENTATION="in", alpha=0.05, XREF=NULL, YREF=NULL, FRONT.IDX=NULL,
-       EREF=NULL, DIRECT=NULL, TRANSPOSE=FALSE, SHEPHARD.INPUT=TRUE, LP=FALSE)
+       EREF=NULL, DIRECT=NULL, TRANSPOSE=FALSE, SHEPHARD.INPUT=TRUE, LP=FALSE, 
+       CONTROL=NULL)
 {
 
    if ( !is.null(DIRECT) )
@@ -22,7 +23,7 @@ dea.boot <- function(X,Y, NREP=200, EFF=NULL, RTS="vrs",
    rts <- which(RTS == rts_) -1 # Foerste i RTS 'fdh' er 0
  
    if ( rts < 1 || rts > 4 )
-      stop(paste("Invalid value of RTS in call to boot:",RTS))
+      stop("Invalid value of RTS in call to boot:",RTS)
 
 
    orientation <- c("in-out","in","out","graph")
@@ -84,7 +85,7 @@ dea.boot <- function(X,Y, NREP=200, EFF=NULL, RTS="vrs",
    Kr <- dim(XREF)[1] # number of units,units in the reference technology
  
    if ( is.null(EFF) )  
-      eff <- dea(X,Y, RTS, ORIENTATION, XREF, YREF, FAST=TRUE)
+      eff <- dea(X,Y, RTS, ORIENTATION, XREF, YREF, FAST=TRUE, CONTROL=CONTROL)
    else if ( is(EFF, "Farrell") )
       eff <- EFF$eff
    else 
@@ -94,21 +95,36 @@ dea.boot <- function(X,Y, NREP=200, EFF=NULL, RTS="vrs",
       stop("The length of EFF must be the number of firms in X and Y")
 
    if ( is.null(EREF) ) {
-   	if ( identical(X, XREF) & identical(Y, YREF) )  {
-   		EREF <- eff
-   	} else {
-      	EREF <- dea(XREF, YREF, RTS, ORIENTATION, FAST=TRUE)
+    if ( identical(X, XREF) & identical(Y, YREF) )  {
+        EREF <- eff
+    } else {
+        EREF <- dea(XREF, YREF, RTS, ORIENTATION, FAST=TRUE, CONTROL=CONTROL)
       }
-	}
-
-if (0)  {  ## Er eff ikke allerede defineret?
-   # Hvis XREF ikke er defineret i kald
-   if ( !.xyref.missing && !is.null(EREF) )
-      eff <- EREF
-}
+    }
 
 
-	# Bootstrap noget der er over 1, dvs. Farrel output eller Shephard input
+    # Hvis eff eller EREF har NA elementer vil X eller XREF faa NA 
+    # elemnter og dermed kommer der NA i elementer i LP problemet og
+    # det giver fejl i 'set.row' ved kald af dea. Derfor tjek af om 
+    # der er NA.
+    if (!all(!is.na(eff))) {
+        nr <- which(is.na(eff))
+        msg <- paste0("The dea calculation has NA values for firms ", 
+            paste(nr, collapse=", "), ".\n",
+            "For bootstrap either remove these firms from the data, use a (another) scaling\n",
+            "of the data, or use a scaling option using CONTROL, cf. the manual for 'dea'.\n")
+        stop(msg)
+    }
+    if (!all(!is.na(EREF))) {
+        nr <- which(is.na(EREF))
+        msg <- paste0("The dea calculation has NA values for firms ", 
+            paste(nr, collapse=", "), " in the reference technology.\n",
+            "For bootstrap either remove these firms from the reference data, use a (another) scaling\n",
+            "of the data, or use a scaling option using CONTROL, cf. the manual for 'dea'.\n")
+        stop(msg)
+    }
+
+    # Bootstrap noget der er over 1, dvs. Farrel output eller Shephard input
    if (ORIENTATION=="out")  farrell<-TRUE else farrell<-FALSE
 
 
@@ -143,8 +159,8 @@ if (0)  {  ## Er eff ikke allerede defineret?
    h <- adjust * h0
    if (LP) cat("Bandwidth =",h,"\n")
 
-	# matrix til at gemme de bootstrappede efficiencer
-	boot <- matrix(NA, nrow=K, ncol=NREP)
+    # matrix til at gemme de bootstrappede efficiencer
+    boot <- matrix(NA, nrow=K, ncol=NREP)
 
 
 if ( ORIENTATION == "in" )  {
@@ -156,14 +172,14 @@ if ( ORIENTATION == "in" )  {
       # eff*XREF er paa randen, og eff/estar*XREF bliver indre punkt
       xstar <- EREF/estar * XREF
       #### xstar <- eff/estar * XREF
-      boot[,b] <- dea(X,Y, RTS, ORIENTATION, XREF=xstar, YREF, FAST=TRUE)
+      boot[,b] <- dea(X,Y, RTS, ORIENTATION, XREF=xstar, YREF, FAST=TRUE, CONTROL=CONTROL)
    }  # b in 1:NREP
 } else if ( ORIENTATION == "out" )  {   # farrel er TRUE
    for ( b in 1:NREP )  {
       # Farrell output efficiencer
       estar <- dea.sample(eff, h, Kr)
       ystar <- EREF/estar * YREF
-      boot[,b] <- dea(X,Y, RTS, ORIENTATION, XREF, YREF=ystar, FAST=TRUE)
+      boot[,b] <- dea(X,Y, RTS, ORIENTATION, XREF, YREF=ystar, FAST=TRUE, CONTROL=CONTROL)
    }  # b in 1:NREP
 } else if ( ORIENTATION == "graph" )  {
    for ( b in 1:NREP )  {
@@ -171,37 +187,39 @@ if ( ORIENTATION == "in" )  {
       xstar <- EREF/estar * XREF
       ystar <- estar/EREF * YREF
       boot[,b] <- dea(X,Y, RTS, ORIENTATION, XREF=xstar, YREF=ystar,
-                      FAST=TRUE)
+                      FAST=TRUE, CONTROL=CONTROL)
    }  # b in 1:NREP
 } else {
    stop("Unknown ORIENTATION for dea.boot")
 }
 
 
-	if ( SHEPHARD.INPUT & ORIENTATION != "out" )  {
-		# Lav input efficiencer storre end 1 hvis den er under 1
-		eff <- 1/eff
-		boot <- 1/boot
-	}
-	# Efficiencer stoerre end 1
-	bias <- rowMeans(boot, na.rm=TRUE) - eff
-	eff.bc <- eff - bias
+    if ( SHEPHARD.INPUT & ORIENTATION != "out" )  {
+        # Lav input efficiencer storre end 1 hvis den er under 1
+        eff <- 1/eff
+        boot <- 1/boot
+    }
+    # Efficiencer stoerre end 1
+    bias <- rowMeans(boot, na.rm=TRUE) - eff
+    eff.bc <- eff - bias
 
-	#ci <- t(apply(boot,1, quantile, 
-	#			probs=c(0.5*alpha, 1-0.5*alpha), type=9, na.rm=TRUE))
-	ci_ <- t(apply(eff-boot,1, quantile, 
-				probs=c(0.5*alpha, 1-0.5*alpha), type=9, na.rm=TRUE))
-	ci <- eff + ci_
+    #ci <- t(apply(boot,1, quantile, 
+    #           probs=c(0.5*alpha, 1-0.5*alpha), type=9, na.rm=TRUE))
+    # ci_ <- t(apply(eff - boot, 1, quantile, 
+    #            probs=c(0.5*alpha, 1-0.5*alpha), na.rm=TRUE, type=9))
+    ci_ <- t(apply(eff-boot, 1, function(x) {
+        quantile(x, probs=c(0.5*alpha, 1-0.5*alpha), type=9, na.rm=TRUE)}))
+    ci <- eff + ci_
 
-	if (SHEPHARD.INPUT & ORIENTATION!="out")  {
-		# Lav efficiencer mm. tilbage til under 1
-		eff <- 1/eff
-		boot <- 1/boot
-		eff.bc <- 1/eff.bc
-		ci <- t(apply(1/ci, 1,rev))  # Byt om paa de lave og hoeje graenser
-		bias <- eff - eff.bc
-	}
-	var <- apply(boot,1,var)
+    if (SHEPHARD.INPUT & ORIENTATION!="out")  {
+        # Lav efficiencer mm. tilbage til under 1
+        eff <- 1/eff
+        boot <- 1/boot
+        eff.bc <- 1/eff.bc
+        ci <- t(apply(1/ci, 1, rev))  # Byt om paa de lave og hoeje graenser
+        bias <- eff - eff.bc
+    }
+    var <- apply(boot,1, function(x) {var(x, na.rm=TRUE)})
 
    bb <- list(eff=eff, eff.bc=eff.bc,
            bias=bias,

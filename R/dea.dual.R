@@ -1,4 +1,4 @@
-# $Id: dea.dual.R 207 2019-12-16 20:14:51Z lao $
+# $Id: dea.dual.R 229 2020-07-04 13:39:18Z lao $
 
 # In the calculation in the method input/output matrices X and Y are
 # of the order good x firms.  Ie. X, Y etc must be transformed as
@@ -28,7 +28,7 @@ dea.dual <- function(X,Y, RTS="vrs", ORIENTATION="in",
       if (LP) print(paste("' is '",RTS,"'\n",sep=""),quote=FALSE)
    }
    RTS <- tolower(RTS)
-   if ( !(RTS %in% rts) )  stop(paste("Unknown scale of returns:", RTS))
+   if ( !(RTS %in% rts) )  stop("Unknown scale of returns:", RTS)
 
    orientation <- c("in-out","in","out","graph")
    if ( is.numeric(ORIENTATION) )  {
@@ -37,7 +37,7 @@ dea.dual <- function(X,Y, RTS="vrs", ORIENTATION="in",
    }
    ORIENTATION <- tolower(ORIENTATION)
    if ( !(ORIENTATION %in% orientation) ) {
-      stop(paste("Unknown value for ORIENTATION:",ORIENTATION),quote=F)
+      stop("Unknown value for ORIENTATION: ",ORIENTATION)
    }
 
    if ( RTS %in% c("fdh","add", "fdh+") )
@@ -45,24 +45,10 @@ dea.dual <- function(X,Y, RTS="vrs", ORIENTATION="in",
    if ( !ORIENTATION %in% c("in","out","in-out") )
       stop("dea.dual does not work for \"graph\"")
 
-   if ( is(X, "data.frame") && data.kontrol(X) || is.numeric(X) ) 
-      { X <- as.matrix(X) }
-   if ( is(Y, "data.frame") && data.kontrol(Y) || is.numeric(Y) ) 
-      { Y <- as.matrix(Y) }
-   if ( is(XREF, "data.frame") && data.kontrol(XREF)||is.numeric(XREF))
-      { XREF <- as.matrix(XREF) }
-   if ( is(YREF, "data.frame") && data.kontrol(YREF)||is.numeric(YREF)) 
-      { YREF <- as.matrix(YREF) }
-
-   if ( !is(X, "matrix") || !is.numeric(X) )
-      stop("X is not a numeric matrix (or data.frame)")
-   if ( !is(Y, "matrix") || !is.numeric(X) )
-      stop("Y is not a numeric matrix (or data.frame)")
-   if ( !is.null(XREF) && (!is(XREF, "matrix") || !is.numeric(XREF)) )
-      stop("XREF is not a numeric matrix (or data.frame)")
-   if ( !is.null(YREF) && (!is(YREF, "matrix") || !is.numeric(YREF)) )
-      stop("YREF is not a numeric matrix (or data.frame)")
-
+    # Hvis data er en data.frame saa tjek om det er numerisk data og lav
+    # dem i saa fald om til en matrix
+    X <- tjek_data(X)
+    Y <- tjek_data(Y)
 
    if ( missing(XREF) || is.null(XREF) )  {
       XREF <- X
@@ -70,7 +56,9 @@ dea.dual <- function(X,Y, RTS="vrs", ORIENTATION="in",
    if ( missing(YREF) || is.null(YREF) )  {
       YREF <- Y
    }
-   
+   XREF <- tjek_data(XREF)
+   YREF <- tjek_data(YREF)
+
    if ( TRANSPOSE )  {
       X <- t(X)
       Y <- t(Y)
@@ -152,7 +140,7 @@ dea.dual <- function(X,Y, RTS="vrs", ORIENTATION="in",
    } else if ( RTS == "crs" )  {
       rlamb <- 0
    } else {
-      stop(paste("Unknown value for RTS in 'dea.dual':", RTS))
+      stop("Unknown value for RTS in 'dea.dual': ", RTS)
    }
 
 
@@ -203,11 +191,11 @@ if ( is.null(AD) )  {
 
    # Initialiser LP objekt
    lps <- make.lp(1+Kr+restr, m+n+rlamb )
-	# Saet lp options
-	lp.control(lps,
-		scaling=c("range", "equilibrate", "integers")  # default scalering er 'geometric'
-	)					# og den giver ikke altid tilfredsstillende resultat;
-						# curtisreid virker i mange tilfaelde slet ikke
+    # Saet lp options
+    lp.control(lps,
+        scaling=c("range", "equilibrate", "integers")  # default scalering er 'geometric'
+    )                   # og den giver ikke altid tilfredsstillende resultat;
+                        # curtisreid virker i mange tilfaelde slet ikke
    name.lp(lps, paste(ifelse(is.null(AD),"Dual","DualAC"),ORIENTATION,
              RTS,sep="-"))
    # if ( LP==TRUE ) print(lps)
@@ -264,15 +252,9 @@ if ( is.null(AD) )  {
          if ( !is.null(objgamma) ) objgamma <- -objgamma
    }
 
-   if ( !is.null(CONTROL) )  {
-      if( !is.list(CONTROL)) {
-         stop( "argument 'control' must be a 'list' object")
-      }
-      do.call( lp.control, c( list( lprec = lps ), CONTROL ) )
-   }
+    if (!missing(CONTROL)) set_control(lps, CONTROL)
 
-
-# if ( LP || !is.null(LPK) ) print(lps)
+    # if ( LP || !is.null(LPK) ) print(lps)
 
    u <- matrix(NA,K,m)   # vector for the final efficiencies
    v <- matrix(NA,K,n)   # vector for the final efficiencies
@@ -282,7 +264,6 @@ if ( is.null(AD) )  {
    if (rlamb > 0)  {
       gamma <- matrix(NA,K,rlamb)
    }
-
 
 
    for ( k in 1:K )  { # Finds the efficiencies for each unit
@@ -320,7 +301,6 @@ if ( is.null(AD) )  {
           }
        }
 
-
       if ( LP )  print(paste("Firm",k), quote=FALSE)
       if ( LP && k == 1 )  print(lps)
       set.basis(lps, default=TRUE)
@@ -328,10 +308,10 @@ if ( is.null(AD) )  {
 
       if ( status != 0 ) {
         if (status == 2 || status == 3) {
-	        # print(paste("Firm",k,"not in the technology set"), quote=F)
+            # print(paste("Firm",k,"not in the technology set"), quote=F)
            objval[k] <- ifelse(ORIENTATION=="in",Inf,-Inf)
         } else {
-	        print(paste("Error in solving for firm",k,":  Status =",status), 
+            print(paste("Error in solving for firm",k,":  Status =",status), 
              quote=F)
            objval[k] <- NA
         }
@@ -348,8 +328,7 @@ if ( is.null(AD) )  {
          }
       }
 
-
-   	if (LP && status==0) {
+    if (LP && status==0) {
          print(paste("Objval, firm",k))
          print(objval[k])
          print("Solution")
@@ -393,8 +372,6 @@ if ( is.null(AD) )  {
       } else {
          warning("Illegal ORIENTATION for argument DIRECT") 
       }
- # print("eff")
- # print(eff)
       if ( is(eff, "matrix") && ( dim(eff)[1]==1 || dim(eff)==1 ) )
          eff <- c(eff) 
    }

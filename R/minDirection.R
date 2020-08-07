@@ -1,9 +1,10 @@
-# $Id: minDirection.R 160 2015-12-22 13:58:31Z b018694 $
+# $Id: minDirection.R 229 2020-07-04 13:39:18Z lao $
 
 # Function to calculate the min step for each input or max step for
 # each output to the frontier, retninger i MEA. A series of LP problems
 
-minDirection <- function(lps, m, n, ORIENTATION, LP=FALSE)  {
+minDirection <- function(lps, m, n, ORIENTATION, LP=FALSE, CONTROL=CONTROL)
+{
    # 'md' antal elementer/varer i direction
    if ( ORIENTATION=="in" )  md <- m
    if ( ORIENTATION=="out" )  md <- n
@@ -11,6 +12,8 @@ minDirection <- function(lps, m, n, ORIENTATION, LP=FALSE)  {
 
    # Saet taeller for fooerste vare
    mn0 <- switch(ORIENTATION, "in"=0, "out"=m, "in-out"=0)
+   
+   if (!missing(CONTROL)) set_control(lps, CONTROL)
   
    Direct <- rep(NA,md)
    for ( h in 1:md )  {
@@ -56,12 +59,12 @@ mea <-  function(X,Y, RTS="vrs", ORIENTATION="in", XREF=NULL, YREF=NULL,
 mea.lines <- function(N, X, Y, ORIENTATION="in")  {
 orientation <- c("in-out","in","out")
 if ( is.numeric(ORIENTATION) )  {
-	ORIENTATION_ <- orientation[ORIENTATION+1]  # "in-out" er nr. 0
-	ORIENTATION <- ORIENTATION_
+    ORIENTATION_ <- orientation[ORIENTATION+1]  # "in-out" er nr. 0
+    ORIENTATION <- ORIENTATION_
 }
 ORIENTATION <- tolower(ORIENTATION)
 if ( !(ORIENTATION %in% orientation) ) {
-	stop(paste("Unknown value for ORIENTATION:",ORIENTATION))
+    stop("Unknown value for ORIENTATION: ", ORIENTATION)
 }
 
 for ( n in N )  {
@@ -92,12 +95,12 @@ for ( n in N )  {
       abline(v=(1-vn)*X[n,1],lty="dotted")
       # lines(c((1-vn)*X[n,1], X[n,1]), c(h=(1-hn)*X[n,2], X[n,2]),lw=2)
       arrows(X[n,1], X[n,2], (1-vn)*X[n,1], (1-hn)*X[n,2], lwd=2 )
-	   dir <- c(vn*X[n,1], hn*X[n,2])
-		#print(paste("dir =", dir), quote=FALSE)
-		mm <- dea(X[n,,drop=FALSE],Y[n,,drop=FALSE], ORIENTATION=ORIENTATION,
-		          XREF=X, YREF=Y,FAST=TRUE,DIRECT=dir)
-	   #print(paste("mm =",mm) , quote=FALSE)
-	   points(X[n,1]-mm*dir[1], X[n,2]-mm*dir[2], pch=16, col="green")
+       dir <- c(vn*X[n,1], hn*X[n,2])
+        #print(paste("dir =", dir), quote=FALSE)
+        mm <- dea(X[n,,drop=FALSE],Y[n,,drop=FALSE], ORIENTATION=ORIENTATION,
+                  XREF=X, YREF=Y,FAST=TRUE,DIRECT=dir)
+       #print(paste("mm =",mm) , quote=FALSE)
+       points(X[n,1]-mm*dir[1], X[n,2]-mm*dir[2], pch=16, col="green")
   
       abline(0, X[n,2]/X[n,1],lty="dashed", col="red")
       abline(X[n,2] - X[n,1]*(X[n,2]-(1-hn)*X[n,2])/(X[n,1]-(1-vn)*X[n,1]), 
@@ -106,14 +109,14 @@ for ( n in N )  {
    } else if (ORIENTATION=="out")  {
       # print(paste("(1+vn)*Y =",(1+hn)*Y[n,2],";  (1+hn)*Y =",(1+vn)*Y[n,1]))
       abline(h=(1+hn)*Y[n,2],lty="dotted")
-	   abline(v=(1+vn)*Y[n,1],lty="dotted")
-	   arrows(Y[n,1], Y[n,2], (1+vn)*Y[n,1], (1+hn)*Y[n,2], lwd=2 )
-	   dir <- c(vn*Y[n,1], hn*Y[n,2])
-		#print(paste("dir =", dir), quote=FALSE)
-		mm <- dea(X[n,,drop=FALSE],Y[n,,drop=FALSE], ORIENTATION=ORIENTATION,
-		          XREF=X, YREF=Y,FAST=TRUE,DIRECT=dir)
-	   #print(paste("mm =",mm) , quote=FALSE)
-	   points(Y[n,1]+mm*dir[1], Y[n,2]+mm*dir[2], pch=16, col="green")
+       abline(v=(1+vn)*Y[n,1],lty="dotted")
+       arrows(Y[n,1], Y[n,2], (1+vn)*Y[n,1], (1+hn)*Y[n,2], lwd=2 )
+       dir <- c(vn*Y[n,1], hn*Y[n,2])
+        #print(paste("dir =", dir), quote=FALSE)
+        mm <- dea(X[n,,drop=FALSE],Y[n,,drop=FALSE], ORIENTATION=ORIENTATION,
+                  XREF=X, YREF=Y,FAST=TRUE,DIRECT=dir)
+       #print(paste("mm =",mm) , quote=FALSE)
+       points(Y[n,1]+mm*dir[1], Y[n,2]+mm*dir[2], pch=16, col="green")
 
       abline(0, Y[n,2]/Y[n,1],lty="dashed", col="red")
       abline(Y[n,2] - Y[n,1]*(Y[n,2]-(1-hn)*Y[n,2])/(Y[n,1]-(1-vn)*Y[n,1]), 
@@ -122,12 +125,12 @@ for ( n in N )  {
    } else if (ORIENTATION=="in-out")  {
       #print(paste("(1+vn)*Y =",(1+hn)*Y[n,1],";  (1+hn)*X =",(1+vn)*X[n,1]), quote=FALSE)
       abline(h=(1+hn)*Y[n,1],lty="dotted")
-	   abline(v=(1-vn)*X[n,1],lty="dotted")
-	   arrows(X[n,1], Y[n,1], (1-vn)*X[n,1], (1+hn)*Y[n,1], lwd=2 )
-	   
-	   dir <- c(vn*X[n,], hn*Y[n,])
-	   #print(paste("dir =", dir), quote=FALSE)
-	   mm <- dea(X[n,,drop=FALSE],Y[n,,drop=FALSE], ORIENTATION=ORIENTATION,
+       abline(v=(1-vn)*X[n,1],lty="dotted")
+       arrows(X[n,1], Y[n,1], (1-vn)*X[n,1], (1+hn)*Y[n,1], lwd=2 )
+       
+       dir <- c(vn*X[n,], hn*Y[n,])
+       #print(paste("dir =", dir), quote=FALSE)
+       mm <- dea(X[n,,drop=FALSE],Y[n,,drop=FALSE], ORIENTATION=ORIENTATION,
              XREF=X, YREF=Y,FAST=TRUE,DIRECT=dir)
       #print(mm)
       #print(paste("mm =",mm) , quote=FALSE)

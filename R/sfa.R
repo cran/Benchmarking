@@ -1,10 +1,10 @@
-# $Id: sfa.R 207 2019-12-16 20:14:51Z lao $
+# $Id: sfa.R 231 2020-07-26 20:56:26Z lao $
 # \encoding{latin1}
 
 
 sfa <- function(x, y, beta0=NULL, lambda0=1, resfun=ebeta, 
                 TRANSPOSE = FALSE, DEBUG=FALSE, 
-                control = list(), hessian=2)  
+                control = list(), hessian=2)
 {
 
 # Funktion: beregner minus loglikelihood
@@ -56,11 +56,11 @@ loglik <- function(parm) {
 if ( missing(beta0) | is.null(beta0) )  {
    # 1. OLS estimate
    m <- lm( y ~ x)      # OLS estimate; linear model
-	# print(logLik(m))
+    # print(logLik(m))
    beta0 <- m$coef
    # sigma0 <- deviance(m)/dim(x)[1]   # estimate of variance, ML estimate
-	# print(dim(x))
-	# print(loglik(c(m$coef,deviance(m)/dim(x)[1],0)))
+    # print(dim(x))
+    # print(loglik(c(m$coef,deviance(m)/dim(x)[1],0)))
 }
 
 
@@ -69,21 +69,21 @@ if ( missing(beta0) | is.null(beta0) )  {
    # print(loglik(parm))
    #print("For control er sat"); print(control)
    if ( missing(control) )  {
-		#print("control er missing")
-		#control["maxeval"] <- 1000
-		control["stepmax"] <- .1
+        #print("control er missing")
+        #control["maxeval"] <- 1000
+        control["stepmax"] <- .1
    } else {
-   	# Hvis 'control' er sat skal det sikres at stepmax har en lille vaerdi
-   	# hvis den ikke er sat i 'control'; er den sat i 'control' bliver den vaerdi
-   	# benyttet paa brugerens egen risiko.
-		#print("control har vaerdier")
-		#print(control)
-		kontrol <- list()
-		kontrol["stepmax"] <- .1
-		for ( i in names(control) )  {
-			kontrol[i] <- control[i]
-		}
-		control <- kontrol
+    # Hvis 'control' er sat skal det sikres at stepmax har en lille vaerdi
+    # hvis den ikke er sat i 'control'; er den sat i 'control' bliver den vaerdi
+    # benyttet paa brugerens egen risiko.
+        #print("control har vaerdier")
+        #print(control)
+        kontrol <- list()
+        kontrol["stepmax"] <- .1
+        for ( i in names(control) )  {
+            kontrol[i] <- control[i]
+        }
+        control <- kontrol
    }
    if (DEBUG) {print("Efter control er sat",quote=F); print(control)}
    if (DEBUG) print("ucminf bliver kaldt",quote=F)
@@ -93,13 +93,13 @@ if ( missing(beta0) | is.null(beta0) )  {
       print(paste("Antal funktionskald",o$info["neval"]),quote=F)
       print(o$info)
       if ( hessian!= 0 & !is.null(o$hessian) )  {
-      	print("Hessian:",quote=F)
-      	print(o$hessian)
+        print("Hessian:",quote=F)
+        print(o$hessian)
       }
       if ( hessian!= 0 & !is.null(o$invhessian) )  {
-      	print("Inverse hessian",quote=F)
-   		print(o$invhessian)
-   	}
+        print("Inverse hessian",quote=F)
+        print(o$invhessian)
+    }
    }
 
    if ( o$convergence < 0 )  {
@@ -122,13 +122,13 @@ if ( missing(beta0) | is.null(beta0) )  {
    names(sf$coef) <- names(o$par[1:K])
    e <- resfun(x,y,sf$beta)   
    sf$residuals <- e
-   sf$fitted.values <- y -e
+   sf$fitted.values <- y - e
    sf$lambda <- o$par[K+1]
    sf$sigma2 <- sum(e^2)/length(e)
    names(sf$par)[K+1] <- "lambda"
    # names(sf$par)[K+2] <- "sigma2"
    sf$N <- dim(x)[1] 
-   sf$df <- dim(x)[2] +3
+   sf$df <- dim(x)[2] + 3
    sf$loglik <- -o$val
    sf$vcov <- matrix(NA, nrow=dim(x)[2]+1, ncol=dim(x)[2]+1)
    if ( hessian == 2 || hessian == 3 ) 
@@ -136,18 +136,18 @@ if ( missing(beta0) | is.null(beta0) )  {
    else if ( hessian == 1 )  {
       if ( !is.null(o$hessian) ) sf$vcov <- genInv(o$hessian)
    } else
-   	sf$vcov <- matrix(NA, nrow=dim(x)[2]+1, ncol=dim(x)[2]+1)
+    sf$vcov <- matrix(NA, nrow=dim(x)[2]+1, ncol=dim(x)[2]+1)
    # Standard error of all parameters
    if (DEBUG & !is.null(o$hessian)) cat("Determinant for Hessian = ", det(o$hessian),"\n" )
    ## Standard error of the parameters in the production function
    ## std.err[1:3]
    # t-ratios
    if (sum(!is.na(sf$vcov))) {
-	   sf$std.err <- sqrt(diag(sf$vcov))
-   	sf$t.value <- sf$par/sf$std.err
+       sf$std.err <- sqrt(diag(sf$vcov))
+    sf$t.value <- sf$par/sf$std.err
    } else {
-   	sf$std.err <- NA
-   	sf$t.value <- NA
+    sf$std.err <- NA
+    sf$t.value <- NA
    }
    # t-ratio for production function
    #  (o$par/std.err)[1:(1+dim(x)[2])]
@@ -162,20 +162,22 @@ sfa.cost <- function(W, Y, COST, beta0 = NULL, lambda0 = 1, resfun = ebeta,
     TRANSPOSE = FALSE, DEBUG=FALSE,
     control=list(), hessian=2)
 {
-	if ( missing(beta0) | is.null(beta0) )  {
-	   # 1. OLS estimate
-	   m <- lm( COST ~ W + Y)      # OLS estimate; linear model
-	   beta0 <- m$coef
-	}
-	cWY <- -1 * cbind(W,Y)
-	cCOST <- -1 * COST
-	sol <- sfa(x=cWY, y=cCOST, beta0=beta0, lambda0=lambda0, resfun=resfun, 
-				TRANSPOSE=TRANSPOSE, DEBUG=DEBUG, control=control, hessian=hessian)
-	return( sol )
+    cWY <- -1 * cbind(W,Y)
+    cCOST <- -1 * COST
+    if ( missing(beta0) | is.null(beta0) )  {
+       # 1. OLS estimate
+       m <- lm( cCOST ~ cWY)      # OLS estimate; linear model
+       beta0 <- m$coef
+    }
+    sol <- sfa(x=cWY, y=cCOST, beta0=beta0, lambda0=lambda0, resfun=resfun, 
+                TRANSPOSE=TRANSPOSE, DEBUG=DEBUG, control=control, hessian=hessian)
+    sol$fitted.values <- -sol$fitted.values
+    sol$residuals <- - sol$residuals
+    class(sol) <- c(class(sol), "sfa.cost")
+    return(sol)
 }  ## sfa.cost
-    
-    
-    
+
+
 
 
 ebeta <- function(x,y,beta)  {
@@ -218,7 +220,7 @@ function (x, digits = max(3, getOption("digits") - 3), ...)
 #   a <- cbind("Parameters"=x$par,"  Std.err"=x$std.err,"  t-value"=x$t.value)
 #   if ( length(x$t.value) > 0 ) {
 #      a<-cbind(a," Pr(>|t|)"=as.integer(1000*
-#	   2*pt(abs(x$t.value),x$N-x$df,lower.tail=F) )/1000)
+#      2*pt(abs(x$t.value),x$N-x$df,lower.tail=F) )/1000)
 #   }
 #   print(a,digits=4,quote=F,...)
 #   cat("sigma2        ",format(x$sigma2,digits=5),"\n")
@@ -226,23 +228,23 @@ function (x, digits = max(3, getOption("digits") - 3), ...)
 }  ## print.sfa
 
 
-
 summary.sfa <- function(object, ...)  {
 #   print.sfa(object)
-   a <- cbind("Parameters"=object$par,"  Std.err"=object$std.err,
-     "  t-value"=object$t.value)
+   a <- cbind("Parameters"=format(object$par, digits=4, nsmall=5, sci=FALSE), "",
+              "Std.err"=format(object$std.err, digits=5, nsmall=5, sci=FALSE), "", 
+              "t-value"=format(object$t.value, digits=4, nsmall=3))
    if ( length(object$t.value) > 0 ) {
-      a<-cbind(a," Pr(>|t|)"=as.integer(1000*
-	   2*pt(abs(object$t.value),object$N-object$df,lower.tail=F) )/1000)
+      a<-cbind(" ", a, " ", "Pr(>|t|)"=format(as.integer(1000*
+       2*pt(abs(object$t.value),object$N-object$df,lower.tail=F) )/1000, digits=3, sci=FALSE))
    }
-   print(a,digits=4,quote=F,...)
-   cat("sigma2        ",format(object$sigma2,digits=5),"\n")
+   print(a, quote=FALSE, ...)
+   cat("sigma2       ",format(object$sigma2,digits=5),"\n")
    cat("sigma2v = ", object$sigma2/(1 + object$lambda^2),
    ";  sigma2u = ", 
          object$sigma2*object$lambda^2/(1 + object$lambda^2),"\n")
    cat("log likelihood = ",object$loglik,"\n")
    cat("Convergence = ",object$convergence,
-   	"; number of evaluations of likelihood function", object$info["neval"], "\n")
+    "; number of evaluations of likelihood function", object$info["neval"], "\n")
    cat("Max value of gradien:", object$info["maxgradient"], "\n")
    cat("Length of last step:", object$info["laststep"], "\n")
    cat("Final maximal allowed step length:", object$info["stepmax"], "\n")
@@ -302,7 +304,9 @@ te.sfa <- function(object)  {
   # Hjaelpevariabler
   lambda <- object$lambda
   s2 <- object$sigma2
-  ustar <- -object$residuals*lambda^2/(1+lambda^2)
+  sign <- 1
+  if (is(object, "sfa.cost")) sign <- -1
+  ustar <- - sign * object$residuals*lambda^2/(1+lambda^2)
   sstar <- lambda/(1+lambda^2)*sqrt(s2)
 
   # Teknisk efficiens for hver enhed
@@ -317,7 +321,9 @@ teBC.sfa <- te.sfa
 teMode.sfa <- function(object)  {
   # Hjaelpevariabler
   lambda <- object$lambda
-  ustar <- -object$residuals*lambda^2/(1+lambda^2)
+  sign <- 1
+  if (is(object, "sfa.cost")) sign <- -1
+  ustar <- - sign * object$residuals*lambda^2/(1+lambda^2)
 
   # Teknisk efficiens for hver enhed
   TE1 = matrix(exp(pmin(0,-ustar)),ncol=1)
@@ -328,9 +334,11 @@ teMode.sfa <- function(object)  {
 
 teJ.sfa <- function(object)  {
   # Hjaelpevariabler
+  sign <- 1
+  if (is(object, "sfa.cost")) sign <- -1
   lambda <- object$lambda
   s2 <- object$sigma2
-  ustar <- -object$residuals*lambda^2/(1+lambda^2)
+  ustar <- - sign * object$residuals*lambda^2/(1+lambda^2)
   sstar <- lambda/(1+lambda^2)*sqrt(s2)
 
   # Teknisk efficiens for hver enhed
@@ -342,7 +350,9 @@ teJ.sfa <- function(object)  {
 
 
 te.add.sfa <- function(object)  {
-  e <- residuals.sfa(object)
+  sign <- 1
+  if (is(object, "sfa.cost")) sign <- -1
+  e <- sign * residuals.sfa(object)
   s2 <- sigma2.sfa(object)
   lambda <- lambda.sfa(object)
   # auxiliary variables

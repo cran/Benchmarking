@@ -1,4 +1,4 @@
-# $Id: fdhPlus.R 207 2019-12-16 20:14:51Z lao $
+# $Id: fdhPlus.R 218 2020-05-21 21:28:28Z lao $
 
 
 # FDH+.  Beregn foerst CRS efficiency med kun en mulig peer; se om
@@ -18,7 +18,7 @@ dea.fdhPlus <- function(X, Y, ORIENTATION="in",
    }
    ORIENTATION <- tolower(ORIENTATION)
    if ( !(ORIENTATION %in% orientation) ) {
-      stop(paste("Unknown value for ORIENTATION:",ORIENTATION))
+      stop("Unknown value for ORIENTATION: ",ORIENTATION)
    }
 
    if ( ORIENTATION=="graph" )
@@ -160,8 +160,8 @@ stop("Directional efficiency does not yet work for RTS='fdh+'")
        lam[k, peer[k]] <- 1
    }
    if ( !is.null(dimnames(X)[[1]]) )  {
-	   names(eff) <- dimnames(X)[[1]]
-	}
+       names(eff) <- dimnames(X)[[1]]
+    }
    e <- list(eff=eff, objval=eff, peers=peer, lambda=lam, RTS="fdh",
              direct=DIRECT, ORIENTATION=ORIENTATION, TRANSPOSE=FALSE)
    class(e) <- "Farrell"
@@ -205,7 +205,7 @@ for ( k in 1:K )  {
       tryCatch ( E[k] <- min(ek, na.rm=TRUE), warning = function(w) NULL, 
           finaly = (E[k] <- Inf) )
    } else {
-	tryCatch ( E[k] <- max(ek, na.rm=TRUE), warning = function(w) NULL,
+    tryCatch ( E[k] <- max(ek, na.rm=TRUE), warning = function(w) NULL,
           finaly = (E[k] <- -Inf)  )
    }
    # print(ek)
@@ -221,7 +221,7 @@ for (k in 1:K)  {
 }
 
 if ( !is.null(dimnames(X)[[1]]) )  {
-	names(E) <- dimnames(X)[[1]]
+    names(E) <- dimnames(X)[[1]]
 }
 
 obj <- list(eff=E, lambda=lambda,RTS="fdh+",  lamR=lamR, peers=peer, 

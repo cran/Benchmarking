@@ -1,4 +1,4 @@
-% $Id: eladder.Rd 173 2017-03-14 10:24:21Z lao $
+% $Id: eladder.Rd 218 2020-05-21 21:28:28Z lao $
 \name{eladder}
 \alias{eladder}
 \alias{eladder.plot}
@@ -73,7 +73,11 @@ eladder.plot(elad, peer, TRIM = NULL, ...)
    sequentially one at a time. Somewhere in the sequence the firm
    becomes efficient and are itself removed from the set of firms
    generating the technology (or the only firm left) and thereafter
-   the efficiencies are super-efficiencies.}
+   the efficiencies are super-efficiencies.
+   
+   When it happens that there is no solution to the dea problem after
+   removing a series of peers then the program might stop before
+   \code{MAXELAD} peers have been removed.}
 
 
 \value{The object returned from \code{eladder} is a list with components
@@ -98,7 +102,8 @@ eladder.plot(elad, peer, TRIM = NULL, ...)
 
 \references{ Dag Fjeld Edvardsen; \emph{Four Essays on the Measurement
    of Productive Efficiency}; University of Gothenburg 2004;
-   \url{http://hdl.handle.net/2077/2923}}
+   \url{http://hdl.handle.net/2077/2923} 
+ }
 
 
 \author{ Peter Bogetoft and Lars Otto \email{larsot23@gmail.com} }

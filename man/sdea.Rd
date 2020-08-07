@@ -1,4 +1,4 @@
-% $Id: sdea.Rd 192 2018-07-31 12:50:56Z lao $
+% $Id: sdea.Rd 229 2020-07-04 13:39:18Z lao $
 \name{sdea}
 \alias{sdea}
 
@@ -13,7 +13,7 @@
 
 \usage{
 sdea(X, Y, RTS = "vrs", ORIENTATION = "in", DIRECT = NULL, param = NULL,
-     TRANSPOSE = FALSE, LP = FALSE)
+     TRANSPOSE = FALSE, LP = FALSE, CONTROL = NULL)
 }
 
 \arguments{
@@ -85,8 +85,7 @@ integers), and free disposability \cr
 
       \code{DIRECT} must not be used in connection with
       \code{DIRECTION="graph"}.
-
- }
+     }
 
   \item{param}{Argument is at present only used when
       \code{RTS="fdh+"}, see \code{\link{dea}} for a description.}
@@ -95,6 +94,10 @@ integers), and free disposability \cr
 
   \item{LP}{Only for debugging, see the description in
       \code{\link{dea}}. }
+
+  \item{CONTROL}{Possible controls to \pkg{lpSolveAPI}, see the
+      documentation for that package. For examples of use see the
+      function \code{\link{dea}}.}
 
 }
 

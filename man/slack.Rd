@@ -1,4 +1,4 @@
-% $Id: slack.Rd 192 2018-07-31 12:50:56Z lao $
+% $Id: slack.Rd 229 2020-07-04 13:39:18Z lao $
 \name{slack}
 \alias{slack}
 \alias{print.slack}
@@ -16,7 +16,7 @@ Slacks are calculated after taking the efficiency into consideration.
 
 
 \usage{
-slack(X, Y, e, XREF = NULL, YREF = NULL, FRONT.IDX = NULL, LP = FALSE)
+slack(X, Y, e, XREF = NULL, YREF = NULL, FRONT.IDX = NULL, LP = FALSE, CONTROL=NULL)
 }
 
 
@@ -40,7 +40,10 @@ slack(X, Y, e, XREF = NULL, YREF = NULL, FRONT.IDX = NULL, LP = FALSE)
   \item{FRONT.IDX}{Index for firms determining the technology}
 
   \item{LP}{Set \code{TRUE} for debugging.}
-
+  
+    \item{CONTROL}{Possible controls to \pkg{lpSolveAPI}, see the
+        documentation for that package. For examples of use see the
+        function \code{\link{dea}}.}
 }
 
 

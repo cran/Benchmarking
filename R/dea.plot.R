@@ -1,4 +1,4 @@
-# $Id: dea.plot.R 207 2019-12-16 20:14:51Z lao $
+# $Id: dea.plot.R 219 2020-05-21 23:58:50Z lao $
 "dea.plot" <-
 function(x, y, RTS="vrs", ORIENTATION="in-out", txt=NULL, add=FALSE, 
             wx=NULL, wy=NULL, TRANSPOSE = FALSE, fex=1, GRID=FALSE,
@@ -8,7 +8,7 @@ function(x, y, RTS="vrs", ORIENTATION="in-out", txt=NULL, add=FALSE,
 # vaegtet sum med vaegte wx og wy; default vaegte som vaere simpel addition.
 #
 {
-	if ( sum(is.na(x)) + sum(is.na(y)) > 0 ) stop("There is one or more NA in 'x' or 'y'")
+    if ( sum(is.na(x)) + sum(is.na(y)) > 0 ) stop("There is one or more NA in 'x' or 'y'")
    rts <- c("fdh","vrs","drs","crs","irs","irs2","add","fdh+")
    if ( is.numeric(RTS) )  {
       cat("Number '",RTS,sep="")
@@ -17,7 +17,7 @@ function(x, y, RTS="vrs", ORIENTATION="in-out", txt=NULL, add=FALSE,
       cat("' is '",RTS,"'\n",sep="")
    }
    RTS <- tolower(RTS)
-   if ( !(RTS %in% rts) ) stop(paste("Unknown value for RTS:",RTS),quote=F)
+   if ( !(RTS %in% rts) ) stop("Unknown value for RTS: ", RTS)
 
    orientation <- c("in-out","in","out","graph")
    if ( is.numeric(ORIENTATION) )  {
@@ -26,7 +26,7 @@ function(x, y, RTS="vrs", ORIENTATION="in-out", txt=NULL, add=FALSE,
    }
    ORIENTATION <- tolower(ORIENTATION)
    if ( !(ORIENTATION %in% orientation) ) {
-      stop(paste("Unknown value for ORIENTATION:",ORIENTATION))
+      stop("Unknown value for ORIENTATION: ", ORIENTATION)
    }
 
    if ( RTS=="fdh+" && ORIENTATION!="in-out" )
@@ -35,18 +35,10 @@ function(x, y, RTS="vrs", ORIENTATION="in-out", txt=NULL, add=FALSE,
    if ( RTS=="add" && ORIENTATION!="in-out" )
       stop("RTS=\"add\" only works for ORIENTATION=\"in-out\"")
 
-   # Hvis data er en data.frame saa tjek om det er numerisk data og lav
-   # dem i saa fald om til en matrix
-   if ( is(x, "data.frame") && data.kontrol(x) || is.numeric(x) ) 
-      { x <- as.matrix(x) }
-   if ( is(y, "data.frame") && data.kontrol(y) || is.numeric(y) ) 
-      { y <- as.matrix(y) }
-
-   if ( !is(x, "matrix") || !is.numeric(x) )
-      stop("x is not a numeric matrix (or data.frame)")
-   if ( !is(y, "matrix") || !is.numeric(y) )
-      stop("y is not a numeric matrix (or data.frame)")
-
+    # Hvis data er en data.frame saa tjek om det er numerisk data og lav
+    # dem i saa fald om til en matrix
+    x <- tjek_data(x)
+    y <- tjek_data(y)
 
    if (TRANSPOSE) {
       x <- t(x)
@@ -72,10 +64,10 @@ function(x, y, RTS="vrs", ORIENTATION="in-out", txt=NULL, add=FALSE,
 
    if ( add == FALSE ) {
       dots = list(...)
-	   if (RANGE)  {
-		   xlim <- 1.2*range(c(0,x)) +c(0,.01)
-		   ylim <- 1.2*range(c(0,y)) +c(0,.01)
-	   }
+       if (RANGE)  {
+           xlim <- 1.2*range(c(0,x)) +c(0,.01)
+           ylim <- 1.2*range(c(0,y)) +c(0,.01)
+       }
       if ( missing(xlim) ) xlim=c(0,1.2*max(x+.001))
       if ( missing(ylim) ) ylim=c(0,1.2*max(y+.0011))
       if ( missing(xlab) ) {xlab <- switch(ORIENTATION, 
@@ -139,7 +131,7 @@ function(x, y, RTS="vrs", ORIENTATION="in-out", txt=NULL, add=FALSE,
       effektive[j] <- prev
       for ( i in idx$ix )  {
          if ( y[i] > y[prev] )  {
-         	j <- j+1
+            j <- j+1
             effektive[j] <- i
             prev <- i
          }

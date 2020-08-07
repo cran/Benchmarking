@@ -1,4 +1,4 @@
-% $Id: Benchmarking-package.Rd 157 2015-07-09 09:40:20Z b002961 $
+% $Id: Benchmarking-package.Rd 232 2020-08-07 08:47:59Z lao $
 \name{Benchmarking-package}
 \alias{Benchmarking-package}
 \alias{Benchmarking}
@@ -9,17 +9,18 @@ Analyses (SFA) -- Model Estimations and Efficiency Measuring }
 
 \description{
 
-The Benchmarking package contains methods to estimate technologies and measure
-efficiencies using DEA and SFA. Data Envelopment Analysis (DEA) are
-supported under different technology assumptions (fdh, vrs, drs, crs,
-irs, add), and using different efficiency measures (input based,
-output based, hyperbolic graph, additive, super, directional). Peers
-are available, partial price information can be included, and optimal
-cost, revenue and profit can be calculated. Evaluation of mergers are
-also supported. A comparative method for estimating stochastic
-frontier function (SFA) efficiencies is included. The methods can
-solve not only standard models, but also many other model variants,
-and they can be modified to solve new models.
+The Benchmarking package contains methods to estimate technologies and
+measure efficiencies using DEA and SFA. Data Envelopment Analysis (DEA)
+are supported under different technology assumptions (fdh, vrs, drs, crs,
+irs, add), and using different efficiency measures (input based, output
+based, hyperbolic graph, additive, super, directional). Peers are
+available, partial price information can be included, and optimal cost,
+revenue and profit can be calculated. Evaluation of mergers are also 
+supported. Comparative methods for estimating stochastic frontier function
+(SFA) efficiencies and for convex nonparametric least squares here for
+convex functions (StoNED) are also included. The methods can solve not
+only standard models, but also many other model variants, and they can
+be modified to solve new models.
 
 The package also support simple plots of DEA technologies with two
 goods; either as a transformation curve (2 outputs), an isoquant (2
@@ -38,12 +39,13 @@ can of course also be used as a stand-alone package.
 \tabular{ll}{
 Package: \tab Benchmarking\cr
 Type: \tab Package\cr
-Version: \tab 0.27 ($Revision: 157 $)\cr
-Date: \tab $Date: 2015-07-09 11:40:20 +0200 (to, 09 jul 2015) $\cr
+Version: \tab 0.29 ($Revision: 232 $)\cr
+Date: \tab $Date: 2020-08-07 10:47:59 +0200 (fr, 07 aug 2020) $\cr
 License: \tab Copyright\cr
 }
 
-\tabular{ll}{\code{dea} \tab DEA input or output efficience measures, peers,
+\tabular{ll}{
+\code{dea} \tab DEA input or output efficience measures, peers,
      lambdas and slacks \cr
 
 \code{dea.dual} \tab Dual weights (prices), including restrictions on
@@ -70,7 +72,6 @@ License: \tab Copyright\cr
 \code{peers} \tab  get the peers for each firm. \cr
 
 \code{dea.boot} \tab Bootstrap DEA models \cr
-% \code{boot.fear}  \cr
 
 \code{cost.opt} \tab Optimal input for given output and prices. \cr
 
@@ -99,8 +100,11 @@ License: \tab Copyright\cr
 
 \code{sfa} \tab Stochastic frontier analysis, production, distance,
      and cost function (SFA) \cr
+     
+\code{stoned} \tab Convex nonparametric least squares here for convex 
+    function function \cr     
 
-\code{outlier.ap} \tab Detection of outliers  \cr
+\code{outlierC.ap, outlier.ap} \tab Detection of outliers  \cr
 
 \code{eff.dens} \tab Estimate and plot kernel density of efficiencies \cr
 
@@ -143,8 +147,7 @@ The input and output matrices can contain negative numbers, and the
 methods can thereby manage restricted or fixed input or output.
 
 The return is not just the efficiency, but also slacks, dual values
-(shadow prices), peers, and lambdas (weights). % Bootstrap rely on the
-% package \pkg{FEAR} (Wilson 2008).
+(shadow prices), peers, and lambdas (weights). 
 
 }
 

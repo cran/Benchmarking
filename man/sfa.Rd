@@ -1,4 +1,4 @@
-% $Id: sfa.Rd 192 2018-07-31 12:50:56Z lao $
+% $Id: sfa.Rd 231 2020-07-26 20:56:26Z lao $
 \name{sfa}
 \alias{sfa}
 \alias{sfa.cost}
@@ -110,13 +110,13 @@ lambda.sfa(object)
    the package with the same name. The efficiency terms are assumed to
    be half--normal distributed.
    
-   Changing the maximum steplength, the trust rgion,  might be important,
-	and this can be done by the option 'control= list(stepmax=0.1)'. The
-	default value is 0.1 and that value is suitable for parameters
-	around 1; for smaller parameters a lower value should be used.
-	Notice that the step length is updated by the optimizing program and
-	thus must be set for every call of the function sfa if it is to be
-	set.
+   Changing the maximum steplength, the trust region,  might be important,
+    and this can be done by the option 'control = list(stepmax=0.1)'. The
+    default value is 0.1 and that value is suitable for parameters
+    around 1; for smaller parameters a lower value should be used.
+    Notice that the step length is updated by the optimizing program and
+    thus must be set for every call of the function sfa if it is to be
+    set.
 
 The generic functions \code{print.sfa}, \code{summary.sfa},
    \code{fitted.sfa}, \code{residuals.sfa}, \code{logLik.sfa}, and
@@ -242,10 +242,10 @@ The generic method \code{summary} prints the parameters, standard
 # y <- matrix(log(d$output))
 
 n <- 50
-x1 <- 1:50 + rnorm(50,0,10)
-x2 <- 100 + rnorm(50,0,10)
-x <- cbind(x1,x2)
-y <- 0.5 + 1.5*x1 + 2*x2 + rnorm(n,0,1) - pmax(0,rnorm(n,0,1))
+x1 <- 1:50 + rnorm(n, 0, 10)
+x2 <- 100 + rnorm(n, 0, 10)
+x <- cbind(x1, x2)
+y <- 0.5 + 1.5*x1 + 2*x2 + rnorm(n, 0, 1) - pmax(0, rnorm(n, 0, 1))
 sfa(x,y)
 summary(sfa(x,y))
 

@@ -1,4 +1,4 @@
-% $Id: dea.merge.Rd 118 2011-07-22 23:28:53Z Lars $
+% $Id: dea.merge.Rd 229 2020-07-04 13:39:18Z lao $
 \name{dea.merge}
 \alias{dea.merge}
 
@@ -10,7 +10,8 @@ similar firms (horizontal integration).  }
 \usage{
 
 dea.merge(X, Y, M, RTS = "vrs", ORIENTATION = "in",
-          XREF = NULL, YREF = NULL, FRONT.IDX = NULL, TRANSPOSE=FALSE)
+          XREF = NULL, YREF = NULL, FRONT.IDX = NULL, TRANSPOSE=FALSE,
+          CONTROL=NULL)
 }
 
 \arguments{\item{}{ Most of the arguments correspond to the arguments in
@@ -35,6 +36,10 @@ dea.merge(X, Y, M, RTS = "vrs", ORIENTATION = "in",
   \item{FRONT.IDX}{ as in \code{dea} }
 
   \item{TRANSPOSE}{ as in \code{dea} }
+
+  \item{CONTROL}{Possible controls to \pkg{lpSolveAPI}, see the
+      documentation for that package. For examples of use see the
+      function \code{\link{dea}}.}
 
 }
 
@@ -89,7 +94,7 @@ x <- matrix(c(100,200,300,500),ncol=1,dimnames=list(LETTERS[1:4],"x"))
 y <- matrix(c(75,100,300,400),ncol=1,dimnames=list(LETTERS[1:4], "y"))
 
 dea.plot.frontier(x,y,RTS="vrs",txt=LETTERS[1:length(x)],
-	xlim=c(0,1000),ylim=c(0,1000) )
+    xlim=c(0,1000),ylim=c(0,1000) )
 dea.plot.frontier(x,y,RTS="drs", add=TRUE, lty="dashed", lwd=2)
 dea.plot.frontier(x,y,RTS="crs", add=TRUE, lty="dotted")
 

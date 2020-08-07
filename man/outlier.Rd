@@ -1,7 +1,8 @@
-% $Id: outlier.Rd 192 2018-07-31 12:50:56Z lao $
+% $Id: outlier.Rd 226 2020-06-27 21:48:14Z lao $
 \name{outlier.ap}
 \alias{outlier.ap}
 \alias{outlier.ap.plot}
+\alias{outlierC.ap}
 
 
 \title{
@@ -9,13 +10,14 @@ Detection of outliers in benchmark models
 }
 
 \description{ The functions implements the Wilson (1993) outlier
-detection method using only R functions.  }
+detection method. One written entirely in R and another written in C++.}
 
 \usage{
-outlier.ap(X, Y, NDEL = 3, NLEN = 25, TRANSPOSE = FALSE)
+outlier.ap (X, Y, NDEL = 3, NLEN = 25, TRANSPOSE = FALSE)
+outlierC.ap(X, Y, NDEL = 3, NLEN = 25, TRANSPOSE = FALSE)
 
-outlier.ap.plot(ratio, NLEN = 25, xlab = "r", ylab = "Log ratio", 
-                ..., ylim)
+outlier.ap.plot(ratio, NLEN = 25, xlab = "Number of firms deleted", 
+                ylab = "Log ratio", ..., ylim)
 }
 
 
@@ -60,11 +62,25 @@ array/vector of length 2.  }
 
 An implementation of the method in Wilson (1993) using only R
 functions and especially the function \code{det} to calculate
-\eqn{R^{(i)}_{\min}}.
+\eqn{R^{(i)}_{\min}}. The alternative method \code{outlierC.ap} 
+is written completely in C++ and is much faster, but still not
+as fast at the method in \pkg{FEAR}.
 
 An elementary presentation of the method is found in Bogetoft and Otto
 (2011), Sect. 5.13 on outliers.
 
+For a data set with 10 firms and considering at the most 3 outliers there are
+175 combinations of firms to delete. For 100 firms there are 166,750
+combinations and for at most 5 outliers there are 79,375,495 combinatins, for
+at most 8 outliers there are  203,366,882,995 combinations. For 200 firms whith
+respectively 3,5 and 8 outliers there are  1,333,500, and 2,601,668,490, and 
+a number we do not know what to call
+57,467,902,686,615 combinations. Thus the number of combinations are increasing
+exponentialy in both number of firms and number of firms to be deleted and so
+is the computational time. Thus you should limit the numbers \code{NDEL} to a
+very small number like at the most 3 or perhabs 5 depending of the number
+of firms. Or you should use the extremely fast method \code{ap} from the
+package \pkg{FEAR} mendtioned in the references.
 }
 
 

@@ -1,4 +1,4 @@
-% $Id: cost.opt.Rd 118 2011-07-22 23:28:53Z Lars $
+% $Id: cost.opt.Rd 229 2020-07-04 13:39:18Z lao $
 \name{cost.opt}
 \alias{cost.opt}
 \alias{print.cost.opt}
@@ -22,13 +22,13 @@ technology}
 
 \usage{
 cost.opt(XREF, YREF, W, YOBS=NULL, RTS="vrs", param=NULL,
-         TRANSPOSE=FALSE, LP=FALSE, LPK = NULL)  
+         TRANSPOSE=FALSE, LP=FALSE, CONTROL=NULL, LPK = NULL)  
 
 revenue.opt(XREF, YREF, P, XOBS=NULL, RTS="vrs",  param=NULL,
-            TRANSPOSE = FALSE, LP = FALSE, LPK = NULL)
+            TRANSPOSE = FALSE, LP = FALSE, CONTROL=NULL, LPK = NULL)
 
 profit.opt(XREF, YREF, W, P, RTS = "vrs",  param=NULL,
-           TRANSPOSE = FALSE, LP = FALSE, LPK = NULL)
+           TRANSPOSE = FALSE, LP = FALSE, CONTROL=NULL, LPK = NULL)
 
 }
 
@@ -97,6 +97,10 @@ profit.opt(XREF, YREF, W, P, RTS = "vrs",  param=NULL,
 
 \item{LP}{Only for debugging. If \code{LP=TRUE} then input and output
     for the LP program are written to standard output for each unit.}
+
+\item{CONTROL}{Possible controls to \pkg{lpSolveAPI}, see the
+    documentation for that package. For examples of use see the
+    function \code{\link{dea}}.}
 
 \item{LPK}{When \code{LPK=k} then a mps file is written for firm
     \code{k}; it can be used as input to an alternative LP solver
