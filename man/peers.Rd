@@ -1,4 +1,4 @@
-% $Id: peers.Rd 205 2019-07-10 14:22:51Z lao $
+% $Id: peers.Rd 238 2021-07-11 16:12:17Z X022278 $
 \name{peers}
 \alias{peers}
 \alias{get.number.peers}
@@ -14,9 +14,9 @@ Find peer firms and units
 \description{ The function \code{peers} finds for each firm its peers,
    \code{get.number.peers} finds for each peer the number of times
    this peer apears as a peer, and \code{get.which.peers} determines
-   for one or more peers the firms they apear as peers for.   Also
-   include a function \code{get.peers.lambda} to calculate for fimrs the 
-   importances (lambdas) of peers.
+   for one or more peers the firms they appear as peers for.   Also
+   include a function \code{get.peers.lambda} to calculate for firms the 
+   importance (lambdas) of peers.
    }
 
 
@@ -61,14 +61,14 @@ Find peer firms and units
    serves as a peer for.
    
    The \code{get.peers.lambda} returns a list of firms with the peers 
-   and corresponding value af lambda.
+   and corresponding value of lambda.
 }
 
 
 \value{ The return values are firm numbers. If the argument
    \code{NAMES=TRUE} is used in the function \code{peers} the return
-   is a list of names of the peers if names for the firms are avilable
-   as rownames.}
+   is a list of names of the peers if names for the firms are available
+   as row names.}
 
 
 \references{ Peter Bogetoft and Lars Otto; \emph{Benchmarking with
@@ -78,13 +78,13 @@ Find peer firms and units
 \author{ Peter Bogetoft and Lars Otto \email{larsot23@gmail.com} }
 
 
-\note{ Peers are defines as firms where the coresponding lambdas are
+\note{ Peers are defined as firms where the corresponding lambdas are
   positive.
 
   Note that peers might change between a Farrell object return from
   \code{dea} with \code{SLACK=FALSE} and a call with \code{SLACK=TRUE}
   or a following call to the function \code{slack} because a peer on
-  the frontier with slack might by the call to \code{dea} be seen as a
+  the frontier with slack might by the call to \code{dea} be a
   peer for itself whereas this will not happen when slacks are
   calculated.  }
 

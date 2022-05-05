@@ -1,5 +1,6 @@
-// $Id: chol_down.cpp 225 2020-06-27 14:31:29Z lao $
+// $Id: chol_down.cpp 236 2021-04-26 20:38:03Z lao $
 #include <math.h>
+#define STRICT_R_HEADERS
 #include <Rcpp.h>
 #include "outlier.h"
 

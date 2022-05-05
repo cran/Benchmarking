@@ -1,4 +1,4 @@
-$Id: NEWS 232 2020-08-07 08:47:59Z lao $
+$Id: NEWS 242 2022-03-18 11:49:12Z X052717 $
 
 Upcoming
 
@@ -7,17 +7,28 @@ Upcoming
 * A fast version of dea.boot
 
 
+Changes to Benchmarking version 0.30
+
+* Corrected bug in cost.opt and revenue.opt when the number of firms determing the technology and the number of firms to determine the optimum are differerent
+
+* Better test for numerical input to X and Y matrices
+
+* In eladder.plot optional change of labels can be given in options
+
+* Correctet error in calculation of slacks in graph orientation (reported by Mette Asmild & co)
+
+* Shifted the names of output prices to be consistent with the shift in output names done in version 0.18 (reported by Rasmus Seneberg Zitthen and Arne Henningsen)
+
 
 Changes to Benchmarking version 0.29
 
-* An implementation of the StoNED estimator which combines the axiomatic and non-parametric frontier (the DEA aspect) with a stochastic noise term (the SFA aspect); we appreciate the help from from Stefan Seifert in implementing StoNED.
+* An implementation of the StoNED estimator which combines the axiomatic and non-parametric frontier (the DEA aspect) with a stochastic noise term (the SFA aspect); we appreciate the help from Stefan Seifert in implementing StoNED.
 
 * The function outlier.ap is much faster, and a version aoulierC.ap written in C++, but still not fast enough.
 
 * Options for the LP solver can now also be used in dea.boot. This can be used to solve problems to find a solution for the dea LP problem when bootstrapping.
 
-* The sign of the fitted values in sfa.cost is now positive just as the variable cost i positive; as a consequence the sign of the residuals is changed and has the calculation for effciencies when the function is a cost function.
-
+* The sign of the fitted values in sfa.cost is now positive just as the variable cost is positive; as a consequence the sign of the residuals is changed and as is the calculation for efficiencies when the function is a cost function.
 
 
 Changes to Benchmarking version 0.28
@@ -39,7 +50,6 @@ Changes to Benchmarking version 0.28
 * Default scaling method changed from 'geometric' to 'range' as it for problematic datasets gives results without the need to scale the data itself.
 
 
-
 Changes to Benchmarking version 0.27
 
 * An experimental implementing of the Malmquist index; minimal manual
@@ -54,7 +64,7 @@ Changes to Benchmarking version 0.27
 
 * Name of collumn for count of peers changed from '#' to 'count'
 
-* New technology "vrs+"; as "vrs", but with restrictins on individual lambda and sums of lambda by using the parameter \code{param}; note that the resulting technology set is not necessarily convex.
+* New technology "vrs+"; as "vrs", but with restrictions on individual lambda and sums of lambda by using the parameter \code{param}; note that the resulting technology set is not necessarily convex.
 
 
 Changes to Benchmarking version 0.26
@@ -66,14 +76,13 @@ Changes to Benchmarking version 0.26
 
 Changes to Benchmarking version 0.25
 
-* Corrected a feature/bug in dea.boot that could lead to negative bias corrected efficiencies (reported by sevaral). Implemented option SHEPHARD.INPUT to avoid negative bias corrected efficiencies if this is wanted.
+* Corrected a feature/bug in dea.boot that could lead to negative bias corrected efficiencies (reported by several). Implemented option SHEPHARD.INPUT to avoid negative bias corrected efficiencies if this is wanted.
 
 * Corrected bug in summary percentages for direction out (reported by Dana Pancurova)
 
-* Corrected a bug in the sfa function that could leed to wrong results and missing standard errors if the function was called two or more times.
+* Corrected a bug in the sfa function that could lead to wrong results and missing standard errors if the function was called two or more times.
 
 * Direction graph does not work for the method mea; the function now stops with an error message and does no longer return ordinary dea efficiencies
-
 
 Changes to Benchmarking version 0.24
 
@@ -81,10 +90,9 @@ Changes to Benchmarking version 0.24
 
 * Corrected several manual pages
 
-* Use of FEAR has been droped as FEAR is hard to install and is not free.
+* Use of FEAR has been dropped as FEAR is hard to install and is not free.
 
 * The method mea can now be used for directions in, out, and in-out.
-
 
 Changes to Benchmarking version 0.23
 
@@ -93,12 +101,10 @@ Changes to Benchmarking version 0.23
 * Changed from using the deprecated function is.real to use of
   is.numeric.
 
-
 Changes to Benchmarking version 0.22
 
 * Corrected bug in dea.direct when the option DIRECTION was given by a
   number (reported by Tomas Balezentis).
-
 
 Changes to Benchmarking version 0.21
 
@@ -111,7 +117,6 @@ Changes to Benchmarking version 0.21
 
  * Better formatting af lambda in several output functions. 
 
-
 Changes to Benchmarking version 0.20
 
  * Changed email for the author/maintainer
@@ -119,17 +124,16 @@ Changes to Benchmarking version 0.20
  * The arguments RTS=fdh+ and param now also works for eladder and mea.
 
  * Solved a bug in cost.opt when number of firms defining the
-   technology differ from the number of firms for for which optimal
+   technology differ from the number of firms for which optimal
    input is to be calculated. This makes it possible to calculate cost
    efficiency for a group of firms that differ for the group that
    defines the technology.
 
 
-
 Changes to Benchmarking version 0.19
 
  * Speed of dea with ORIENTATION="graph" has been almost doubled do to
-   splicing in the bisection algorithmen; and now it gives the right
+   splicing in the bisection algorithm in use; and now it gives the right
    efficiency for firms outside the technology set (before the highest
    possible value was 2)
 
@@ -141,8 +145,7 @@ Changes to Benchmarking version 0.19
  * Corrected bug for missing names of peers when using NAMES=TRUE in
    peers for RTS="fdh".
 
- * Slack is now ok for directinal efficiency
-
+ * Slack is now ok for directional efficiency
 
 Changes to Benchmarking version 0.18
 
@@ -165,11 +168,10 @@ Changes to Benchmarking version 0.18
    than or equal 1 as for RTS=irs.
 
  * On request, numerical data frames are now accepted as arguments for
-   X and Y. And as a byproduct vectors or arrays are condisered to be
-   1 good (input og output) for many firms.
+   X and Y. And as a by-product vectors or arrays are considered to be
+   1 good (input or output) for many firms.
 
  * Firms with missing values are removed in the function sfa.
-
 
 
 Changes to Benchmarking version 0.17
@@ -189,12 +191,11 @@ Changes to Benchmarking version 0.17
  * Every group of functions are now documented in a separate file
 
  * Efficiencies with no solutions returns -Inf or Inf depending on the
-   orientation. This is in agreement with the use in super efficiency.
+   orientation. This agrees with the use in super efficiency.
 
  * Better summaries for Farrell and slack objects
 
  * Fixed bug in slack when either input and/or outputs have big values
-
 
 
 Changes to Benchmarking version 0.16
@@ -225,7 +226,7 @@ Changes to Benchmarking version 0.16
  * A wrapper around FEAR::boot.sw89 such that it can be called and
    deliver results as other functions in Benchmarking.
 
- * A new value for RTS in dea.plot: "fdh+". At the moment, however, it
+ * A new value for RTS in dea.plot: "fdh+". Now however, it
    only works for in-out direction.
 
  * The documentation has been corrected and somewhat expanded.
@@ -234,7 +235,7 @@ Changes to Benchmarking version 0.16
 
 Changes to Benchmarking version 0.15
 
-  * The methods now stops if there is an unknown value for RTS
+  * The methods now stop if there is an unknown value for RTS
     or ORIENTATION
 
   * dea.dual now has argument DIRECT same way as dea
@@ -251,9 +252,8 @@ Changes to Benchmarking version 0.15
     when number of inputs and outputs was equal
 
 
-
 Changes to Benchmarking version 0.14
   * make.merge can now use a factor to define mergers
   * data sets included
   * dea new argument DIRECT for directional efficiency
-  * opdated all manuals
+  * updated all manuals

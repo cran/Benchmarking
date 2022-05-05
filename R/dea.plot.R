@@ -1,4 +1,4 @@
-# $Id: dea.plot.R 219 2020-05-21 23:58:50Z lao $
+# $Id: dea.plot.R 244 2022-05-05 14:31:31Z X052717 $
 "dea.plot" <-
 function(x, y, RTS="vrs", ORIENTATION="in-out", txt=NULL, add=FALSE, 
             wx=NULL, wy=NULL, TRANSPOSE = FALSE, fex=1, GRID=FALSE,
@@ -100,7 +100,7 @@ function(x, y, RTS="vrs", ORIENTATION="in-out", txt=NULL, add=FALSE,
          grid(col="darkgray")
          box(col="grey")
       }
-      if ( class(txt)=="logical" && txt )  {
+      if ( is(txt, "logical") && txt )  {
          if ( is(x, "matrix") )  {
             if ( !is.null(rownames(x)) )  {
                txt <- rownames(x)

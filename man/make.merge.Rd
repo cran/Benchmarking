@@ -1,4 +1,4 @@
-% $Id: make.merge.Rd 118 2011-07-22 23:28:53Z Lars $
+% $Id: make.merge.Rd 238 2021-07-11 16:12:17Z X022278 $
 \name{make.merge}
 \alias{make.merge}
 
@@ -20,7 +20,7 @@ make.merge(grp, nFirm = NULL, X = NULL, names = NULL)
        each component of the list is a (named) list with the firm numbers or
        names going into this merger.
 
-       Or a factor of length K with Kg levels where where each level
+       Or a factor of length K with Kg levels where each level
        determines a merger; to exclude firms for mergers set the
        factor value to NA. }
 
@@ -51,7 +51,7 @@ firms and \code{m} inputs, and \code{M <- make.merge(gr,K)} then
 
 \value{ Returns an aggregation matrix of dimension Kg times K where
 rows corresponds to new merged firms and columns are 1 for firms to be
-included and 0 for firms to be excluded in the the given merger as
+included and 0 for firms to be excluded in the given merger as
 defined by the row. }
 
 

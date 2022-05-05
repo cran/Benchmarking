@@ -1,4 +1,4 @@
-# $Id: graphEff.R 229 2020-07-04 13:39:18Z lao $
+# $Id: graphEff.R 241 2022-03-16 14:00:23Z X052717 $
 
 # Funktion til beregning af graf efficiens.  Beregning sker via
 # bisection hvor der itereres mellem mulige og ikke-mulige loesninger
@@ -18,23 +18,23 @@ graphEff <- function(lps, X, Y, XREF, YREF, RTS, FRONT.IDX, rlamb, oKr,
    K = dim(X)[1]  # number of units, firms, DMUs
    Kr = dim(YREF)[1]  # number of units, firms, DMUs
 
-if (LP)  {
-    cat("m=",m, ", n=",n, ", K=",K, ", Kr=", Kr, "\n", sep="")
-    flush.console()
-}
+    if (LP)  {
+        cat("m=",m, ", n=",n, ", K=",K, ", Kr=", Kr, "\n", sep="")
+        flush.console()
+    }
 
    objval <- rep(NA,K)   # vector for the final efficiencies
    if ( FAST ) {
-     lambda <- NULL
+       lambda <- NULL
    } else {
-      lambda <- matrix(NA, nrow=K, ncol=Kr) # lambdas one column per unit
+       lambda <- matrix(NA, nrow=K, ncol=Kr) # lambdas one column per unit
    }
    set.column(lps, 1, rep(0,dim(lps)[1]))
    lpcontr <- lp.control(lps)
    tol <- lpcontr$epsilon["epsint"]
    lp.control(lps, timeout=5, verbose="severe")
    if (!missing(CONTROL)) set_control(lps, CONTROL)
-   for ( k in 1:K)  {
+   for ( k in 1:K)  {   ## loekke for hver unit
       if ( LP )  { print(paste("Firm",k), quote=FALSE); flush.console()}
       # Lav bisection
       a <- 0
@@ -52,9 +52,9 @@ if (LP)  {
       if (LP) { print(paste("For G=1, status =",status)); flush.console()}
       nIter <- nIter + 1
       if ( status == 0 )  {
-        # G=1 er mulig; hvis G=1-tol ikke er mulig, er G=1 optimal loesning
-         G <- 1 - sqrt(tol)
-        if (LP) { print(paste("G korrigeret til", G, "; sqrt(tol) =", sqrt(tol))); flush.console()}
+         # G=1 er mulig; hvis G=1-tol ikke er mulig, er G=1 optimal loesning
+         G <- 1 - tol
+         if (LP) { print(paste("G korrigeret til", G, "; tol =", tol)); flush.console() }
          set.rhs(lps, c(-G*X[k,],Y[k,]/G), 1:(m+n))
          #if (LP) write.lp(lps, filename="graphEff.lp")
          # Uden set.basis gaer 'solve' en sjaelden gang i en uendelig loekke
@@ -91,7 +91,7 @@ if (LP)  {
          if ( b > 2 )  { a <- sqrt(b) # 'b' blev oeget anden potens og forrige
                                               # vaerdi var sqrt(b) som saa er en mulig
                                               # nedre graense
-          }  else  { a <- 1 }
+         }  else  { a <- 1 }
       }
 
       status <- 0 # status kunne godt have en anden vaerdi og saa 
@@ -130,7 +130,7 @@ if (LP)  {
 
       # bisection loekke
       if (LP) { print(paste("Bisection interval: [",a,",",b,"]")); flush.console()}
-      while ( !gFundet && b-a > tol && nIter < 50 )  {
+      while ( !gFundet && b-a > tol^2 && nIter < 50 )  {
         # if (LP) {cat("nIter =", nIter, "\n"); flush.console()}
          G <- (a+b)/2
          # if (LP) { print(paste("Bisect: G = ",G,"(",k,")")); flush.console()}
@@ -189,9 +189,9 @@ if (LP)  {
 
 
    e <- objval
-   e[abs(e-1) < sqrt(tol)] <- 1
-   lambda[abs(lambda-1) < sqrt(tol)] <- 1   # taet ved 1
-   lambda[abs(lambda) < sqrt(tol)] <- 0     # taet ved 0
+   e[abs(e-1) < tol] <- 1
+   lambda[abs(lambda-1) < tol] <- 1   # taet ved 1
+   lambda[abs(lambda) < tol] <- 0     # taet ved 0
 
    if ( FAST ) { 
       return(e)
@@ -219,27 +219,36 @@ if (LP)  {
               )
    class(oe) <- "Farrell"
 
-   if ( SLACK ) {
-      if ( TRANSPOSE )  { # Transponer tilbage hvis de blev transponeret
-         X <- t(X)
-         Y <- t(Y)
-         XREF <- t(XREF)
-         YREF <- t(YREF)
-      }
-      sl <- slack(X, Y, oe, XREF, YREF, FRONT.IDX, LP=LP)
-      oe$slack <- sl$slack
-      oe$sx <- sl$sx
-      oe$sy <- sl$sy
-      oe$lambda <- sl$lambda
-      if (LP)  {
-         print("slack fra slack:")
-         print(sl$slack)
-         print("slack efter slack:")
-         print(oe$slack)
-         flush.console()
-      }
-   }
+   if ( SLACK )  {
+        if ( TRANSPOSE )  { # Transponer tilbage hvis de blev transponeret
+           X <- t(X)
+           Y <- t(Y)
+           XREF <- t(XREF)
+           YREF <- t(YREF)
+        }
+
+        sl.x <-  X*e - lambda %*% XREF
+        sl.y <- -Y/e + lambda %*% YREF
+        sl.x[abs(sl.x) < tol] <- 0
+        sl.y[abs(sl.y) < tol] <- 0
+        sum <- rowSums(sl.x) + rowSums(sl.y)
+        ### sum[abs(sum) < tol] <- 0
+        colnames(sl.x) <- paste("sx",1:m,sep="")
+        colnames(sl.y) <- paste("sy",1:n,sep="")
+        
+        oe$sx <- sl.x 
+        oe$sy <- sl.y 
+        oe$sum <- sum
+        oe$slack <- sum > tol
+
+        if (LP)  {
+            print("sum fra slack:")
+            print(sum)
+            print("slack efter slack:")
+            print(oe$slack)
+            flush.console()
+        }
+   }  ## if (SLACK)
 
    return(oe)
 }
-

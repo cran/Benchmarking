@@ -1,4 +1,4 @@
-% $Id: dea.boot.Rd 228 2020-07-03 15:06:03Z lao $
+% $Id: dea.boot.Rd 238 2021-07-11 16:12:17Z X022278 $
 \name{dea.boot}
 \alias{dea.boot}
 \alias{boot.fear}
@@ -32,7 +32,7 @@ boot.fear(X, Y, NREP = 200, EFF = NULL, RTS = "vrs", ORIENTATION = "in",
   \item{Y}{Outputs of firms to be evaluated, a K x n matrix of
       observations of K firms with n outputs (firm x input). }
 
-  \item{NREP}{Number of bootstrap replicats}
+  \item{NREP}{Number of bootstrap replications}
 
   \item{EFF}{Efficiencies for (X,Y) relative to the technology
       generated from (XREF,YREF).}
@@ -156,10 +156,10 @@ boot.fear(X, Y, NREP = 200, EFF = NULL, RTS = "vrs", ORIENTATION = "in",
    of efficiencies are sorted for each firm individually. 
    % as this is done    by \code{FEAR::boot.sw98}. 
    Unfortunately, this means that the component of replicas is not the efficiencies for
-   the same bootstrap replica, but could easily be from differencts
+   the same bootstrap replica, but could easily be from different
    bootstrap replicas. This also means that this function can
    \emph{not} be used to bootstrap tests for statistical hypotheses
-   where the statistics involves summing of firms efficiencies.}
+   where the statistics involves summing of firm's efficiencies.}
 
 \seealso{ The documentation for \code{boot.sw98} in the package
    \pkg{FEAR}. }
@@ -216,7 +216,7 @@ save.seed <- sample.int(1e9,1)
 
 # The bootstrap and calculate CRS and VRS under the assumption that
 # the true technology is CRS (the null hypothesis) and such that the
-# results correponds to the case where CRS and VRS are calculated for
+# results corresponds to the case where CRS and VRS are calculated for
 # the same reference set of firms; to make this happen we set the
 # random number generator to the same state before the calls.
 set.seed(save.seed)
@@ -232,7 +232,7 @@ S
 # Accept the hypothesis at 10% level?
 critValue(bs, alpha=.1) <= S
 
-# The probability of observering a smaller value of S when the
+# The probability of observing a smaller value of S when the
 # hypothesis is true; the p--value.
 typeIerror(S, bs)
 # Accept the hypothesis at size level 10%?

@@ -1,4 +1,4 @@
-% $Id: sdea.Rd 229 2020-07-04 13:39:18Z lao $
+% $Id: sdea.Rd 238 2021-07-11 16:12:17Z X022278 $
 \name{sdea}
 \alias{sdea}
 
@@ -6,7 +6,7 @@
 \title{ Super efficiency }
 
 
-\description{ The method \code{sdea} calculates super-effciency and
+\description{ The method \code{sdea} calculates super-efficiency and
    returns the same class of object as \code{\link{dea}}.  }
 
 
@@ -30,7 +30,7 @@ sdea(X, Y, RTS = "vrs", ORIENTATION = "in", DIRECT = NULL, param = NULL,
   firm. }
 
   \item{RTS}{ Text string or a number defining the underlying DEA
-      technology / returns to scale assumption; the same values as for
+      technology / returns to scale assumption, the same values as for
       \code{\link{dea}}.
 
 \tabular{rll}{
@@ -103,7 +103,7 @@ integers), and free disposability \cr
 
 
 \details{Super-efficiency measures are constructed by avoiding that
-   the evaluated firm can help span the technology; ie. if the firm in
+   the evaluated firm can help span the technology, i.e. if the firm in
    qestuen is a firm on the frontier in a normal dea approach then
    this firm in super efficiency might be outside the technology set.
    }
@@ -113,19 +113,19 @@ integers), and free disposability \cr
    described in \code{\link{dea}}.  The relevant components are
 
   \item{eff}{The efficiencies.  Note when DIRECT is used then the
-      efficencies are not Farrell efficiencies but rather exces values
-      in DIRECT units of measurement }
+      efficencies are not Farrell efficiencies but rather excess values
+      in DIRECT units of measurement. }
 
   \item{lambda}{The lambdas, i.e. the weight of the peers, for each
-      firm}
+      Firm.}
 
   \item{objval}{The objective value as returned from the LP program;
       normally the same as eff. }
 
   \item{RTS}{The return to scale assumption as in the option
-      \code{RTS} in the call}
+      \code{RTS} in the call.}
 
-  \item{ORIENTATION}{The efficiency orientation as in the call}
+  \item{ORIENTATION}{The efficiency orientation as in the call.}
 
 }
 

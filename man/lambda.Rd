@@ -1,4 +1,4 @@
-% $Id: lambda.Rd 205 2019-07-10 14:22:51Z lao $
+% $Id: lambda.Rd 238 2021-07-11 16:12:17Z X022278 $
 \name{lambda}
 \alias{lambda}
 \alias{lambda.print}
@@ -36,7 +36,7 @@ lambda.print(x, KEEPREF = FALSE, ...)
 }
 
 
-\details{ Only returns the the lambdas for firms that appear as a
+\details{ Only returns the lambdas for firms that appear as a
 peer, i.e. only lambdas for firms where at least one element of the
 lambda is positive.  }
 

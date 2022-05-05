@@ -1,4 +1,4 @@
-% $Id: norWood2004.Rd 82 2010-10-24 20:00:48Z Lars $
+% $Id: norWood2004.Rd 238 2021-07-11 16:12:17Z X022278 $
 \name{norWood2004}
 \alias{norWood2004}
 \docType{data}
@@ -18,10 +18,10 @@ A data set for 113 farmers in forestry in Norway.
   \describe{
     \item{\code{firm}}{firm number}
     \item{\code{m}}{Variable cost}
-    \item{\code{x}}{Woodland, value of forrest and land}
+    \item{\code{x}}{Woodland, value of forest and land}
     \item{\code{y}}{Profit}
     \item{\code{z1}}{Secondary income from ordinary farming}
-    \item{\code{z3}}{Age of forrest owner}
+    \item{\code{z3}}{Age of forest owner}
     \item{\code{z6}}{Whether there is a long-term plan =1 or not =0}
   }
 }

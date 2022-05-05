@@ -1,4 +1,4 @@
-% $Id: dea.merge.Rd 229 2020-07-04 13:39:18Z lao $
+% $Id: dea.merge.Rd 243 2022-05-03 14:44:51Z X052717 $
 \name{dea.merge}
 \alias{dea.merge}
 
@@ -14,15 +14,14 @@ dea.merge(X, Y, M, RTS = "vrs", ORIENTATION = "in",
           CONTROL=NULL)
 }
 
-\arguments{\item{}{ Most of the arguments correspond to the arguments in
-\code{\link{dea}}, with K firms, m inputs, and n outputs.}
+\arguments{
 
   \item{X}{ K times m matrix as in \code{dea} }
 
   \item{Y}{ K times n matrix as in \code{dea} }
 
   \item{M}{Kg times K matrix where each row defines a merger by the
-  firms (collums) included; matrix as returned from method
+  firms (columns) included in the matrix as returned from method
   \code{\link{make.merge}}}
 
   \item{RTS}{as in \code{\link{dea}} }
@@ -46,6 +45,9 @@ dea.merge(X, Y, M, RTS = "vrs", ORIENTATION = "in",
 
 \details{ 
 The K firms are merged into Kg new, merged firms.
+
+Most of the arguments correspond to the arguments in
+\code{\link{dea}}, with K firms, m inputs, and n outputs.
 
 The decomposition is summarized on page 275 and in table 9.1 page 276
 in Bogetoft and Otto (2011) and is based on Bogetoft and Wang (2005) }

@@ -1,4 +1,4 @@
-% $Id: cost.opt.Rd 229 2020-07-04 13:39:18Z lao $
+% $Id: cost.opt.Rd 243 2022-05-03 14:44:51Z X052717 $
 \name{cost.opt}
 \alias{cost.opt}
 \alias{print.cost.opt}
@@ -34,9 +34,6 @@ profit.opt(XREF, YREF, W, P, RTS = "vrs",  param=NULL,
 
 \arguments{
 
-\item{}{Input and output matrices are in the same form as for the
-  method \code{\link{dea}}.}
-
 \item{XREF}{Input of the firms defining the technology, a K x m matrix
   of observations of K firms with m inputs (firm x input).  In case
   \code{TRANSPOSE=TRUE} the input matrix is transposed as input x
@@ -48,11 +45,11 @@ profit.opt(XREF, YREF, W, P, RTS = "vrs",  param=NULL,
   x firm. }
 
 \item{W}{Input prices as a matrix. Either same prices for all firms or
-  individual prices for all firms; i.e. either a 1 x m or a K x m
+  individual prices for all firms, i.e. either a 1 x m or a K x m
   matrix for K firms and m inputs }
 
 \item{P}{Output prices as a matrix. Either same prices for all firms
-  or individual prices for all firms; i.e. either a 1 x n or K x n
+  or individual prices for all firms, i.e. either a 1 x n or K x n
   matrix for K firms and n outputs }
 
 \item{XOBS}{The input for which an optimal, revenue maximizing, output
@@ -71,7 +68,7 @@ profit.opt(XREF, YREF, W, P, RTS = "vrs",  param=NULL,
 \tabular{rll}{
 0 \tab fdh \tab Free disposability hull, no convexity assumption \cr
 1 \tab vrs \tab Variable returns to scale, convexity and free disposability \cr
-2 \tab drs \tab Decreasing returns to scale, convexity, down-scaling and free disposability \cr
+2 \tab drs \tab Decreasing returns to scale, convexity, downscaling and free disposability \cr
 3 \tab crs \tab Constant returns to scale, convexity and free disposability \cr
 4 \tab irs \tab Increasing returns to scale, (up-scaling, but not down-scaling), convexity and free disposability \cr
 5 \tab add \tab Additivity (scaling up and down, but only with integers), and free disposability \cr
@@ -81,7 +78,7 @@ profit.opt(XREF, YREF, W, P, RTS = "vrs",  param=NULL,
 
 }
 
-\item{param}{Possible parameters. At the moment only used for
+\item{param}{Possible parameters. Now only used for
     RTS="fdh+" to set low and high values for restrictions on lambda;
     see the section details and examples in \code{\link{dea}} for its
     use. Future versions might also use \code{param} for other
@@ -110,7 +107,10 @@ profit.opt(XREF, YREF, W, P, RTS = "vrs",  param=NULL,
 
 
 
-\details{ The LP optimization problem is formulated in Bogetoft and
+\details{ Input and output matrices are in the same form as for the
+  method \code{\link{dea}}.
+  
+  The LP optimization problem is formulated in Bogetoft and
   Otto (2011, pp 35 and 102) and is solved by the LP method in the
   package \pkg{lpSolveAPI}.
 
@@ -140,7 +140,7 @@ profit.opt(XREF, YREF, W, P, RTS = "vrs",  param=NULL,
 \item{lambda}{The peer weights that determines the technology, a
     matrix. Each row is the lambdas for the firm corresponding to that
     row; for the vrs technology the rows sum to 1. A column shows for
-    a given firm how other firms are compared to this firm; i.e. peers
+    a given firm how other firms are compared to this firm, i.e. peers
     are firms with a positive element in their columns.}
 
 }

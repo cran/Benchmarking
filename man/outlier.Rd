@@ -1,4 +1,4 @@
-% $Id: outlier.Rd 226 2020-06-27 21:48:14Z lao $
+% $Id: outlier.Rd 238 2021-07-11 16:12:17Z X022278 $
 \name{outlier.ap}
 \alias{outlier.ap}
 \alias{outlier.ap.plot}
@@ -80,7 +80,7 @@ exponentialy in both number of firms and number of firms to be deleted and so
 is the computational time. Thus you should limit the numbers \code{NDEL} to a
 very small number like at the most 3 or perhabs 5 depending of the number
 of firms. Or you should use the extremely fast method \code{ap} from the
-package \pkg{FEAR} mendtioned in the references.
+package \pkg{FEAR} mentioned in the references.
 }
 
 

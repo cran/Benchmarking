@@ -1,4 +1,4 @@
-% $Id: dea.Rd 229 2020-07-04 13:39:18Z lao $
+% $Id: dea.Rd 238 2021-07-11 16:12:17Z X022278 $
 \name{dea}
 \alias{dea}
 % \alias{dea.mat}
@@ -32,12 +32,12 @@ dea(X, Y, RTS="vrs", ORIENTATION="in", XREF=NULL, YREF=NULL,
 \item{X}{Inputs of firms to be evaluated, a K x m matrix
   of observations of K firms with m inputs (firm x input).  In case
   \code{TRANSPOSE=TRUE} the input matrix is transposed to input x
-  firm. }
+  firm.}
 
 \item{Y}{Outputs of firms to be evaluated, a K x n matrix
   of observations of K firms with n outputs (firm x input).  In case
   \code{TRANSPOSE=TRUE} the output matrix is transposed to output x
-  firm. }
+  firm.}
 
 \item{RTS}{ Text string or a number defining the underlying DEA
     technology / returns to scale assumption.
@@ -70,7 +70,7 @@ free disposability, the free disposability and replicability hull
  or local constant return to scale \cr
  
 %8 \tab fdh++ \tab Should be the same as fdh+, but without use of Special 
-%Ordered Set in the solution of the LP problem; unfortunately this is not
+%Ordered Set in the solution of the LP problem; unfortunately, this is not
 %always the case, and the problem is with fdh++ \cr
 
 %9 \tab fdh0 \tab Same as fdh, but always solved as a LP problem 
@@ -96,7 +96,7 @@ via \code{param}
 
 \item{SLACK}{Calculate slack in a phase II calculation by an intern 
     call of the function \code{\link{slack}}. Note that the precision
-    for calculating slacks for orientation graph is low. }
+    for calculating slacks for orientation graph is low.}
      
 \item{DUAL}{Calculate dual variables, i.e. shadow prices; not
     calculated for orientation graph as that is not an LP problem.}
@@ -177,7 +177,7 @@ be changed by the argument \code{param} that will set the lower and
 upper bound to 1-param and 1+param; the default value is
 param=.15. The value must be greater than or equal to 0 and strictly
 less than 1. A value of 0 corresponds to RTS="fdh".  To get an
-asymmetric interval set param to a 2 dimentional array with values for
+asymmetric interval set param to a 2 dimensional array with values for
 the low and high end for interval, for instance
 \code{param=c(.8,1.15)}.  The FDH+ technology set is described in
 Bogetoft and Otto (2011) pages 73--74.
@@ -208,7 +208,7 @@ units of measurements, i.e. \eqn{x-e d}, and for output orientation
 \eqn{y+e d}.  The directional efficency can be restricted to inputs
 (\code{ORIENTAION="in"}), restricted to outputs
 (\code{ORIENTAION="out"}), or both include inputs and output
-directions (\code{ORIENTAION="in-out"}). Dirctional efficiency is
+directions (\code{ORIENTAION="in-out"}). Directional efficiency is
 discussed on pages 31--35 and 121--127 in Bogetoft and Otto (2011).
 
 }
@@ -220,13 +220,13 @@ discussed on pages 31--35 and 121--127 in Bogetoft and Otto (2011).
 
 \item{eff}{The efficiencies.  Note when DIRECT is used then the
     efficencies are not Farrell efficiencies but rather exces values
-    in DIRECT units of measurement }
+    in DIRECT units of measurement}
 
 \item{lambda}{The lambdas, i.e. the weight of the peers, for each firm}
 
 \item{objval}{The objective value as returned from the LP program;
     normally the same as eff, but for \code{slack} it is the the sum
-    of the slacks. }
+    of the slacks}
 
 \item{RTS}{The return to scale assumption as in the option \code{RTS}
      in the call}
@@ -277,7 +277,7 @@ of the argument \code{TRANSPOSE=TRUE} gives an error.
 The dual values are not unique for extreme points (firms on the
 boundary with an efficiency of 1) and therefore the calculated dual
 values for these firms can depend on the order of firms in the
-reference technology. The same lack of uniqueness also make the peers
+reference technology. The same lack of uniqueness also makes the peers
 for some firms depend on the order of firms in the reference
 technology.
 
@@ -326,7 +326,7 @@ option list for the function call.
 
 If a numerical problem occurs, status=5, the best solution is probably to
 scale the input \code{X} and output \code{Y} yourself. The best results are
-obtained when the variables are close to 1. If the some variable are in the
+obtained when the variables are close to 1. If some variable are in the
 millions, then let the unit of measure be a million units.
 
 }

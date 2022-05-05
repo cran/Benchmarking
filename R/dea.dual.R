@@ -1,4 +1,4 @@
-# $Id: dea.dual.R 229 2020-07-04 13:39:18Z lao $
+# $Id: dea.dual.R 244 2022-05-05 14:31:31Z X052717 $
 
 # In the calculation in the method input/output matrices X and Y are
 # of the order good x firms.  Ie. X, Y etc must be transformed as
@@ -372,7 +372,7 @@ if ( is.null(AD) )  {
       } else {
          warning("Illegal ORIENTATION for argument DIRECT") 
       }
-      if ( is(eff, "matrix") && ( dim(eff)[1]==1 || dim(eff)==1 ) )
+      if ( is(eff, "matrix") && ( dim(eff)[1]==1 ) )   ##### || dim(eff)==1 ) )
          eff <- c(eff) 
    }
 

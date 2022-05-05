@@ -1,4 +1,4 @@
-# $Id: rev.R 229 2020-07-04 13:39:18Z lao $
+# $Id: rev.R 233 2020-08-10 16:43:17Z lao $
 
 # Function to calculate maximun revenue for given input and given
 # output prices.
@@ -121,7 +121,7 @@ revenue.opt <- function(XREF, YREF, P, XOBS=NULL, RTS="vrs", param=NULL,
    for ( k in 1:K )  {
       if (LP) print(paste("===> firm",k),quote=FALSE)
       if ( dim(P)[2] != 1 && k > 1 ) { 
-         set.objfn(lps, c(P[,k],rep(0,K)))
+         set.objfn(lps, c(P[,k],rep(0,Kr)))
        }
       set.rhs(lps, XOBS[,k], 1:m)
 

@@ -1,4 +1,4 @@
-% $Id: milkProd.Rd 114 2011-04-10 20:55:50Z Lars $
+% $Id: milkProd.Rd 238 2021-07-11 16:12:17Z X022278 $
 \name{milkProd}
 \alias{milkProd}
 \docType{data}
@@ -30,7 +30,7 @@ Data colected from Danish  milk producers.
 is a semicolon separated file and not a comma separated file.  }
 
 \source{
-Accounting and buissiness check data
+Accounting and business check data
 }
 
 \examples{

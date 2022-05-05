@@ -1,4 +1,4 @@
-% $Id: projekt.Rd 80 2010-10-20 08:58:43Z Lars $
+% $Id: projekt.Rd 238 2021-07-11 16:12:17Z X022278 $
 \name{projekt}
 \alias{projekt}
 \docType{data}
@@ -16,7 +16,7 @@ Accounting and production data for 101 milk producing farmers.
   \describe{
     \item{\code{numb}}{Serial number for the milk producer}
     \item{\code{cows}}{Number of cows}
-    \item{\code{vet}}{Veterinary expences}
+    \item{\code{vet}}{Veterinary expenses}
     \item{\code{unitCost}}{Unit cost, variable cost}
     \item{\code{capCost}}{Capacity cost}
     \item{\code{fixedCost}}{Fixed cost}

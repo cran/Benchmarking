@@ -1,4 +1,4 @@
-% $Id: dea.direct.Rd 129 2014-06-16 13:31:01Z b002961 $
+% $Id: dea.direct.Rd 238 2021-07-11 16:12:17Z X022278 $
 \name{dea.direct}
 \alias{dea.direct}
 
@@ -107,7 +107,7 @@ dea.direct(X, Y, DIRECT, RTS = "vrs", ORIENTATION = "in",
   The Farrell efficiency interpretation is the ratio by which a firm
   can proportionally reduce all inputs (or expand all outputs) without
   producing less outputs (using more inputs). The directional
-  efficiecies have the same interpretation expect that the direction is
+  efficiencies have the same interpretation expect that the direction is
   not proportional to the inputs (or outputs) and therefore the
   different inputs may have different reduction ratios, the
   efficiency is an array and not just a number.
@@ -120,7 +120,7 @@ dea.direct(X, Y, DIRECT, RTS = "vrs", ORIENTATION = "in",
       components.  The method \code{slack} only returns the three
       components in the list relevant for slacks.
 
-\item{eff}{The Farrell efficiencies.  Note that the the efficiencies
+\item{eff}{The Farrell efficiencies.  Note that the efficiencies
     are calculated to have the same interpretations as Farrell
     efficiencies. \code{eff} is a matrix if there are more than 1
     good.}
@@ -165,7 +165,7 @@ R}; Springer 2011 }
   \code{DIRECT}, equal to the variable, discretionary inputs (outputs)
   and 0 for the fixed inputs (outputs).
 
-  When the the argument \code{DIRECT=X} is used the then the returned
+  When the argument \code{DIRECT=X} is used the then the returned
   efficiency is equal to 1 minus the Farrell efficiency for input
   orientation and equal to the Farrell efficiency minus 1 for output
   orientation.

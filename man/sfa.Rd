@@ -1,4 +1,4 @@
-% $Id: sfa.Rd 231 2020-07-26 20:56:26Z lao $
+% $Id: sfa.Rd 238 2021-07-11 16:12:17Z X022278 $
 \name{sfa}
 \alias{sfa}
 \alias{sfa.cost}
@@ -110,12 +110,12 @@ lambda.sfa(object)
    the package with the same name. The efficiency terms are assumed to
    be half--normal distributed.
    
-   Changing the maximum steplength, the trust region,  might be important,
+   Changing the maximum step length, the trust region, might be important,
     and this can be done by the option 'control = list(stepmax=0.1)'. The
     default value is 0.1 and that value is suitable for parameters
     around 1; for smaller parameters a lower value should be used.
     Notice that the step length is updated by the optimizing program and
-    thus must be set for every call of the function sfa if it is to be
+    thus, must be set for every call of the function sfa if it is to be
     set.
 
 The generic functions \code{print.sfa}, \code{summary.sfa},

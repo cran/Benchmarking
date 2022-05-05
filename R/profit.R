@@ -1,4 +1,4 @@
-# $Id: profit.R 229 2020-07-04 13:39:18Z lao $
+# $Id: profit.R 235 2021-04-11 13:46:25Z lao $
 
 # Calculates optimal input and output to maximize profit for given
 # input and output prices.
@@ -25,6 +25,11 @@ profit.opt <- function(XREF, YREF, W, P, RTS="vrs", param=NULL,
       stop("Number of inputs in W and XREF differ")
    if ( n != dim(P)[1] )
       stop("Number of outputs in P and YREF differ")
+
+    XREF <- tjek_data(XREF)
+    YREF <- tjek_data(YREF)
+    W <- tjek_data(W)
+    P <- tjek_data(P)
 
    rts <- c("fdh","vrs","drs","crs","irs","irs","add","fdh+")
    if ( missing(RTS) ) RTS <- "vrs" 

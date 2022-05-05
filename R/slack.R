@@ -1,4 +1,4 @@
-# $Id: slack.R 229 2020-07-04 13:39:18Z lao $
+# $Id: slack.R 241 2022-03-16 14:00:23Z X052717 $
 
 # Calculate slack at the efficient points.
 
@@ -12,7 +12,7 @@ slack <- function(X, Y, e, XREF=NULL, YREF=NULL, FRONT.IDX=NULL,
    if ( !methods::is(e,"Farrell") )  {
        stop("In call of slack: argument 'e' must be of class 'Farrell'")
    }
-
+   
    RTS <- e$RTS
    if ( RTS == "fdh0" ) RTS <- "fdh"
    if (LP) print(paste("slack:  RTS =",RTS),quote=F)
@@ -80,6 +80,45 @@ slack <- function(X, Y, e, XREF=NULL, YREF=NULL, FRONT.IDX=NULL,
      SKALERING <- FALSE
    }
 
+
+   if ( e$ORIENTATION=="graph" )  {
+        ## stop(paste0("The use of the method 'slack' does not work for orientation 'graph'\n",
+        ##  "  Use option SLACK in method 'dea'"))
+        lps <- make.lp(1, 1)
+        lpcontr <- lp.control(lps)
+        tol <- (lpcontr$epsilon["epsint"])
+        # delete.lp(lps)
+        rm(lps, lpcontr)
+
+        objval <- eff <- e$eff
+
+        sx <-  X*eff - e$lambda %*% XREF
+        sy <- -Y/eff + e$lambda %*% YREF
+        sx[abs(sx) < tol] <- 0
+        sy[abs(sy) < tol] <- 0
+        sum <- rowSums(sx) + rowSums(sy)
+        sum[abs(sum) < tol] <- 0
+        colnames(sx) <- paste("sx",1:m,sep="")
+        colnames(sy) <- paste("sy",1:n,sep="")
+
+        if ( FALSE && e$TRANSPOSE ) {
+            sx <- t(sx)
+            sy <- t(sy)
+        }
+        
+        if ( SKALERING )  {
+            sx <- sx * matrix(mmm, nrow=K, ncol=m, byrow=TRUE)
+            sy <- sy * matrix(nnn, nrow=K, ncol=n, byrow=TRUE)
+        } 
+
+        oe <- list(eff=eff, slack=sum>tol, sum=sum, objval=objval, sx=sx, sy=sy,
+            lambda=lambda, RTS=e$RTS, ORIENTATION=e$ORIENTATION, 
+            TRANSPOSE=e$TRANSPOSE)
+        class(oe) <- "slack"
+        return(oe)
+   }  ## if (e$ORIENTATION=="graph")
+
+
    if ( RTS != "crs" && RTS != "add" )  {
       rlamb <- 2
    } else { 
@@ -99,8 +138,20 @@ slack <- function(X, Y, e, XREF=NULL, YREF=NULL, FRONT.IDX=NULL,
          FF <- eff
          E <- rep(1,K)
       } else if ( e$ORIENTATION == "graph" )  {
-         E <- eff
-         FF <- 1/eff
+          # Nedenstaaende virker ikke altid, derfor bruges beregningen
+          # under "if ( e$ORIENTATION=="graph" )"
+          stop("We should never end here")
+          lps <- make.lp(1, 1)
+          lpcontr <- lp.control(lps)
+          tol <- lpcontr$epsilon["epsint"]
+          # delete.lp(lps)
+          # Afrunding af eff. kan goere, at det beregnede punkt paa frontier
+          # faktisk ligger uden for frontier. Derfor adderes 'tol' til eff.
+          # tallet for at sikre den bliver inde i teknologimaengden.
+          # tol <- 0
+         E <- eff + tol
+         FF <- 1/eff - tol
+          rm(lps, lpcontr, tol)
       } else {
         stop("Unknown orientation in slack: ", e$ORIENTATION)
       }
@@ -125,17 +176,16 @@ slack <- function(X, Y, e, XREF=NULL, YREF=NULL, FRONT.IDX=NULL,
                  immediate. = TRUE) 
       }
 
-   }  # if ( is.null(e$direct) )
+   }  ## if ( is.null(e$direct) )
 
 
    # Initialiser LP objekt
    lps <- make.lp(m+n +rlamb, m+n+Kr)
-    lp.control(lps,
+   lp.control(lps,
         scaling=c("range", "equilibrate", "integers")  # default scalering er 'geometric'
-    )                   # og den giver ikke altid tilfredsstillende resultat;
-                        # curtisreid virker i mange tilfaelde slet ikke
-   name.lp(lps, 
-          paste("DEA-slack",RTS,",",e$ORIENTATION,"orientated",sep="-"))
+   )                   # og den giver ikke altid tilfredsstillende resultat;
+                       # curtisreid virker i mange tilfaelde slet ikke
+   name.lp(lps, paste("DEA-slack",RTS,",",e$ORIENTATION,"orientated",sep="-"))
 
    # saet raekker i matrix med restriktioner
    for ( h in 1:m )
@@ -212,6 +262,7 @@ slack <- function(X, Y, e, XREF=NULL, YREF=NULL, FRONT.IDX=NULL,
       }
       set.rhs(lps, rhs, 1:(m+n))
       if (LP)  {
+         print(paste("Effektivitet er ", E[k]))
          print(paste("Hoejresiden for firm",k))
          if ( is.null(e$direct) )  {
             print(E[k] * X[k,])
@@ -228,10 +279,11 @@ slack <- function(X, Y, e, XREF=NULL, YREF=NULL, FRONT.IDX=NULL,
 
       set.basis(lps, default=TRUE)
       status <- solve(lps)
+      if (LP) print(paste0("status = ", status))
       if ( status != 0 ) {
          if ( status == 2 || status == 3 ) {
-            # print(paste("Firm",k,"not in the technology set"), quote=F)
-           # print(paste("Status =",status))
+           if (LP) print(paste("Firm",k,"not in the technology set"), quote=F)
+           if (LP) print(paste("Status =",status))
            objval[k] <- 0
            sol <- rep(0,m+n+Kr)
            sol[m+n+k] <- 1
@@ -255,7 +307,7 @@ slack <- function(X, Y, e, XREF=NULL, YREF=NULL, FRONT.IDX=NULL,
          print(sol)
       }
 
-   }  # loop for each firm
+   }  # loop for each firm; "for (k in 1:K)"
 
    # Drop soejler i lambda der alene er nuller, dvs lambda soejler skal 
    # alene vaere reference firms
@@ -319,7 +371,7 @@ slack <- function(X, Y, e, XREF=NULL, YREF=NULL, FRONT.IDX=NULL,
    class(oe) <- "slack"
 
     return(oe)
-} # slack
+}  ## slack()
 
 
 
@@ -384,5 +436,5 @@ summary.slack <- function(object, digits=4, ...)  {
       print(xx, quote=FALSE, rigth=TRUE, ...)
       invisible(xx)
    }
-}
+}  ## summary.slack()
 

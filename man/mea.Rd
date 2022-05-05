@@ -1,4 +1,4 @@
-% $Id: mea.Rd 150 2015-07-06 20:48:17Z B002961 $
+% $Id: mea.Rd 238 2021-07-11 16:12:17Z X022278 $
 \name{mea}
 \alias{mea}
 \alias{mea.lines}
@@ -7,7 +7,7 @@
 \title{ MEA multi-directional efficiency analysis }
 
 \description{ Potential improvements PI or multi-directional
-efficiency analysis.  The result is an exces value measures by the
+efficiency analysis.  The result is an excess value measures by the
 direction.
 
 The direction is determined by the direction corresponding to the
@@ -76,7 +76,7 @@ mea.lines(N, X, Y, ORIENTATION="in")
   \item{LPK}{ as in \code{dea} }
 
   \item{N}{Number of firms where directional lines are to be drawn on
-      an all raeady ecisting frontier plot (\link{dea.plot.frontier})}
+      an already existing frontier plot (\link{dea.plot.frontier})}
 
 }
 
@@ -92,12 +92,12 @@ more outputs.  }
 \value{ The results are returned in a Farrell object with the
     following components.
 
-\item{eff}{Exces value in DIRECT units of measurement, this is
+\item{eff}{Excess value in DIRECT units of measurement, this is
     \emph{not} Farrell efficiency }
 
 \item{lambda}{The lambdas, i.e. the weight of the peers, for each firm}
 
-\item{objval}{The objective value as returned from the LP program;
+\item{objval}{The objective value as returned from the LP program,
     normally the same as eff}
 
 \item{RTS}{The return to scale assumption as in the option \code{RTS}
@@ -106,7 +106,7 @@ more outputs.  }
 \item{ORIENTATION}{The efficiency orientation as in the call}
 
 \item{direct}{ A K times m|n|m+n matrix with directions for each firm:
-    the number of columns depends on wether it is input, output og
+    the number of columns depends on whether it is input, output or
     in-out orientated.}
 
 \item{TRANSPOSE}{As in the call}
@@ -122,8 +122,8 @@ more outputs.  }
 
 
 \note{ The calculation is done in \code{\link{dea}} after a
-   calculation of the dirction that then is used in the argument
-   \code{DIRECT}.  The calulation of the direction is done in a series
+   calculation of the direction that then is used in the argument
+   \code{DIRECT}.  The calculation of the direction is done in a series
    LP programs, one for each good in the direction. }
 
 
@@ -148,7 +148,7 @@ me$eff *  me$direct
 e <- dea(X,Y)
 e
 peers(e)
-# Farrell potential saving in inputs, exces inputs
+# Farrell potential saving in inputs, excess inputs
 (1-eff(e)) * X
 }
 

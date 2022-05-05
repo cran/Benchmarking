@@ -1,4 +1,4 @@
-% $Id: malmq.Rd 183 2018-06-14 15:45:11Z lao $
+% $Id: malmq.Rd 238 2021-07-11 16:12:17Z X022278 $
 
 \name{malmq}
 \alias{malmq}
@@ -6,7 +6,7 @@
 \title{Malmquist index}
 
 \description{
-	Estimates Malmquist indices for productivity and its decomposition beteween two
+	Estimates Malmquist indices for productivity and its decomposition between two
 	periods. The units in the two periods does not have to be exactly the same, but
 	the Malmquist index is only calculated for units present in both periods.
 }
@@ -53,7 +53,7 @@ malmq(X0, Y0, ID0 = NULL, X1, Y1, ID1 = NULL, RTS = "vrs", ORIENTATION = "in",
 
 \details{
 The \emph{index for technical changes} \code{tc} is calculated as \code{sqrt(e10/e11 * e00/e01)} 
-where \code{e<s><t>} is the efficience for period \code{s} when the refenrece technology is
+where \code{e<s><t>} is the efficiency for period \code{s} when the reference technology is
 for period \code{t}, i.e. determined from the observations for period \code{t} and 
 \code{XREF=X_t, YREF=Y_t}, as is the option for the function \code{dea}.
 
@@ -63,16 +63,16 @@ The \emph{Malmquist index for productivity} \code{mq} is calculates as \code{sqr
 
 \value{
 	\item{m}{Malmquist index for productivity.}
-	\item{tc}{Index for technoligy change.}
+	\item{tc}{Index for technology change.}
 	\item{ec}{Index for efficiency change.}
 	\item{mq}{Malmquist index for productivity; same as \code{m}.}
 	\item{id}{Index for firms present in both period 0 and period 1.}
 	\item{id0}{Index for firms in period 0 that are also in period 1.}
 	\item{id1}{Index for firms in period 1 that are also in period 0.}
-	\item{e00}{The efficiencies for period 0 with reference technoligy from period 0.}
-	\item{e10}{The efficiencies for period 1 with reference technoligy from period 0.}
-	\item{e11}{The efficiencies for period 1 with reference technoligy from period 1.}
-	\item{e01}{The efficiencies for period 0 with reference technoligy from period 1.}
+	\item{e00}{The efficiencies for period 0 with reference technology from period 0.}
+	\item{e10}{The efficiencies for period 1 with reference technology from period 0.}
+	\item{e11}{The efficiencies for period 1 with reference technology from period 1.}
+	\item{e01}{The efficiencies for period 0 with reference technology from period 1.}
 }
 
 
@@ -102,7 +102,7 @@ DEA, SFA, and R}; Springer 2011 }
    text(x1, y1, 1:dim(x1)[1], col="red", adj=-1)
 
    m <- malmq(x0,y0,,x1,y1,,RTS="vrs")
-   print("Malmquist index for change in productivity, technoligy change:")
+   print("Malmquist index for change in productivity, technology change:")
    print(m$mq)
    print("Index for change of frontier:")
    print(m$tc)
@@ -110,6 +110,6 @@ DEA, SFA, and R}; Springer 2011 }
 
 
 % Add one or more standard keywords, see file 'KEYWORDS' in the
-% R documentation directory.
+% R dokumentation directory.
 \keyword{ efficiencies }
 \keyword{ Malmquist }

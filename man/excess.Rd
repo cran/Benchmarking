@@ -1,4 +1,4 @@
-% $Id: excess.Rd 206 2019-07-11 14:15:27Z lao $
+% $Id: excess.Rd 238 2021-07-11 16:12:17Z X022278 $
 \name{excess}
 \alias{excess}
 
@@ -19,10 +19,10 @@ excess(object, X = NULL, Y = NULL)
   \item{object}{ A Farrell object as returned from functions like
       \link{dea}, \link{dea.direct}, link{sdea}, and \link{mea}. }
 
-  \item{X}{ Input matrix, only neccesary for ordinary input Farrell
+  \item{X}{ Input matrix, only necessary for ordinary input Farrell
       efficiency }
 
-  \item{Y}{ Ouput matrix , only neccesary for ordinary output Farrell
+  \item{Y}{ Ouput matrix , only necessary for ordinary output Farrell
       efficiency }
 
 }
@@ -32,16 +32,16 @@ excess(object, X = NULL, Y = NULL)
   For Farrell input efficiency E the exess input is \eqn{(1-E) X} and
   for Farrell ouput efficiency F the missing output is \eqn{(F-1) Y}.
   
-  Notice that the excess calculated does not include any slackvalues. In 
+  Notice that the excess calculated does not include any slack values. In 
   case slacks are present and calculated it might be more appropriate 
-  to add slack; i.e. to use \code{excess(object, X, Y) + slack(X, Y, object)}.
+  to add slack, i.e. to use \code{excess(object, X, Y) + slack(X, Y, object)}.
 
   For directional efficiency e in the direction D the excess input is
   \eqn{e D}.
 
   If a firm is outside the technology set, as could be the case when
   calculating super-efficiencies, the Farrell input efficiency is
-  larger then 1 and then the excess values are negative.
+  larger than 1, and then the excess values are negative.
 
 }
 

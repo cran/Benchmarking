@@ -1,4 +1,4 @@
-# $Id: cost.R 229 2020-07-04 13:39:18Z lao $
+# $Id: cost.R 235 2021-04-11 13:46:25Z lao $
 
 # Function to calculate minimum cost input.
 
@@ -30,6 +30,11 @@ cost.opt <- function(XREF, YREF, W, YOBS=NULL, RTS="vrs", param=NULL,
       stop("Number of inputs in W and XREF differ")
    if ( n != dim(YOBS)[1] )
       stop("Number of outputs in YREF and YOBS differ")
+
+    XREF <- tjek_data(XREF)
+    YREF <- tjek_data(YREF)
+    W <- tjek_data(W)
+    YOBS <- tjek_data(YOBS)
 
    rts <- c("fdh","vrs","drs","crs","irs","irs","add","fdh+")
    if ( is.numeric(RTS) )  {
@@ -111,7 +116,7 @@ cost.opt <- function(XREF, YREF, W, YOBS=NULL, RTS="vrs", param=NULL,
    
    for ( k in 1:K )  {
       if ( dim(W)[2] != 1 && k > 1 ) { 
-         set.objfn(lps, c(W[,k],rep(0,K)))
+         set.objfn(lps, c(W[,k],rep(0,Kr)))
        }
       set.rhs(lps, YOBS[,k], (m+1):(m+n))
 

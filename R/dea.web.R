@@ -1,4 +1,4 @@
-# $Id: dea.web.R 207 2019-12-16 20:14:51Z lao $
+# $Id: dea.web.R 244 2022-05-05 14:31:31Z X052717 $
 
 # Foerste forsoeg med en web-graf for efficiens og tilhoerende input/output
 
@@ -17,11 +17,11 @@ function(X, E, N=NULL, txt=NULL, add=FALSE,
       stop("If X is for more firms then N must be present")
 
    sl <- 0
-   if ( class(E) == "Farrell" )  {
+   if ( is(E, "Farrell") )  {
       # Hvordan skelne mellem sx eller st der er behov for?
-   	if ( !is.null(E$sx) && E$ORIENTATION=="in" )  sl <- E$sx
-   	else if ( !is.null(E$sx) && E$ORIENTATION=="out" )  sl <- -E$sy
-	   E <- eff(E)
+    if ( !is.null(E$sx) && E$ORIENTATION=="in" )  sl <- E$sx
+    else if ( !is.null(E$sx) && E$ORIENTATION=="out" )  sl <- -E$sy
+       E <- eff(E)
    }
    if ( length(E) != dim(X)[1] )
       stop("Firms in X and E must be the same")
@@ -32,7 +32,7 @@ function(X, E, N=NULL, txt=NULL, add=FALSE,
       E <- E[N]
    } else  m <- length(X)
    # Nu er en X et array
-   if ( class(sl) == "matrix" )  {
+   if ( is(sl, "matrix") )  {
       sl <- sl[N,]
    }
 
@@ -49,7 +49,7 @@ function(X, E, N=NULL, txt=NULL, add=FALSE,
 
    # Polaere linjer for hver vare
    segments(rep(0,m),rep(0,m), xlim[2]*cos(angle), xlim[2]*sin(angle), 
-	col="darkgray")
+    col="darkgray")
 
    text(xlim[2]*cos(angle)*1.05, xlim[2]*sin(angle)*1.05, 1:m) #, col="darkgray")
 
@@ -57,7 +57,7 @@ function(X, E, N=NULL, txt=NULL, add=FALSE,
        grid(col="darkgray")
        box(col="grey")
   }
-  if ( class(txt)=="logical" && txt )  {
+  if ( is(txt, "logical") && txt )  {
       if ( !is(X, "matrix") )  {
          if ( !is.null(rownames(X)) )  {
             txt <- rownames(X)
@@ -68,7 +68,7 @@ function(X, E, N=NULL, txt=NULL, add=FALSE,
          txt <- 1:length(X)
       }
    }
-   if ( class(txt)!="logical" && length(txt) > 0 ) {
+   if ( !is(txt, "logical") && length(txt) > 0 ) {
      # Evt. tekst paa punkter saettes lidt nede til hoejre
      text(X,X,txt,adj=c(-.75,.75),cex=fex)
    }

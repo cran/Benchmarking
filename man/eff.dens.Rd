@@ -1,4 +1,4 @@
-% $Id: eff.dens.Rd 131 2014-06-24 17:00:12Z b002961 $
+% $Id: eff.dens.Rd 238 2021-07-11 16:12:17Z X022278 $
 \name{eff.dens}
 \alias{eff.dens}
 \alias{eff.dens.plot}
@@ -32,10 +32,10 @@ an explanation.  }
 \item{\dots}{ Further arguments to the \code{plot} method like line
 type and line width.  }
 
-\item{xlim}{ Range on the x-axis; usualy not needed, just use the
+\item{xlim}{ Range on the x-axis; usually not needed, just use the
 defaults. }
 
-\item{ylim}{ Range on the x-axis; usualy not needed, just use the
+\item{ylim}{ Range on the x-axis; usually not needed, just use the
 defaults. }
 
 \item{xlab}{ Label for the x-axis. }
@@ -46,7 +46,7 @@ defaults. }
 
 
 \details{ The calculation is based on a reflection method (Silverman
-1986, 30) using the default window kernel and defult bandwidth (window
+1986, 30) using the default window kernel and default bandwidth (window
 width) in the method \code{density}.  
 
 The method \code{eff.dens.plot} plot the density directly, and

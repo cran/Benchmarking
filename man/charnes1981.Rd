@@ -1,4 +1,4 @@
-% $Id: charnes1981.Rd 96 2010-11-27 22:47:25Z Lars $
+% $Id: charnes1981.Rd 238 2021-07-11 16:12:17Z X022278 $
 \name{charnes1981}
 \alias{charnes1981}
 \docType{data}
@@ -8,7 +8,7 @@
 
 \description{
 
- The data set is from an US federally sponsored program for providing
+The data set is from an US federally sponsored program for providing
 remedial assistance to disadvantaged primary school students. The
 firms are 70 school sites, and data are from entire sites. The
 variables consists of results from three different kind of tests, a

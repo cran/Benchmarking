@@ -1,4 +1,4 @@
-% $Id: eladder.Rd 218 2020-05-21 21:28:28Z lao $
+% $Id: eladder.Rd 240 2022-01-07 12:15:15Z X052717 $
 \name{eladder}
 \alias{eladder}
 \alias{eladder.plot}
@@ -11,7 +11,8 @@ is removed sequentially one at a time }
 \usage{
 eladder(n, X, Y, RTS = "vrs", ORIENTATION = "in", 
         XREF=NULL, YREF=NULL, DIRECT = NULL, param=NULL, MAXELAD=NULL)
-eladder.plot(elad, peer, TRIM = NULL, ...)
+eladder.plot(elad, peer, TRIM = NULL, 
+    xlab="Most influential peers", ylab="Efficiency", ...)
 }
 
 
@@ -48,7 +49,7 @@ eladder.plot(elad, peer, TRIM = NULL, ...)
       \code{\link{dea}} for a further description of this argument.}
 
 
-  \item{param}{Possible parameters. At the moment only used for
+  \item{param}{Possible parameters. Now only used for
     RTS="fdh+" to set low and high values for restrictions on lambda;
     see the section details and examples in \code{\link{dea}} for its
     use. Future versions might also use \code{param} for other
@@ -58,10 +59,15 @@ eladder.plot(elad, peer, TRIM = NULL, ...)
 
   \item{elad}{The sequence of efficiencies returned from \code{eladder}. }
 
-  \item{peer}{The sequence of peers returned from \code{eladder}. }
+  \item{peer}{The sequence of peers returned from \code{eladder}. Also used for 
+      annotations at the tickmarks at the x-axis.}
 
   \item{TRIM}{The number of characters for the name of the peers on
       the axis in the plot. }
+      
+  \item{xlab}{A title for the x axis}
+
+  \item{ylab}{A title for the y axis}
       
    \item{\dots}{Usual options for the method \code{plot}.}
 

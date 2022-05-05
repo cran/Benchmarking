@@ -1,5 +1,7 @@
-// $Id: outlier.cpp 231 2020-07-26 20:56:26Z lao $
+// $Id: outlier.cpp 236 2021-04-26 20:38:03Z lao $
 #include <math.h>
+#define STRICT_R_HEADERS
+#include <float.h>
 #include <Rcpp.h>
 #include <vector>
 #include "outlier.h"

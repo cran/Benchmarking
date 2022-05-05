@@ -1,4 +1,4 @@
-% $Id: slack.Rd 229 2020-07-04 13:39:18Z lao $
+% $Id: slack.Rd 238 2021-07-11 16:12:17Z X022278 $
 \name{slack}
 \alias{slack}
 \alias{print.slack}
@@ -48,7 +48,7 @@ slack(X, Y, e, XREF = NULL, YREF = NULL, FRONT.IDX = NULL, LP = FALSE, CONTROL=N
 
 
 \details{ Slacks are calculated in a LP problem where the sum of all
-   slacks are maximied after correction for efficiency. 
+   slacks are maximised after correction for efficiency. 
     The for calculating slacks for orientation graph is low because of the low precision in the calculated graph efficiency. }
 
 

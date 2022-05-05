@@ -1,4 +1,4 @@
-# $Id: make.merge.R 207 2019-12-16 20:14:51Z lao $
+# $Id: make.merge.R 244 2022-05-05 14:31:31Z X052717 $
 
 
 make.merge <- function(grp, nFirm=NULL, X=NULL, names=NULL)  {
@@ -6,12 +6,12 @@ make.merge <- function(grp, nFirm=NULL, X=NULL, names=NULL)  {
    # Hvad der skal merges skal angives som indeks i en liste af arrays
    # hvor hvert array er indeks for de enheder der skal indgaa i en given
    # gruppe
-   if ( class(grp) == "factor" )  {
+   if ( is(grp, "factor") )  {
       # print("Faktor")
       g <- nlevels(grp)
       K <- Kg <- length(grp)
       Kn <- -1
-   } else if ( class(grp)=="list" && class(grp[[1]])=="character" ) {
+   } else if ( is(grp, "list") && is(grp[[1]], "character") ) {
       # print("Liste af navne")
       g <- length(grp)
       Kn <- K <- length(names) 
@@ -21,8 +21,8 @@ make.merge <- function(grp, nFirm=NULL, X=NULL, names=NULL)  {
      g <- length(grp)
      Kg <- -1
    }
-   if ( !is.null(nFirm) && class(nFirm)!="numeric" && 
-                                class(nFirm)!="integer" )
+   if ( !is.null(nFirm) && !is(nFirm, "numeric") && 
+                                !is(nFirm, "integer") )
       stop("The argument nFirm must be numeric or integer")
    if ( !is.null(X) && !is(X, "matrix") )
       stop("The argument X must be a matrix")
@@ -46,23 +46,23 @@ make.merge <- function(grp, nFirm=NULL, X=NULL, names=NULL)  {
       stop("The length of the factor grp must be the number of rows in X")
    if ( !is.null(names) && K>0 && K!=Kn )
       stop("The length of names must be the number of firms")
-   if ( class(grp)=="list" && class(grp[[1]])=="character" && Kn <= 0)
+   if ( is(grp, "list") && is(grp[[1]], "character") && Kn <= 0)
       stop("When grp is a list of names for mergers the argument names must also be supplied")
    if ( K < 0 && Kn > 0 )
       K <- Kn
 
    Mer <- matrix(0, nrow=g, ncol=K)
-   if ( class(grp) == "factor" )  {
+   if ( is(grp, "factor") )  {
       for ( i in 1:g )  {  # Saet 1-taller soejler for dem der skal merges
-     	    Mer[i,as.numeric(grp)==i] <- 1 
+            Mer[i,as.numeric(grp)==i] <- 1 
       }
-   } else if ( class(grp)=="list" && class(grp[[1]])=="character")  {
+   } else if ( is(grp, "list") && is(grp[[1]], "character") )  {
       for ( i in 1:g )  {
          Mer[i,which(names %in% grp[[i]])] <- 1
       }
    } else {
       for ( i in 1:g )  {  # Saet 1-taller soejler for dem der skal merges
-     	    Mer[i,grp[[i]]] <- 1 
+            Mer[i,grp[[i]]] <- 1 
       }
    }
    if ( !is.null(names(grp)) )

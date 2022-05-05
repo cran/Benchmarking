@@ -1,4 +1,4 @@
-# $Id: dea.R 230 2020-07-05 14:58:19Z lao $
+# $Id: dea.R 241 2022-03-16 14:00:23Z X052717 $
 
 # DEA beregning via brug af lp_solveAPI. Fordelene ved lp_solveAPI er
 # faerre kald fra R med hele matricer for hver unit og dermed skulle
@@ -314,7 +314,7 @@ dea  <-  function(X,Y, RTS="vrs", ORIENTATION="in", XREF=NULL,YREF=NULL,
 
     if ( ORIENTATION == "graph" )  {
         oe <- graphEff(lps, X, Y, XREF, YREF, RTS, FRONT.IDX, rlamb, oKr, 
-                          param=param, TRANSPOSE, SLACK,FAST,LP) 
+                          param=param, TRANSPOSE, SLACK, FAST, LP) 
         # delete.lp(lps)
         return(oe)
     }
@@ -532,7 +532,7 @@ dea  <-  function(X,Y, RTS="vrs", ORIENTATION="in", XREF=NULL,YREF=NULL,
      
     } else {
         ux <- vy <- NULL
-    }
+    }  ##  if (DUAL)
     if (LP) print("DUAL faerdig")
 
     if ( directMin )  {
@@ -553,7 +553,7 @@ dea  <-  function(X,Y, RTS="vrs", ORIENTATION="in", XREF=NULL,YREF=NULL,
         }
         if ( !is.null(DIRECT) & is(DIRECT, "matrix") )
             DIRECT <- t(DIRECT)
-    }
+    }  ## if (TRANSPOSE)
 
     oe <- list(eff=e, lambda=lambda, objval=objval, RTS=RTS,
               primal=primal, dual=dual, ux=ux, vy=vy, gamma=gamma,
@@ -569,7 +569,7 @@ dea  <-  function(X,Y, RTS="vrs", ORIENTATION="in", XREF=NULL,YREF=NULL,
     class(oe) <- "Farrell"
 
 
-    if ( SLACK ) {
+    if ( SLACK )  {
          if ( TRANSPOSE )  { # Transponer tilbage hvis de blev transponeret
             X <- t(X)
             Y <- t(Y)
@@ -593,7 +593,7 @@ dea  <-  function(X,Y, RTS="vrs", ORIENTATION="in", XREF=NULL,YREF=NULL,
             print("slack efter slack:")
             print(oe$slack)
         }
-    }
+    }  ## if (SLACK)
 
    return(oe)
 
@@ -621,7 +621,7 @@ data_kontrol <- function(X)  {
 
 # Tjek om data er matrix og hvis ikke lav om til matrix
 tjek_data <- function(X)  {
-    if (is.matrix(X)) return(X)
+    if (is.matrix(X) & is.numeric(X)) return(X)
     if (is.null(X) || !data_kontrol(X)) {
         stop("'", deparse(substitute(X)), 
              "' is not a numeric matrix (or numeric data.frame)", call.=FALSE)

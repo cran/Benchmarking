@@ -1,9 +1,9 @@
-# $Id: eff.dens.R 140 2015-05-15 21:48:02Z B002961 $
+# $Id: eff.dens.R 244 2022-05-05 14:31:31Z X052717 $
 
 # Plot af taethed for efficiencer, bruger spejlingsprcincip
 
 eff.dens <- function(eff, bw="nrd0")  {
-   if ( class(eff) == "Farrell" )
+   if ( is(eff, "Farrell") )
       E <- eff$eff
    else
       E <- eff
@@ -33,7 +33,7 @@ eff.dens <- function(eff, bw="nrd0")  {
 
 
 eff.dens.plot  <- function(obj, bw="nrd0", ..., xlim, ylim, xlab, ylab)  {
-   if ( class(obj) != "list" )  {
+   if ( !is(obj, "list") )  {
       o_ <- eff.dens(obj, bw=bw)
       obj <- o_
    }

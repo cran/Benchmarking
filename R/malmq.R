@@ -1,4 +1,4 @@
-# $Id: malmq.R 222 2020-06-12 18:44:31Z lao $
+# $Id: malmq.R 237 2021-05-16 20:22:11Z lao $
 
 # Beregner Malmquist indeks og dekomponering af samme ud fra to perioder
 
@@ -54,11 +54,15 @@
 #print(ID0)
 #print(length(ID0))
    # Laengden af ID skal svare til antal units i X og Y
-   if ( K0 != length(ID0) ||  K0 != length(ID0) )
+   if ( K0 != length(ID0) ||  K0 != dim(Y0)[1] )
       stop("Number of units in X0 and Y0 must correspont to length of ID0")
-   if ( K1 != length(ID1) ||  K1 != length(ID1) )
+   if ( K1 != length(ID1) ||  K1 != dim(Y1)[1] )
       stop("Number of units in X1 and Y1 must correspont to length of ID1")
 
+    # Antal input skal vaere samme i X0 og X1
+    if (m0 != m1) stop("Number of inputs must be the same in X0 and X1")
+    # Antal output skal vaere samme i Y0 og Y1
+    if (n0 != n1) stop("Number of outputs must be the same in Y0 and Y1")
 
    # Find faellesmaengden af units og tilhoerende indeks
    idlab <- intersect(ID0, ID1)

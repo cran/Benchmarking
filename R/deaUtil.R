@@ -1,4 +1,4 @@
-# $Id: deaUtil.R 218 2020-05-21 21:28:28Z lao $
+# $Id: deaUtil.R 244 2022-05-05 14:31:31Z X052717 $
 
 # Naesten alle funktioner transponerer lambda i forhold til normal.
 # Normal er lambda K x Kr, men i naesten alle funktioner laves den
@@ -174,7 +174,7 @@ peers <- function(object, NAMES=FALSE, N=1:dim(object$lambda)[1], LAMBDA=0)  {
    #    print("Rownames i lambda")
    #    print(rownames(object$lambda))
    #  }
-   if ( class(object) != "Farrell" && class(object) != "slack" )
+   if ( !is(object, "Farrell") && !is(object, "slack") )
        stop("'Object' is not of class 'Farrell' (or 'slack');",
             " you might have used FAST=TRUE in 'dea'.")
    if ( object$TRANSPOSE ) {
@@ -389,7 +389,7 @@ lambda <- function(object, KEEPREF=FALSE)  {
 
 # Calculate excess input or output
 excess <- function(object, X=NULL, Y=NULL)  {
-   if ( class(object) != "Farrell" )
+   if ( !is(object, "Farrell") )
       stop("Only works for object of class/type 'Farrell'",
            " as output from dea and like functions")
    if ( is.null(object$direct) && is.null(X) && is.null(Y) )
@@ -500,7 +500,8 @@ eladder <- function(n, X, Y, RTS="vrs", ORIENTATION="in",
 
 
 
-eladder.plot <- function(elad, peer, TRIM=NULL, ...)  {
+eladder.plot <- function(elad, peer, TRIM=NULL, xlab="Most influential peers",
+        ylab="Efficiency", ...)  {
    if ( all(is.na(elad)) )
       stop("All values of first argument are NA")
    if ( !is.null(TRIM) & !is.numeric(TRIM) )
@@ -514,9 +515,9 @@ eladder.plot <- function(elad, peer, TRIM=NULL, ...)  {
    linje <- ifelse(TRIM==1,2,TRIM^(1/1.3))
    opar <- 
        par(mar=c(linje+2,4.1,4.1,2.1))
-   plot(elad, xaxt="n", xlab="", ylab="Efficiency", ...)
-   mtext("Most influential peers", side=1, line=linje+.5)
-   if ( class(peer) == "character" || class(peer) == "factor" )  {
+   plot(elad, xaxt="n", xlab="", ylab=ylab, ...)
+   mtext(xlab, side=1, line=linje+.5)
+   if ( is(peer, "character") || is(peer, "factor") )  {
       axis(1, at=1:length(peer),
             labels=strtrim(peer,TRIM), las=ifelse(TRIM>1,2,0) )
    } else {

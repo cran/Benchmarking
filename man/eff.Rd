@@ -1,4 +1,4 @@
-% $Id: eff.Rd 118 2011-07-22 23:28:53Z Lars $
+% $Id: eff.Rd 238 2021-07-11 16:12:17Z X022278 $
 \name{eff, efficiencies}
 \alias{eff}
 \alias{efficiencies}
@@ -83,7 +83,7 @@ Bogetoft and Otto; \emph{Benchmarking with DEA, SFA, and R}, Springer
 \author{ Peter Bogetoft and Lars Otto \email{larsot23@gmail.com} }
 
 \note{ For the Farrell object the orientation is determined by the
- calculations that led to the object and can not be changed here.  }
+ calculations that led to the object and cannot be changed here.  }
 
 
 \seealso{

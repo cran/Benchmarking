@@ -1,4 +1,4 @@
-% $Id: dea.dual.Rd 118 2011-07-22 23:28:53Z Lars $
+% $Id: dea.dual.Rd 238 2021-07-11 16:12:17Z X022278 $
 \name{dea.dual}
 \alias{dea.dual}
 % \alias{dea.dual.mat}
@@ -63,10 +63,10 @@ to \code{Y}}
 
 \item{DUAL}{
 
- Matrix of order \dQuote{number of input plus number of outputs minus
+ Matrix of order \dQuote{number of inputs plus number of outputs minus
  2} times 2.  The first column is the lower bound and the second column is
  the upper bound for the restrictions on the multiplier ratios. The ratios are relative to the first input and the first
- output, respectively. This implyies that there is no restriction for neither the first
+ output, respectively. This implies that there is no restriction for neither the first
  input nor the first output so that the number of restrictions is two less
  than the total number of inputs and outputs.
 

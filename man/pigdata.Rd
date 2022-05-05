@@ -1,4 +1,4 @@
-% $Id: pigdata.Rd 104 2011-02-06 11:56:03Z Lars $
+% $Id: pigdata.Rd 242 2022-03-18 11:49:12Z X052717 $
 \name{pigdata}
 \alias{pigdata}
 \docType{data}
@@ -28,8 +28,8 @@ also produces crop, i.e. a multi--output data set.  }
     \item{\code{w4}}{Price of labour}
     \item{\code{w5}}{Price of michenery}
     \item{\code{w6}}{Price of other capital}
-    \item{\code{p2}}{Price of pig}
-    \item{\code{p4}}{Price of crop}
+    \item{\code{p2}}{Price of crop}
+    \item{\code{p4}}{Price of pig}
     \item{\code{cost}}{Total cost, w1*x1+...+w6*x6.}
     \item{\code{rev}}{Total revenue, p2*y2+p4*y4.}
   }
