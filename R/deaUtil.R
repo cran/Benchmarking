@@ -1,4 +1,4 @@
-# $Id: deaUtil.R 244 2022-05-05 14:31:31Z X052717 $
+# $Id: deaUtil.R 246 2022-05-31 11:56:07Z X052717 $
 
 # Naesten alle funktioner transponerer lambda i forhold til normal.
 # Normal er lambda K x Kr, men i naesten alle funktioner laves den
@@ -460,6 +460,7 @@ eladder <- function(n, X, Y, RTS="vrs", ORIENTATION="in",
     # if (LP) print(paste("Peers =",peers(e)), quote=FALSE)
     # if (LP) print(lambda(e))
     # Er der nogen peers overhovedet ellers kan vi bare slutte nu
+    if ( is.na(eff(e)) ) break
     if ( abs(eff(e)) == Inf ) break
     if ( is.na(peers(e)[1]) ) break
     elad[i] <- e$eff

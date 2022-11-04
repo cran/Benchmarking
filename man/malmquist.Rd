@@ -1,4 +1,4 @@
-% $Id: malmquist.Rd 238 2021-07-11 16:12:17Z X022278 $
+% $Id: malmquist.Rd 247 2022-09-15 22:38:27Z X052717 $
 
 \name{malmquist}
 \alias{malmquist}
@@ -6,12 +6,12 @@
 \title{Malmquist index for firms in a panel}
 
 \description{Estimate Malmquist index for firms in a panel data set. The data set does not
-	need to be balanced.}
+    need to be balanced.}
 
 \usage{
-malmquist(X, Y, ID, TIME, RTS = "vrs", ORIENTATION = "in", SLACK = FALSE, DUAL = FALSE,
-	DIRECT = NULL, param = NULL, TRANSPOSE = FALSE, FAST = TRUE, LP = FALSE, 
-	CONTROL = NULL, LPK = NULL)
+malmquist(X, Y, ID, TIME, RTS = "vrs", ORIENTATION = "in", SAMEREF=FALSE, 
+    SLACK = FALSE, DUAL = FALSE, DIRECT = NULL, param = NULL, 
+    TRANSPOSE = FALSE, FAST = TRUE, LP = FALSE, CONTROL = NULL, LPK = NULL)
 }
 
 \arguments{
@@ -30,6 +30,11 @@ malmquist(X, Y, ID, TIME, RTS = "vrs", ORIENTATION = "in", SLACK = FALSE, DUAL =
     
   \item{ORIENTATION}{Input efficiency "in" (1), output
     efficiency "out" (2), and graph efficiency "graph" (3) as in \code{\link{dea}}.}
+
+  \item{SAMEREF}{Use the same units for reference technology when comparing 
+  two periods. This is not restricted to same units in several timpe periods, 
+  but only to pairwise periods comparisons for Malmquist. Default is to use 
+  available and possible differnt units in pairwise periods.}
 
   \item{SLACK}{See \code{\link{dea}}.}
   
@@ -62,7 +67,7 @@ malmquist(X, Y, ID, TIME, RTS = "vrs", ORIENTATION = "in", SLACK = FALSE, DUAL =
 
 \value{
    \item{m}{Malmquist indicies, an array of length T*K in the order of \code{ID} and \code{TIME}, 
-   	i.e. the order of the rows of \code{X}.}
+    i.e. the order of the rows of \code{X}.}
    \item{tc}{Technical change indices, an array of length T*K.}
    \item{ec}{Efficiency indices, an array of length T*K.}
    \item{id}{Index for firms as \code{ID}}
@@ -105,7 +110,7 @@ DEA, SFA, and R}; Springer 2011 }
  text(x1, y1, 1:dim(x1)[1], col="red", adj=-1)
  text(x2, y2, 1:dim(x1)[1], col="blue", adj=-1)
  legend("bottomright", legend=c("Period 0", "Period 1", "Period 2"),
- 	col=c("black", "red", "blue"), lty=1, pch=c(1,16, 17),  bty="n")
+    col=c("black", "red", "blue"), lty=1, pch=c(1,16, 17),  bty="n")
  
  X <- rbind(x0, x1, x2)
  Y <- rbind(y0, y1, y2)

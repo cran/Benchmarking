@@ -1,4 +1,4 @@
-# $Id: malmquist.R 222 2020-06-12 18:44:31Z lao $
+# $Id: malmquist.R 247 2022-09-15 22:38:27Z X052717 $
 
 # Beregner Malmquist indeks for enhederne ID over tidspunkterne i TIME
 
@@ -10,7 +10,7 @@
 
 
 malmquist <- function(X, Y, ID, TIME, 
-         RTS="vrs", ORIENTATION="in",
+         RTS="vrs", ORIENTATION="in", SAMEREF=FALSE,
          SLACK=FALSE, DUAL=FALSE, DIRECT=NULL, param=NULL,
          TRANSPOSE=FALSE, FAST=TRUE, LP=FALSE, CONTROL=NULL, LPK=NULL)  
 {
@@ -20,6 +20,8 @@ malmquist <- function(X, Y, ID, TIME,
    unit <- unique(ID)
    
    # |time| sorteres hvis variablen er numerisk ellers bruges implicit raekkefoelge
+   # Boer saa ikke al data sorteres? Nej fordi det er ikke TIME der sorteres, men alene
+   # de entydige TIME vaerdier uafhaenhaengigt at units.
    if ( is.numeric(time) )  time <- sort(time)
 
    # Vaerdier for foerste aarstal |time| vedbliver med at vaere NA
@@ -46,29 +48,30 @@ malmquist <- function(X, Y, ID, TIME,
        X1 <- X[time[t]==TIME,, drop=FALSE]
        Y1 <- Y[time[t]==TIME,, drop=FALSE]
        
-#print("0. periode")
-#print(cbind(X0=X0, Y0=Y0, id0))
-#print("1. periode")
-#print(cbind(X1=X1, Y1=Y1, id1))
-
        m <- malmq(X0,Y0,id0, X1,Y1,id1,  RTS=RTS, ORIENTATION=ORIENTATION,
-         SLACK=SLACK, DUAL=DUAL, DIRECT=DIRECT, param=param,
+         SAMEREF=SAMEREF, SLACK=SLACK, DUAL=DUAL, DIRECT=DIRECT, param=param,
          TRANSPOSE=TRANSPOSE, FAST=TRUE, LP=LP, CONTROL=CONTROL, LPK=LPK)
 
-       # Raekkefoelgen skal vaere som i X og Y, dvs. som ID
-       Malm[ID %in% m$id & TIME==time[t]] <- m$m # Malmquist indeks for aendring i produktivitet
-       TC[ID %in% m$id & TIME==time[t]] <- m$tc # teknisk aendring, flytning af frontier
-       EC[ID %in% m$id & TIME==time[t]] <- m$ec # aendring i effektivitet
+    # Raekkefoelgen skal vaere som i X og Y, dvs. som ID
+    for (i in m$id)  {
+        Malm[ID==i & TIME==time[t]] <- m$m[m$id==i] # Malmquist indeks for aendring i produktivitet
+        TC[ID==i & TIME==time[t]] <- m$tc[m$id==i] # teknisk aendring, flytning af frontier
+        EC[ID==i & TIME==time[t]] <- m$ec[m$id==i] # aendring i effektivitet
 
-       E00[ID %in% m$id & TIME==time[t]] <- m$e00
-       E01[ID %in% m$id & TIME==time[t]] <- m$e01
-       E10[ID %in% m$id & TIME==time[t]] <- m$e10
-       E11[ID %in% m$id & TIME==time[t]] <- m$e11
-       if ( t==2 )  {
-        # Foerste aar kan saettes 
-           E11[ID %in% m$id & TIME==time[t-1]] <- m$e00
-       } 
-   }  # for (t)
+        E00[ID==i & TIME==time[t]] <- m$e00[m$id==i]
+        E01[ID==i & TIME==time[t]] <- m$e01[m$id==i]
+        E10[ID==i & TIME==time[t]] <- m$e10[m$id==i]
+        E11[ID==i & TIME==time[t]] <- m$e11[m$id==i]
+        }
+
+        if ( t==2)  {
+            # Foerste aar kan saettes 
+            for (i in m$id)  {
+                E11[ID==i & TIME==time[t-1]] <- m$e00[m$id==i]
+            }
+        }
+    }  # for (t)
+   
 
    return(list(m=Malm, tc=TC, ec=EC, id=ID, time=TIME,
                e00=E00, e10=E10, e11=E11, e01=E01))

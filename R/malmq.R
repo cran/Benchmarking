@@ -1,4 +1,4 @@
-# $Id: malmq.R 237 2021-05-16 20:22:11Z lao $
+# $Id: malmq.R 247 2022-09-15 22:38:27Z X052717 $
 
 # Beregner Malmquist indeks og dekomponering af samme ud fra to perioder
 
@@ -9,7 +9,7 @@
 # metode for haandtering af flere perioder.
 
  malmq <- function(X0, Y0, ID0=NULL,  X1,Y1, ID1=NULL, 
-          RTS="vrs", ORIENTATION="in",
+          RTS="vrs", ORIENTATION="in", SAMEREF=FALSE,
           SLACK=FALSE, DUAL=FALSE, DIRECT=NULL, param=NULL,
           TRANSPOSE=FALSE, FAST=TRUE, LP=FALSE, CONTROL=NULL, LPK=NULL)  
 {
@@ -48,11 +48,6 @@
    if ( is.null(ID0) )  ID0 <- seq(1,K0)
    if ( is.null(ID1) )  ID1 <- seq(1,K1)
 
-#print(X0)
-#print(class(X0))
-#print(K0)
-#print(ID0)
-#print(length(ID0))
    # Laengden af ID skal svare til antal units i X og Y
    if ( K0 != length(ID0) ||  K0 != dim(Y0)[1] )
       stop("Number of units in X0 and Y0 must correspont to length of ID0")
@@ -66,47 +61,68 @@
 
    # Find faellesmaengden af units og tilhoerende indeks
    idlab <- intersect(ID0, ID1)
-   id0 <- ID0 %in% idlab   # seq(1,length(id0))[id0 %in% idlab]
+   id0 <- ID0 %in% idlab
    id1 <- ID1 %in% idlab
-# print(sum(id0))
-# print(length(unique(ID0[id0])))
-# print(sum(id1))
-# print(length(unique(ID1[id1])))
+
     # Er der gengangere, og er der samme antal i de to perioder
     if ( sum(id0) != length(unique(ID0[id0])) || sum(id1) != length(unique(ID1[id1])) || 
             sum(id0)!=sum(id1) )
         stop("Units in ID are not unique for each period")
 
-   # Input og output for faellesmaengden af units
-   x0 <- X0[id0,,drop=FALSE]   
-   y0 <- Y0[id0,,drop=FALSE]
-   x1 <- X1[id1,,drop=FALSE]   
-   y1 <- Y1[id1,,drop=FALSE]
-
+    # Input og output for faellesmaengden af units. 
+    # De samme units der skal beregnes for ellers giver det ingen mening
+    # at beregne Malmquist indeks
+    x0 <- X0[id0,,drop=FALSE]   
+    y0 <- Y0[id0,,drop=FALSE]
+    x1 <- X1[id1,,drop=FALSE]   
+    y1 <- Y1[id1,,drop=FALSE]
+    
+    # Reference teknologi kan godt vaere bestemt af forskelige units i 
+    # forskellige perioder, men det kan ogsaa vaere de samme units der 
+    # bestemmer teknologien i hver periode.
+    if (SAMEREF)  {
+        X0 <- X0[id0,,drop=FALSE]   
+        Y0 <- Y0[id0,,drop=FALSE]
+        X1 <- X1[id1,,drop=FALSE]   
+        Y1 <- Y1[id1,,drop=FALSE]
+    }
 
    # Skal teknologien i en periode bestemmes af alle dem der i
    # perioden uafhaengigt af om de er i den anden periode?  Som det er
    # gjort nu er teknologien bestemt af dem der er i begge perioder.
+   # Ved at bruge X0, X1 mm. som reference bestemmes teknologien af alle
+   # units i paagaeldende periode, selv om der kun beregnes indeks for units
+   # der er i begge perioder.
 
-   e00 <- dea(x0, y0, RTS=RTS, ORIENTATION=ORIENTATION,
+   e00_ <- dea(x0, y0, RTS=RTS, ORIENTATION=ORIENTATION, XREF=X0,YREF=Y0,
          SLACK=SLACK, DUAL=DUAL, DIRECT=DIRECT, param=param,
          TRANSPOSE=TRANSPOSE, FAST=TRUE, LP=LP, CONTROL=CONTROL, LPK=LPK)
-   e10 <- dea(x1, y1, RTS=RTS, ORIENTATION=ORIENTATION, XREF=x0,YREF=y0,
+   e10_ <- dea(x1, y1, RTS=RTS, ORIENTATION=ORIENTATION, XREF=X0,YREF=Y0,
          SLACK=SLACK, DUAL=DUAL, DIRECT=DIRECT, param=param,
          TRANSPOSE=TRANSPOSE, FAST=TRUE, LP=LP, CONTROL=CONTROL, LPK=LPK)
-   e11 <- dea(x1, y1, RTS=RTS, ORIENTATION=ORIENTATION,
+   e11_ <- dea(x1, y1, RTS=RTS, ORIENTATION=ORIENTATION, XREF=X1,YREF=Y1,
          SLACK=SLACK, DUAL=DUAL, DIRECT=DIRECT, param=param,
          TRANSPOSE=TRANSPOSE, FAST=TRUE, LP=LP, CONTROL=CONTROL, LPK=LPK)
-   e01 <- dea(x0, y0, RTS=RTS, ORIENTATION=ORIENTATION, XREF=x1,YREF=y1,
+   e01_ <- dea(x0, y0, RTS=RTS, ORIENTATION=ORIENTATION, XREF=X1,YREF=Y1,
          SLACK=SLACK, DUAL=DUAL, DIRECT=DIRECT, param=param,
          TRANSPOSE=TRANSPOSE, FAST=TRUE, LP=LP, CONTROL=CONTROL, LPK=LPK)
 
+    # Lav raekkefoelgen saa den svarer til den i idlab
+    e00 <- rep(NA, length(idlab))
+    e01 <- rep(NA, length(idlab))
+    e10 <- rep(NA, length(idlab))
+    e11 <- rep(NA, length(idlab))
+    for( i in idlab)  {
+        e00[idlab==i] <- e00_[ID0[id0]==i]
+        e01[idlab==i] <- e01_[ID0[id0]==i]
+        e10[idlab==i] <- e10_[ID1[id1]==i]
+        e11[idlab==i] <- e11_[ID1[id1]==i]
+    }
    tc <- sqrt(e10/e11 * e00/e01)  # teknisk aendring; flytning af frontier
    ec <- e11/e00                  # aendring i effektivitet
    m  <- tc * ec
    mq <- sqrt(e10/e00 * e11/e01)  ## == m;  Malmquist indeks for produktivitet
 
-   
    return( list(m=m, tc=tc, ec=ec, mq=mq, id=idlab, id0=id0, id1=id1, 
                 e00=e00, e10=e10, e11=e11, e01=e01) )
 

@@ -1,4 +1,4 @@
-// $Id: chol_down.cpp 236 2021-04-26 20:38:03Z lao $
+// $Id: chol_down.cpp 249 2022-10-23 16:12:37Z x052717 $
 #include <math.h>
 #define STRICT_R_HEADERS
 #include <Rcpp.h>
@@ -18,9 +18,9 @@ compileAttributes("Benchmarking", verbose=TRUE)
 
 // Find Cholesky faktorisering af symmetrisk positiv definit matrix A;
 // resultat er en nedre trekantsmatrix.
-// Inputmatricen A ændres ikke.
-// Særlig beregnet til brug i outlier.ap derfor ingen kontrol af input.
-// Der er ingen test af noget så funktionen kan give underlige
+// Inputmatricen A aendres ikke.
+// Saerlig beregnet til brug i outlier.ap derfor ingen kontrol af input.
+// Der er ingen test af noget saa funktionen kan give underlige
 // resultater hvis 'A' ikke er symetrisk og positiv definit.
 // [[Rcpp::export]]
 NumericMatrix chol_LO(const NumericMatrix A)
@@ -46,9 +46,9 @@ NumericMatrix chol_LO(const NumericMatrix A)
 
 
 
-// Opdater Cholesky faktorisering ved en rang 1 ændring enten
+// Opdater Cholesky faktorisering ved en rang 1 aendring enten
 // ved plus eller ved minus.
-// Input L og v ændres IKKE undervejs og er derfor IKKE ændret ved retur.
+// Input L og v aendres IKKE undervejs og er derfor IKKE aendret ved retur.
 // [[Rcpp::export]]
 NumericMatrix chol_downdate(const NumericMatrix L, const NumericVector v)
 {
@@ -98,7 +98,7 @@ NumericMatrix chol_downdate2(const NumericMatrix L, const NumericVector v)
 
 // Beregn determinant ud fra Cholesky faktorisering 'L' der
 // dowddates med rang 1.
-// Bemærk L bliver IKKE ændret i funktionen!!!
+// Bemaerk L bliver IKKE aendret i funktionen!!!
 // [[Rcpp::export]]
 double det_chol_downdate(const NumericMatrix L, const NumericVector v)
 {
@@ -202,7 +202,7 @@ NumericMatrix inverse_spd(const NumericMatrix A, bool lower_triangel=false)
 
 
 
-// Løser ligningssystemet Ly=d hver L er nedre trekantmatrix
+// Loeser ligningssystemet Ly=d hver L er nedre trekantmatrix
 // [[Rcpp::export]]
 NumericVector solve_LO(const NumericMatrix L, const NumericVector d)
 {

@@ -1,4 +1,4 @@
-% $Id: malmq.Rd 238 2021-07-11 16:12:17Z X022278 $
+% $Id: malmq.Rd 247 2022-09-15 22:38:27Z X052717 $
 
 \name{malmq}
 \alias{malmq}
@@ -6,52 +6,60 @@
 \title{Malmquist index}
 
 \description{
-	Estimates Malmquist indices for productivity and its decomposition between two
-	periods. The units in the two periods does not have to be exactly the same, but
-	the Malmquist index is only calculated for units present in both periods.
+    Estimates Malmquist indices for productivity and its decomposition between two
+    periods. The units in the two periods does not have to be exactly the same, but
+    the Malmquist index is only calculated for units present in both periods.
 }
 
 \usage{
 malmq(X0, Y0, ID0 = NULL, X1, Y1, ID1 = NULL, RTS = "vrs", ORIENTATION = "in", 
-	SLACK = FALSE, DUAL = FALSE, DIRECT = NULL, param = NULL, TRANSPOSE = FALSE,
-	FAST = TRUE, LP = FALSE, CONTROL = NULL, LPK = NULL)
+    SAMEREF=FALSE, SLACK = FALSE, DUAL = FALSE, DIRECT = NULL, param = NULL, 
+    TRANSPOSE = FALSE, FAST = TRUE, LP = FALSE, CONTROL = NULL, LPK = NULL)
 }
 
 \arguments{
-  \item{X0}{Inputs of firms in period 0, a K0 x m matrix
+    \item{X0}{Inputs of firms in period 0, a K0 x m matrix
     of observations of K0 firms with m inputs (firm x input). }
-    
-  \item{Y0}{Outputs of firms in period 0, a K0 x n matrix
-  of observations of K0 firms with n outputs (firm x input). }
-  
-  \item{ID0}{Index for firms in period 0; could be numbers or labels. Length K0.}
-  
-  \item{X1}{Inputs of firms in period 1, a K1 x m matrix
+
+    \item{Y0}{Outputs of firms in period 0, a K0 x n matrix
+    of observations of K0 firms with n outputs (firm x input). }
+
+    \item{ID0}{Index for firms in period 0; could be numbers or labels. Length K0.}
+
+    \item{X1}{Inputs of firms in period 1, a K1 x m matrix
     of observations of K1 firms with m inputs (firm x input).}
-    
-  \item{Y1}{Outputs of firms in period 1, a K1 x n matrix
-  of observations of K1 firms with n outputs (firm x input). }
-  
-  \item{ID1}{Index for firms in period 0; could be numbers or labels. Length K0.}
-  
-  \item{RTS}{Returns to scale assumption as in \code{\link{dea}}.}
-  
-  \item{ORIENTATION}{Input efficiency "in" (1), output
+
+    \item{Y1}{Outputs of firms in period 1, a K1 x n matrix
+    of observations of K1 firms with n outputs (firm x input). }
+
+    \item{ID1}{Index for firms in period 0; could be numbers or labels. Length K0.}
+
+    \item{RTS}{Returns to scale assumption as in \code{\link{dea}}.}
+
+    \item{ORIENTATION}{Input efficiency "in" (1), output
       efficiency "out" (2), and graph efficiency "graph" (3) as in \code{\link{dea}}.}
+
+    \item{SAMEREF}{Use the same units for reference technology when comparing 
+    two periods. This is not restricted to same units in several timpe periods, 
+    but only to pairwise periods comparisons for Malmquist.  Default is to use 
+    available and possible differnt units in pairwise periods.}
+
       
-  \item{SLACK}{See \code{\link{dea}}.}
-  \item{DUAL}{See \code{\link{dea}}.}
-\item{DIRECT}{See \code{\link{dea}}.}
-\item{param}{See \code{\link{dea}}.}
-\item{TRANSPOSE}{See \code{\link{dea}}.}
-\item{FAST}{See \code{\link{dea}}.}
-\item{LP}{See \code{\link{dea}}.}
-\item{CONTROL}{See \code{\link{dea}}.}
-\item{LPK}{See \code{\link{dea}}.}
-  
+    \item{SLACK}{See \code{\link{dea}}.}
+    \item{DUAL}{See \code{\link{dea}}.}
+    \item{DIRECT}{See \code{\link{dea}}.}
+    \item{param}{See \code{\link{dea}}.}
+    \item{TRANSPOSE}{See \code{\link{dea}}.}
+    \item{FAST}{See \code{\link{dea}}.}
+    \item{LP}{See \code{\link{dea}}.}
+    \item{CONTROL}{See \code{\link{dea}}.}
+    \item{LPK}{See \code{\link{dea}}.}
 }
 
 \details{
+The order of the units in values is given by the returned value \code{id}. 
+This is usefull if the order of units differ completely between \code{ID0} and \code{ID1}.
+    
 The \emph{index for technical changes} \code{tc} is calculated as \code{sqrt(e10/e11 * e00/e01)} 
 where \code{e<s><t>} is the efficiency for period \code{s} when the reference technology is
 for period \code{t}, i.e. determined from the observations for period \code{t} and 
@@ -62,17 +70,17 @@ The \emph{Malmquist index for productivity} \code{mq} is calculates as \code{sqr
 }
 
 \value{
-	\item{m}{Malmquist index for productivity.}
-	\item{tc}{Index for technology change.}
-	\item{ec}{Index for efficiency change.}
-	\item{mq}{Malmquist index for productivity; same as \code{m}.}
-	\item{id}{Index for firms present in both period 0 and period 1.}
-	\item{id0}{Index for firms in period 0 that are also in period 1.}
-	\item{id1}{Index for firms in period 1 that are also in period 0.}
-	\item{e00}{The efficiencies for period 0 with reference technology from period 0.}
-	\item{e10}{The efficiencies for period 1 with reference technology from period 0.}
-	\item{e11}{The efficiencies for period 1 with reference technology from period 1.}
-	\item{e01}{The efficiencies for period 0 with reference technology from period 1.}
+    \item{m}{Malmquist index for productivity.}
+    \item{tc}{Index for technology change.}
+    \item{ec}{Index for efficiency change.}
+    \item{mq}{Malmquist index for productivity; same as \code{m}.}
+    \item{id}{Index for firms present in both period 0 and period 1.}
+    \item{id0}{Index for firms in period 0 that are also in period 1.}
+    \item{id1}{Index for firms in period 1 that are also in period 0.}
+    \item{e00}{The efficiencies for period 0 with reference technology from period 0.}
+    \item{e10}{The efficiencies for period 1 with reference technology from period 0.}
+    \item{e11}{The efficiencies for period 1 with reference technology from period 1.}
+    \item{e01}{The efficiencies for period 0 with reference technology from period 1.}
 }
 
 

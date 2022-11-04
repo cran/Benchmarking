@@ -1,4 +1,4 @@
-// $Id: outlier.cpp 236 2021-04-26 20:38:03Z lao $
+// $Id: outlier.cpp 249 2022-10-23 16:12:37Z x052717 $
 #include <math.h>
 #define STRICT_R_HEADERS
 #include <float.h>
@@ -56,7 +56,7 @@ void outlierCpp(const int K, const int R, NumericMatrix xy,
     double rrlast;
     int e, h;
     int nmmp1;
-    vector<int> del(1);  // Mængde af indeks der skal udelades, antal firms
+    vector<int> del(1);  // Maengde af indeks der skal udelades, antal firms
     vector<int> j(1);
 
     for (int r=1; r <= R; ++r) {

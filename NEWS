@@ -1,4 +1,4 @@
-$Id: NEWS 242 2022-03-18 11:49:12Z X052717 $
+$Id: NEWS 249 2022-10-23 16:12:37Z x052717 $
 
 Upcoming
 
@@ -7,15 +7,24 @@ Upcoming
 * A fast version of dea.boot
 
 
+Changes to Benchmarking version 0.31
+
+* In the calculation of Malmquist index in malmquist.R and malmq.R there is new an option to use a technology set for a period that is determined by the units available in that period and not just units available in both periods (SAMEREF=FALSE).
+
+* Corrected an error in order of returned results in malmquist.R and malmq.R when the order of units differ in the periods involved.
+
+* Removed several special Danish letters in the code as they are not liked by CRAN
+
+
 Changes to Benchmarking version 0.30
 
-* Corrected bug in cost.opt and revenue.opt when the number of firms determing the technology and the number of firms to determine the optimum are differerent
+* Corrected bug in cost.opt and revenue.opt when the number of firms determining the technology and the number of firms to determine the optimum are different
 
 * Better test for numerical input to X and Y matrices
 
 * In eladder.plot optional change of labels can be given in options
 
-* Correctet error in calculation of slacks in graph orientation (reported by Mette Asmild & co)
+* Corrected error in calculation of slacks in graph orientation (reported by Mette Asmild & co)
 
 * Shifted the names of output prices to be consistent with the shift in output names done in version 0.18 (reported by Rasmus Seneberg Zitthen and Arne Henningsen)
 
@@ -62,7 +71,7 @@ Changes to Benchmarking version 0.27
 
 * Possible to set maximum number of peers to delete in eladder by parameter MAXELAD
 
-* Name of collumn for count of peers changed from '#' to 'count'
+* Name of column for count of peers changed from '#' to 'count'
 
 * New technology "vrs+"; as "vrs", but with restrictions on individual lambda and sums of lambda by using the parameter \code{param}; note that the resulting technology set is not necessarily convex.
 

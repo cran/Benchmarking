@@ -1,4 +1,4 @@
-# $Id: dea.plot.R 244 2022-05-05 14:31:31Z X052717 $
+# $Id: dea.plot.R 245 2022-05-11 22:52:42Z X052717 $
 "dea.plot" <-
 function(x, y, RTS="vrs", ORIENTATION="in-out", txt=NULL, add=FALSE, 
             wx=NULL, wy=NULL, TRANSPOSE = FALSE, fex=1, GRID=FALSE,
@@ -113,7 +113,7 @@ function(x, y, RTS="vrs", ORIENTATION="in-out", txt=NULL, add=FALSE,
             txt <- 1:length(x)
          }
       }
-      if ( class(txt)!="logical" && length(txt) > 0 ) {
+      if ( !is(txt, "logical") && length(txt) > 0 ) {
         # Evt. tekst paa punkter saettes lidt nede til hoejre
         text(x,y,txt,adj=c(-.75,.75),cex=fex)
       }
