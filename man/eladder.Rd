@@ -1,18 +1,27 @@
-% $Id: eladder.Rd 240 2022-01-07 12:15:15Z X052717 $
+% $Id: eladder.Rd 259 2023-09-19 08:34:20Z larso $
+\encoding{UTF-8}
 \name{eladder}
 \alias{eladder}
+\alias{eladder2}
 \alias{eladder.plot}
 
-\title{ Efficiency ladder for a single firm }
+\title{Efficiency ladder for a single firm}
 
-\description{ How the efficiency changes as the most influential peer
-is removed sequentially one at a time }
+\description{How the efficiency changes as the most influential peer is
+removed sequentially one at a time. For \code{eladder} the removed peer it
+is the one that have the largest change in efficiency when removed and for 
+\code{eladder2} it is the peer with the largest weight (lambda).}
 
 \usage{
-eladder(n, X, Y, RTS = "vrs", ORIENTATION = "in", 
-        XREF=NULL, YREF=NULL, DIRECT = NULL, param=NULL, MAXELAD=NULL)
+
+eladder(n, X, Y, RTS="vrs", ORIENTATION="in", 
+	XREF=NULL, YREF=NULL, DIRECT=NULL, param=NULL, MAXELAD=NULL)
+
+eladder2(n, X, Y, RTS = "vrs", ORIENTATION = "in", 
+	XREF=NULL, YREF=NULL, DIRECT = NULL, param=NULL, MAXELAD=NULL)
+
 eladder.plot(elad, peer, TRIM = NULL, 
-    xlab="Most influential peers", ylab="Efficiency", ...)
+	xlab="Most influential peers", ylab="Efficiency", ...)
 }
 
 
@@ -59,8 +68,8 @@ eladder.plot(elad, peer, TRIM = NULL,
 
   \item{elad}{The sequence of efficiencies returned from \code{eladder}. }
 
-  \item{peer}{The sequence of peers returned from \code{eladder}. Also used for 
-      annotations at the tickmarks at the x-axis.}
+  \item{peer}{The sequence of peers returned from \code{eladder}. Also used
+	  for annotations at the tick marks at the x-axis.}
 
   \item{TRIM}{The number of characters for the name of the peers on
       the axis in the plot. }
@@ -74,12 +83,15 @@ eladder.plot(elad, peer, TRIM = NULL,
 }
 
 
-\details{ The function \code{eladder} calculates how the efficiency
-   for a firm changes when the most influential peer is removed
-   sequentially one at a time. Somewhere in the sequence the firm
+\details{ The function \code{eladder} calculates how the efficiency for a
+   firm changes when the most influential peer is removed sequentially one
+   at a time. For \code{ eladder} the largest effect is the largest change
+   in efficiency and for \code{ eladder2} the largest weight, lambda.
+   
+   Somewhere in the sequence the firm
    becomes efficient and are itself removed from the set of firms
-   generating the technology (or the only firm left) and thereafter
-   the efficiencies are super-efficiencies.
+   generating the technology (or the only firm left) and thereafter 
+   the efficiencies are super-efficiencies and the process stops.
    
    When it happens that there is no solution to the dea problem after
    removing a series of peers then the program might stop before
@@ -102,8 +114,8 @@ eladder.plot(elad, peer, TRIM = NULL,
    the x-axis might be squeeze together and be illegible. In this case
    restrict the number of influential peers to be removed.
 
-   The efficiency step ladder is discussed in Essay 4 of Dag Fjeld
-   Edvardsens's Ph.D. thesis from 2004.}
+   The efficiency step ladder is discussed in Essay III of Dag Fjeld
+   Edvardsen's Ph.D. thesis from 2004.}
 
 
 \references{ Dag Fjeld Edvardsen; \emph{Four Essays on the Measurement

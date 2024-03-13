@@ -1,4 +1,4 @@
-% $Id: dea.Rd 238 2021-07-11 16:12:17Z X022278 $
+% $Id: dea.Rd 253 2023-02-27 14:10:46Z X052717 $
 \name{dea}
 \alias{dea}
 % \alias{dea.mat}
@@ -142,7 +142,7 @@ via \code{param}
      FAST cannot be used as input for \code{slack} and \code{peers}.}
 
 \item{CONTROL}{Possible controls to \pkg{lpSolveAPI}, see the
-      documentation for that package.}
+      documentation for that package; use \code{?lp.control.options}}
 
 \item{\dots}{Optional parameters for the print and summary methods.}
 
@@ -319,15 +319,18 @@ satisfactory, i.e. sometime, a solution cannot always be found -- the
 program prints a warning and the efficiency for the firm is set to NA. 
 Often this is due to a bad scaling of the data. Either the user can try 
 a different scaling of data when calling the function or one can use the
-option \code{CONTROL} to try a different scaling I the program. For 
-instance one can try \code{CONTROL=list(scaling=c("geometric", "equilibrate")}
-or \code{CONTROL=list(scaling=c("curtisreid", "equilibrate")} in the 
-option list for the function call.
+option \code{CONTROL} to try a different scaling by the program. For 
+instance one can insert \code{CONTROL=list(scaling=c("geometric", "equilibrate")}
+or \code{CONTROL=list(scaling=c("curtisreid", "equilibrate", "dynupdate")} 
+in the option list for the function call. The full list of possible 
+scaling options can be found found from \code{?lp.control.options} under
+"scaling".
 
 If a numerical problem occurs, status=5, the best solution is probably to
-scale the input \code{X} and output \code{Y} yourself. The best results are
-obtained when the variables are close to 1. If some variable are in the
-millions, then let the unit of measure be a million units.
+scale the input \code{X} and output \code{Y} yourself or use a different
+scaling option as desribed above. The best results are obtained when the 
+variables are close to 1. If some variable are in the millions, then let
+the unit of measure be a million.
 
 }
 

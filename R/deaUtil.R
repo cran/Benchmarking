@@ -1,4 +1,4 @@
-# $Id: deaUtil.R 246 2022-05-31 11:56:07Z X052717 $
+# $Id: deaUtil.R 263 2024-03-13 14:04:04Z larso $
 
 # Naesten alle funktioner transponerer lambda i forhold til normal.
 # Normal er lambda K x Kr, men i naesten alle funktioner laves den
@@ -426,7 +426,7 @@ excess <- function(object, X=NULL, Y=NULL)  {
 
 
 
-eladder <- function(n, X, Y, RTS="vrs", ORIENTATION="in", 
+eladder2 <- function(n, X, Y, RTS="vrs", ORIENTATION="in", 
                     XREF=NULL, YREF=NULL, DIRECT=NULL, param=NULL, MAXELAD=NULL)  {
 
    if ( is.null(XREF) )  {
@@ -438,7 +438,7 @@ eladder <- function(n, X, Y, RTS="vrs", ORIENTATION="in",
 
    idx <- NULL
    if ( missing(MAXELAD) || is.null(MAXELAD) ) {
-    MAXELAD <- dim(XREF)[1]
+    	MAXELAD <- dim(XREF)[1]
    } else {
     if( !is.numeric(MAXELAD) ) stop("MAXELAD must be an integer")
         MAXELAD <- min(abs(MAXELAD), dim(XREF)[1])
@@ -467,15 +467,15 @@ eladder <- function(n, X, Y, RTS="vrs", ORIENTATION="in",
     # Array nr. for den stoerste vaerdi af lambda
     # Bruger kun den foerste hvis der er flere
     p <- which.max(e$lambda)
-    # if (LP) print(paste("p =",p))
     # firm number for array number p, firm numbers follow L in the colnames
     str <- substring(colnames(e$lambda)[p],2)
-    # if (LP) print(str)
+    # 'ip' er indeksnr. for peer lavet ud fra søjlenavnet
     suppressWarnings(ip <- as.integer(str))
-    # if (LP) print(paste("    ", ip),quote=FALSE)
     # nok en firm der ikke laengere skal indgaa i referenceteknologien
     if ( is.na(ip) )  {
-       # det er et navn/en streng saa den skal laves om til et indeks,
+    	# Søjlenavn mangler i lambda eller er ikke et nummer så ip er NA, 
+    	# derfor forsøges de fundet ud fra søjlenavn i XREF.
+       # Det er et navn/en streng saa den skal laves om til et indeks,
        # et heltal, for elleres kan den ikke bruges som indeks til FRONT.IDX
        str0 <- substring(str,2)
        # if (LP) print(str0)
@@ -488,9 +488,10 @@ eladder <- function(n, X, Y, RTS="vrs", ORIENTATION="in",
     }
     # saa er ip et tal
     idx <- c(idx,-ip)
+    if (eff(e) > 1) break
   }
-  elad <- na.omit(elad)
-  elad <- elad[1:length(elad)]
+  ## elad <- c(na.omit(elad))  # Er dette ikke overflødigt? Der er test for is.na(eff(e))
+  						       # Nej for elad er initialiseret til bar NA'er
   if ( is.null(idx) )  {
      idx <- NA
   } else {

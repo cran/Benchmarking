@@ -1,4 +1,4 @@
-# $Id: dea.dual.R 244 2022-05-05 14:31:31Z X052717 $
+# $Id: dea.dual.R 257 2023-06-07 09:51:25Z larso $
 
 # In the calculation in the method input/output matrices X and Y are
 # of the order good x firms.  Ie. X, Y etc must be transformed as
@@ -387,6 +387,11 @@ if ( is.null(AD) )  {
 
    colnames(u) <- paste("u",1:m,sep="")
    colnames(v) <- paste("v",1:n,sep="")
+   if (rlamb==1)  {
+	   colnames(gamma) <- "gamma"
+	} else if (rlamb>=2)  {
+		colnames(gamma) <- paste("gamma",1:rlamb,sep="")
+	}
 
    if ( TRANSPOSE )  {
       u <- t(u)

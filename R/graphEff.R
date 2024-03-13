@@ -1,13 +1,13 @@
-# $Id: graphEff.R 241 2022-03-16 14:00:23Z X052717 $
+# $Id: graphEff.R 256 2023-04-26 16:29:58Z larso $
 
 # Funktion til beregning af graf efficiens.  Beregning sker via
 # bisection hvor der itereres mellem mulige og ikke-mulige loesninger
-# et LP problem hvor venstreside er som in- og output orienteret
+# i et LP problem hvor venstreside er som in- og output orienteret
 # efficiens. blot er foerste soejle erstattet af rene nuller, og G*X og
 # (1/G)*Y optraeder paa hoejresiden. Minimering af 0 saa der blot soeges om
 # der er en mulig loesning. Da soejlen for efficiens er bar 0'er vil
 # justering af efficiens ud over G ikke ske, dvs. det er kun lambdaer
-# der tilpasses for at se om der er en mulig loesning.
+# der tilpasses for at se, om der er en mulig loesning.
 
 graphEff <- function(lps, X, Y, XREF, YREF, RTS, FRONT.IDX, rlamb, oKr, 
          param=param, TRANSPOSE=FALSE, SLACK=FALSE, FAST=FALSE, LP=FALSE,
@@ -17,6 +17,7 @@ graphEff <- function(lps, X, Y, XREF, YREF, RTS, FRONT.IDX, rlamb, oKr,
    n = dim(Y)[2]  # number of outputs
    K = dim(X)[1]  # number of units, firms, DMUs
    Kr = dim(YREF)[1]  # number of units, firms, DMUs
+   MAXITER <- 50  # Maksimale antal interationer i bysection
 
     if (LP)  {
         cat("m=",m, ", n=",n, ", K=",K, ", Kr=", Kr, "\n", sep="")
@@ -29,9 +30,11 @@ graphEff <- function(lps, X, Y, XREF, YREF, RTS, FRONT.IDX, rlamb, oKr,
    } else {
        lambda <- matrix(NA, nrow=K, ncol=Kr) # lambdas one column per unit
    }
+
    set.column(lps, 1, rep(0,dim(lps)[1]))
    lpcontr <- lp.control(lps)
    tol <- lpcontr$epsilon["epsint"]
+   if (LP) {cat("tol = ", tol, "\n", sep="")}
    lp.control(lps, timeout=5, verbose="severe")
    if (!missing(CONTROL)) set_control(lps, CONTROL)
    for ( k in 1:K)  {   ## loekke for hver unit
@@ -41,8 +44,7 @@ graphEff <- function(lps, X, Y, XREF, YREF, RTS, FRONT.IDX, rlamb, oKr,
       b <- 2  # medfoerer start med G=1
       nIter <- 0
       gFundet <- FALSE
-      xIset <- TRUE
-
+      xIset <- TRUE  # Lidt mystisk variabel; TRUE hvis interval SKAL findes
       # Er G==1 en mulighed?
       G <- 1
       set.rhs(lps, c(-G*X[k,],Y[k,]/G), 1:(m+n))
@@ -50,9 +52,9 @@ graphEff <- function(lps, X, Y, XREF, YREF, RTS, FRONT.IDX, rlamb, oKr,
       status <- solve(lps)
       #if (status==7) { print(paste("For G=1, status =",status)); flush.console()}
       if (LP) { print(paste("For G=1, status =",status)); flush.console()}
-      nIter <- nIter + 1
       if ( status == 0 )  {
          # G=1 er mulig; hvis G=1-tol ikke er mulig, er G=1 optimal loesning
+         nIter <- nIter + 1
          G <- 1 - tol
          if (LP) { print(paste("G korrigeret til", G, "; tol =", tol)); flush.console() }
          set.rhs(lps, c(-G*X[k,],Y[k,]/G), 1:(m+n))
@@ -62,29 +64,25 @@ graphEff <- function(lps, X, Y, XREF, YREF, RTS, FRONT.IDX, rlamb, oKr,
          status <- solve(lps)
          #if (status==7) { print(paste("For G=1-eps, status =",status)); flush.console()}
          if (LP) { print(paste("For G=1-eps, status =",status)); flush.console()}
-         nIter <- nIter + 1
          if ( status != 0 )  {
             # G=1 er mulig og G=1-eps er ikke-mulig ==> G==1
             G <- b <- 1
             gFundet <- TRUE
          }
       } else {
-         if (LP) {warning("Firm outside technology set, firm =",k); flush.console()}
-         # G=1 er ikke mulig; firm uden for teknology set saa G > 1; eller
+         # G=1 er ikke mulig; unit uden for teknology, saa G > 1; eller
          # der er skeet en fejl i solve.
-         xIset <- FALSE
-         # Bestem oevre graense
-         b <- 2
-         while (status != 0 && nIter < 50)  {
+         if (LP) {warning("Firm outside technology set, firm =",k); flush.console()}
+         # Bestem oevre graense, start med 2; 'b' er allerede sat til 2
+         while (status != 0 && nIter < MAXITER)  {
+            nIter <- nIter + 1
             set.rhs(lps, c(-b*X[k,], Y[k,]/b), 1:(m+n))
             set.basis(lps, default=TRUE)
             status <- solve(lps)
-            if ( status==5 )  {
-               set.basis(lps, default=TRUE)
-               status <- solve(lps)
-            }
+            if (LP) { print(paste0("For b = ", b, ", status = ",status)); flush.console()}
             #if (status==7) { print(paste0("b G = ", G, ", status =",status)); flush.console()}
-            nIter <- nIter + 1
+            if (status==0) break
+            # 'b' skal ikke aendres naar en loesning findes
             b <- b^2
          }
          # nedre graense
@@ -92,14 +90,17 @@ graphEff <- function(lps, X, Y, XREF, YREF, RTS, FRONT.IDX, rlamb, oKr,
                                               # vaerdi var sqrt(b) som saa er en mulig
                                               # nedre graense
          }  else  { a <- 1 }
-      }
+         xIset <- FALSE  # Interval er nu sat
+      }  ## Nedre og Oevre graense, interval, er sat, men kun naar G>1
 
       status <- 0 # status kunne godt have en anden vaerdi og saa 
                   # ville naeste loekke ikke blive gennemloebet
       if ( !gFundet && xIset && status == 0 )  {
-        # Find en nedre graense; find et interval under 1 som kan
-        # bruges ved start af bisection.
-         # G==1 er mulig og G er ikke fundet endnu
+        # Find interval naar G<1;
+        # skal bruges ved start af bisection.
+        # Der kraever normalt faerre iterationer at loebe intervaller igennem i 
+        # stedet for at bruge bisection straks, fordi loesning ofte er mellem 0.6 og 1.0.
+         # G==1 er mulig og G er mindre end 1
          dif <- .1
          i <- 1
          while ( status==0 && i < 10 )  {
@@ -108,10 +109,6 @@ graphEff <- function(lps, X, Y, XREF, YREF, RTS, FRONT.IDX, rlamb, oKr,
             set.rhs(lps, c(-G*X[k,],Y[k,]/G), 1:(m+n))
             set.basis(lps, default=TRUE)
             status <- solve(lps)
-            if ( status==5 )  {
-               set.basis(lps, default=TRUE)
-               status <- solve(lps)
-            }
             #if (status==7) { print(paste("Graense: G = ",G,"; status = ",status)); flush.console()}
             if (LP) { print(paste("G = ",G,"; status = ",status)); flush.console()}
             nIter <- nIter + 1
@@ -128,39 +125,39 @@ graphEff <- function(lps, X, Y, XREF, YREF, RTS, FRONT.IDX, rlamb, oKr,
       }
 
 
-      # bisection loekke
+      # Bisection loekke
       if (LP) { print(paste("Bisection interval: [",a,",",b,"]")); flush.console()}
-      while ( !gFundet && b-a > tol^2 && nIter < 50 )  {
+      while ( !gFundet && b-a > tol^1.5 && nIter < MAXITER )  {
         # if (LP) {cat("nIter =", nIter, "\n"); flush.console()}
          G <- (a+b)/2
          # if (LP) { print(paste("Bisect: G = ",G,"(",k,")")); flush.console()}
          set.rhs(lps, c(-G*X[k,],Y[k,]/G), 1:(m+n))
-            set.basis(lps, default=TRUE)
-            status <- solve(lps)
+         set.basis(lps, default=TRUE)
+         status <- solve(lps)
          #if (status==7) { print(paste("Bisect G = ",G,"(",k,"); status =",status)); flush.console()}
          if (LP) { print(paste("G = ",G,"(",k,"); status =",status)); flush.console()}
          if ( status == 0 ) {
-            # loesning findes
+            # loesning findes, saet ny oevre graense
             b <- G
-         } else {
+         } else {  # ellers ny nedre graense, hvis loesning ikke findes
             a <- G
          }
          nIter <- nIter + 1
-      }
-      if (LP) {print(paste("nIter =",nIter,"; status =",status)); flush.console()}
+      }  ## while (...
+      if (LP) {print(paste0("nIter=",nIter,"; G=", G, "; status=",status)); flush.console()}
 
       if ( status != 0 )  {
          # Hvis den sidste vaerdi af G ikke var mulig bruger vi den
          # oevre graense. Det er noedvendigt med en mulig loesning for at
          # kunne faa lambdaer og duale vaerdier.
          G <- b
-          set.rhs(lps, c(-G*X[k,],Y[k,]/G), 1:(m+n))
-          set.basis(lps, default=TRUE)
+         set.rhs(lps, c(-G*X[k,],Y[k,]/G), 1:(m+n))
+         set.basis(lps, default=TRUE)
          status <- solve(lps)
          #if (status==7) { print(paste("Sidste G = ",G,"; status =",status)); flush.console()}
        }
       if (LP)  {
-         print(paste("G = ",G,"(",k,"); status =",status))
+         print(paste0("G = ",G," (",k,"); status = ",status))
          # print(rlamb)
          # print("Solution")
          # print(get.variables(lps))
@@ -173,19 +170,19 @@ graphEff <- function(lps, X, Y, XREF, YREF, RTS, FRONT.IDX, rlamb, oKr,
          sol <- get.variables(lps)
          lambda[k,] <- sol[2:(1+Kr)]
       }
-    if (LP && status==0) {
-         print(paste("Objval, firm",k))
-         print(get.objective(lps))
-         # print("Solution/varaibles")
-         # print(get.variables(lps))
-         # print("Primal solution")
-         # print(get.primal.solution(lps))
-         # print("Dual solution:")
-         # print(get.dual.solution(lps))
-         flush.console()
-      }
-   }  # loop for each firm
-    lp.control(lps, timeout=0, verbose="neutral")
+        if (LP && status==0) {
+             print(paste("Objval, firm",k))
+             print(get.objective(lps))
+             # print("Solution/varaibles")
+             # print(get.variables(lps))
+             # print("Primal solution")
+             # print(get.primal.solution(lps))
+             # print("Dual solution:")
+             # print(get.dual.solution(lps))
+             flush.console()
+        }
+   }  # loop for each unit
+   lp.control(lps, timeout=0, verbose="neutral")
 
 
    e <- objval
@@ -199,9 +196,9 @@ graphEff <- function(lps, X, Y, XREF, YREF, RTS, FRONT.IDX, rlamb, oKr,
    }
 
    if ( length(FRONT.IDX)>0 )  {
-      colnames(lambda) <- paste("L",(1:oKr)[FRONT.IDX],sep="")
+       colnames(lambda) <- paste("L",(1:oKr)[FRONT.IDX],sep="")
    } else {
-      colnames(lambda) <- paste("L",1:Kr,sep="")
+       colnames(lambda) <- paste("L",1:Kr,sep="")
    }
 
    primal <- dual <- NULL

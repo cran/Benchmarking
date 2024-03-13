@@ -1,4 +1,4 @@
-# $Id: dea.R 241 2022-03-16 14:00:23Z X052717 $
+# $Id: dea.R 257 2023-06-07 09:51:25Z larso $
 
 # DEA beregning via brug af lp_solveAPI. Fordelene ved lp_solveAPI er
 # faerre kald fra R med hele matricer for hver unit og dermed skulle
@@ -525,9 +525,14 @@ dea  <-  function(X,Y, RTS="vrs", ORIENTATION="in", XREF=NULL,YREF=NULL,
         vy <- sign*dual[,(2+m):(1+m+n),drop=FALSE] 
         colnames(ux) <- paste("u",1:m,sep="")
         colnames(vy) <- paste("v",1:n,sep="")
-        if ( rlamb > 0 ) 
+        if ( rlamb > 0 ) {
             gamma <- dual[,(1+m+n+1):(1+m+n+rlamb),drop=FALSE]
-        else
+		   if (rlamb==1)  {
+			   colnames(gamma) <- "gamma"
+			} else {
+				colnames(gamma) <- paste("gamma",1:rlamb,sep="")
+			}
+        } else
             gamma <- NULL
      
     } else {

@@ -1,4 +1,4 @@
-% $Id: excess.Rd 238 2021-07-11 16:12:17Z X022278 $
+% $Id: excess.Rd 262 2024-03-13 12:37:42Z larso $
 \name{excess}
 \alias{excess}
 
@@ -17,7 +17,7 @@ excess(object, X = NULL, Y = NULL)
 \arguments{ 
 
   \item{object}{ A Farrell object as returned from functions like
-      \link{dea}, \link{dea.direct}, link{sdea}, and \link{mea}. }
+      \link{dea}, \link{dea.direct}, \link{sdea}, and \link{mea}. }
 
   \item{X}{ Input matrix, only necessary for ordinary input Farrell
       efficiency }

@@ -1,4 +1,4 @@
-% $Id: dea.boot.Rd 238 2021-07-11 16:12:17Z X022278 $
+% $Id: dea.boot.Rd 253 2023-02-27 14:10:46Z X052717 $
 \name{dea.boot}
 \alias{dea.boot}
 \alias{boot.fear}
@@ -159,7 +159,13 @@ boot.fear(X, Y, NREP = 200, EFF = NULL, RTS = "vrs", ORIENTATION = "in",
    the same bootstrap replica, but could easily be from different
    bootstrap replicas. This also means that this function can
    \emph{not} be used to bootstrap tests for statistical hypotheses
-   where the statistics involves summing of firm's efficiencies.}
+   where the statistics involves summing of firm's efficiencies.
+   
+    If a numerical problem occurs, status=5, or if no solution can be found,
+    the best solution is often to scale the input \code{X} and output
+    \code{Y} yourself or use the option \code{CONTROL} to change scaling in
+    the program itself, as described in the notes for \code{\link{dea}}.
+}
 
 \seealso{ The documentation for \code{boot.sw98} in the package
    \pkg{FEAR}. }

@@ -1,4 +1,4 @@
-% $Id: cost.opt.Rd 243 2022-05-03 14:44:51Z X052717 $
+% $Id: cost.opt.Rd 253 2023-02-27 14:10:46Z X052717 $
 \name{cost.opt}
 \alias{cost.opt}
 \alias{print.cost.opt}
@@ -162,6 +162,10 @@ and the weights are returned in \code{lambda}.  Note that the peers
 now are the firms for the optimal input and/or output allocation, not
 just the technical efficient firms.
 
+If a numerical problem occurs, status=5, or if no solution can be found,
+the best solution is often to scale the input \code{X} and output
+\code{Y} yourself or use the option \code{CONTROL} to change scaling in
+the program itself, as described in the notes for \code{\link{dea}}.
 }
 
 

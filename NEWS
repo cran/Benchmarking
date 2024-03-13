@@ -1,10 +1,17 @@
-$Id: NEWS 249 2022-10-23 16:12:37Z x052717 $
+﻿$Id: NEWS 260 2023-11-05 11:45:35Z larso $
 
 Upcoming
 
 * Directional distance efficiency for parametric function
 
 * A fast version of dea.boot
+
+
+Changes to Benchmarking version 0.32
+
+* Corrected bug in 'dea' with 'ORIENTATION="graph"'. When the calculated efficiency was between 1 and 2 the result was always 2 (reported by Mette Asmild and Alexander Öttl).
+
+* Added an eladder method that strictly corresponds to the reference; the original eladder method has been renamed to eladder2 (reported by Angeliki Flokou).
 
 
 Changes to Benchmarking version 0.31
@@ -20,13 +27,13 @@ Changes to Benchmarking version 0.30
 
 * Corrected bug in cost.opt and revenue.opt when the number of firms determining the technology and the number of firms to determine the optimum are different
 
-* Better test for numerical input to X and Y matrices
+* A better test for numerical input to X and Y matrices
 
 * In eladder.plot optional change of labels can be given in options
 
 * Corrected error in calculation of slacks in graph orientation (reported by Mette Asmild & co)
 
-* Shifted the names of output prices to be consistent with the shift in output names done in version 0.18 (reported by Rasmus Seneberg Zitthen and Arne Henningsen)
+* In pigdata.Rd shifted the names of output prices to be consistent with the shift in output names done in version 0.18 (reported by Rasmus Seneberg Zitthen and Arne Henningsen)
 
 
 Changes to Benchmarking version 0.29
@@ -35,9 +42,9 @@ Changes to Benchmarking version 0.29
 
 * The function outlier.ap is much faster, and a version aoulierC.ap written in C++, but still not fast enough.
 
-* Options for the LP solver can now also be used in dea.boot. This can be used to solve problems to find a solution for the dea LP problem when bootstrapping.
+* Options for the LP solver can now also be used in dea.boot. They can be used when solving problems to find a solution for the dea LP problem when bootstrapping.
 
-* The sign of the fitted values in sfa.cost is now positive just as the variable cost is positive; as a consequence the sign of the residuals is changed and as is the calculation for efficiencies when the function is a cost function.
+* The sign of the fitted values in sfa.cost is now positive just as the variable cost is positive; therefore, the sign of the residuals is changed and as is the calculation for efficiencies when the function is a cost function.
 
 
 Changes to Benchmarking version 0.28
@@ -99,7 +106,7 @@ Changes to Benchmarking version 0.24
 
 * Corrected several manual pages
 
-* Use of FEAR has been dropped as FEAR is hard to install and is not free.
+* Use of FEAR has been dropped as FEAR is hard to install and not free.
 
 * The method mea can now be used for directions in, out, and in-out.
 

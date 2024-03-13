@@ -46,7 +46,7 @@ teBC.sfa(object)
 teMode.sfa(object)
 teJ.sfa(object)
 
-te.add.sfa(object)
+te.add.sfa(object, ...)
 
 sigma2u.sfa(object)
 sigma2v.sfa(object)
@@ -103,7 +103,10 @@ lambda.sfa(object)
 
 
   \item{object}{Object of class \sQuote{sfa} as output from the
-      function \code{sfa}} }
+      function \code{sfa}} 
+      
+  \item{\dots}{Further arguments ... }    
+}
 
 
 \details{ The optimization is done by the R method \code{ucminf} from

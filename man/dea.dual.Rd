@@ -1,4 +1,4 @@
-% $Id: dea.dual.Rd 238 2021-07-11 16:12:17Z X022278 $
+% $Id: dea.dual.Rd 253 2023-02-27 14:10:46Z X052717 $
 \name{dea.dual}
 \alias{dea.dual}
 % \alias{dea.dual.mat}
@@ -141,6 +141,11 @@ scale restriction }
 Note that the dual values are not unique for extreme points in the
 technology set. In this case the value of the calculated dual variable can
 depend on the order of the complete efficient firms.
+
+If a numerical problem occurs, status=5, or if no solution can be found,
+the best solution is often to scale the input \code{X} and output
+\code{Y} yourself or use the option \code{CONTROL} to change scaling in
+the program itself, as described in the notes for \code{\link{dea}}.
 
 }
 

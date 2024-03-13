@@ -1,6 +1,6 @@
-# $Id: NAMESPACE 231 2020-07-26 20:56:26Z lao $
+# $Id: NAMESPACE 258 2023-08-03 12:27:03Z larso $
 export(dea, sdea,   # efficiency, eff,
-excess, eladder, eladder.plot,
+excess, eladder, eladder.plot, eladder2,
 dea.dual,
 dea.direct, dea.boot, boot.fear, 
 #  dea.mat, dea.dual.mat,

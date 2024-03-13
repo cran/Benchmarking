@@ -1,4 +1,4 @@
-% $Id: pigdata.Rd 242 2022-03-18 11:49:12Z X052717 $
+% $Id: pigdata.Rd 252 2023-01-02 13:28:15Z X052717 $
 \name{pigdata}
 \alias{pigdata}
 \docType{data}
@@ -40,7 +40,7 @@ pigs. Labor and capital are used not just directly for pig-raising but
 also on the field.  }
 
 \note{ Data as \code{.csv} are loaded by the command \code{data} using
-\code{ read.table(..., header = TRUE, sep = ";")} such that this file
+\code{ read.table(..., header = TRUE, sep = ";")} as the file
 is a semicolon separated file and not a comma separated file.  }
 
 \source{ Farmers accounting data converted to index. }

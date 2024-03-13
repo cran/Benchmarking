@@ -1,13 +1,14 @@
 Package: Benchmarking
 Type: Package
 Title: Benchmark and Frontier Analysis Using DEA and SFA
-Version: 0.31
-Date: 2022-11-04
+Version: 0.32
+Date: 2024-03-14
 Author: Peter Bogetoft and Lars Otto
 Maintainer: Lars Otto <larsot23@gmail.com>
 Depends: lpSolveAPI, ucminf, quadprog
 Imports: methods, stats, graphics, grDevices, Rcpp
 LinkingTo: Rcpp
+Encoding: UTF-8
 Description: Methods for frontier
     analysis, Data Envelopment Analysis (DEA), under different
     technology assumptions (fdh, vrs, drs, crs, irs, add/frh, and fdh+),
@@ -26,6 +27,6 @@ Description: Methods for frontier
 License: GPL (>= 2)
 LazyLoad: yes
 NeedsCompilation: yes
-Packaged: 2022-11-04 13:43:20 UTC; X052717
+Packaged: 2024-03-13 14:34:15 UTC; larso
 Repository: CRAN
-Date/Publication: 2022-11-04 17:40:11 UTC
+Date/Publication: 2024-03-13 15:00:02 UTC

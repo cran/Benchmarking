@@ -349,7 +349,7 @@ teJ.sfa <- function(object)  {
 # te2.sfa <- teJ.sfa
 
 
-te.add.sfa <- function(object)  {
+te.add.sfa <- function(object, ...)  {
   sign <- 1
   if (is(object, "sfa.cost")) sign <- -1
   e <- sign * residuals.sfa(object)

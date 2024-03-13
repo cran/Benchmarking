@@ -1,4 +1,4 @@
-% $Id: slack.Rd 238 2021-07-11 16:12:17Z X022278 $
+% $Id: slack.Rd 253 2023-02-27 14:10:46Z X052717 $
 \name{slack}
 \alias{slack}
 \alias{print.slack}
@@ -83,6 +83,12 @@ DEA-Solver Software}, 2nd edn. Springer 2007 .  }
 
 \author{ Peter Bogetoft and Lars Otto \email{larsot23@gmail.com}}
 
+\note{
+    If a numerical problem occurs, status=5, or if no solution can be found,
+    the best solution is often to scale the input \code{X} and output
+    \code{Y} yourself or use the option \code{CONTROL} to change scaling in
+    the program itself, as described in the notes for \code{\link{dea}}.
+}
 
 \examples{
 x <- matrix(c(100,200,300,500,100,200,600),ncol=1)
