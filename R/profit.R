@@ -1,4 +1,4 @@
-# $Id: profit.R 235 2021-04-11 13:46:25Z lao $
+# $Id: profit.R 268 2025-01-10 21:21:42Z larso $
 
 # Calculates optimal input and output to maximize profit for given
 # input and output prices.
@@ -130,6 +130,7 @@ profit.opt <- function(XREF, YREF, W, P, RTS="vrs", param=NULL,
 
       set.basis(lps, default=TRUE)
       status <- solve(lps)
+      if (LP)  print(paste("Status =",status))
       if ( status == 3 )  {
          cat("\nProfit is unbounded for firm ",k,
             ". Input and output are not uniquely determined.\n", sep="")

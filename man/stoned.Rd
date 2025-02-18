@@ -1,4 +1,4 @@
-% $Id: stoned.Rd 238 2021-07-11 16:12:17Z X022278 $
+% $Id: stoned.Rd 269 2025-02-01 14:14:09Z larso $
 \name{stoned}
 \alias{stoned}
 
@@ -61,7 +61,8 @@ semi-parametric frontier estimation subject to shape constraints",
 }
 
 \author{
-Stefan Seifert \email{s.seifert@ilr.uni-bonn.de} and Lars Otto \email{larsot23@gmail.com}
+Stefan Seifert \email{stefan.seifert@uni-goettingen.de} and Lars Otto 
+\email{larsot23@gmail.com}
 }
 
 \note{
@@ -74,6 +75,11 @@ other technology assumptions do have an intercept.
 
 Note that the method \code{stoned} is a rather slow method and probably only 
 works in a reasonable time for less than 3-400 units.
+
+No non-commercial solver at this time of writing is able to solve the NLP 
+formulation required for the multiplicative S toned. Therefore, the NLP is
+approximated with a QP formulation with some transformation of the objective 
+function. Unfortunately this has not been checked in alle details.
 }
 
 %% ~Make other sections like Warning with \section{Warning }{....} ~

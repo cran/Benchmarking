@@ -1,10 +1,17 @@
-﻿$Id: NEWS 260 2023-11-05 11:45:35Z larso $
+﻿$Id: NEWS 269 2025-02-01 14:14:09Z larso $
 
 Upcoming
 
 * Directional distance efficiency for parametric function
 
 * A fast version of dea.boot
+
+
+Changes to Benchmarking version 0.33
+
+* Corrected an error in in the function 'critValue' -- the critical value calculated was in most cases to small by half the distance to the next observation point in increasing order (reported by Angeliki Flokou).
+
+* Minor bugs and errors repaired and a few clarifications in the man pages.
 
 
 Changes to Benchmarking version 0.32

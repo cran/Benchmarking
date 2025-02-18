@@ -1,4 +1,4 @@
-# $Id: bootStat.R 117 2011-05-17 10:17:07Z Lars $
+# $Id: bootStat.R 265 2024-07-28 09:45:12Z larso $
 
 # Calculates the critical value at level |alpha| for the vector of
 # trials |s|
@@ -6,7 +6,7 @@ critValue <- function(s, alpha=0.05) {
   if ( alpha <= 0 || alpha >= 1 ) 
      stop("The argument alpha must be between 0 and 1")
   ss_ <- sort(s)
-  mean( ss_[floor(alpha*length(s))], ss_[ceiling(alpha*length(s))], 
+  mean( c(ss_[floor(alpha*length(s))], ss_[ceiling(alpha*length(s))]), 
         na.rm=TRUE )
 }
 
@@ -22,5 +22,5 @@ typeIerror <- function(shat,s) {
       if ( shat <= min(s) )  return(0)
       if ( shat >= max(s) )  return(1)
   }
-  uniroot(reject,c(0,1))$root
+  uniroot(reject,c(0,1), tol=.Machine$double.eps^.5)$root
 }

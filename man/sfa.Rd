@@ -1,4 +1,4 @@
-% $Id: sfa.Rd 238 2021-07-11 16:12:17Z X022278 $
+% $Id: sfa.Rd 270 2025-02-18 15:55:25Z larso $
 \name{sfa}
 \alias{sfa}
 \alias{sfa.cost}
@@ -96,11 +96,11 @@ lambda.sfa(object)
   \item{DEBUG}{Set to TRUE to get various debugging information written
   on the console}
 
-  \item{control}{List of control parameters to \code{ucminf}}
+  \item{control}{List of control parameters to 
+  	  \code{\link[ucminf:ucminf]{ucminf}} }
 
-  \item{hessian}{How the Hessian is delivered, see the ucminf
-      documentation}
-
+  \item{hessian}{How the Hessian is delivered, see the 
+      \code{\link[ucminf:ucminf]{ucminf}} documentation}
 
   \item{object}{Object of class \sQuote{sfa} as output from the
       function \code{sfa}} 
@@ -109,9 +109,9 @@ lambda.sfa(object)
 }
 
 
-\details{ The optimization is done by the R method \code{ucminf} from
-   the package with the same name. The efficiency terms are assumed to
-   be half--normal distributed.
+\details{ The optimization is done by the R method 
+   \code{\link[ucminf:ucminf]{ucminf}} from the package with the same name.
+   The efficiency terms are assumed to be half--normal distributed.
    
    Changing the maximum step length, the trust region, might be important,
     and this can be done by the option 'control = list(stepmax=0.1)'. The
@@ -170,7 +170,7 @@ can also be obtained by \cr \code{residuals(sfa-object)}}
 
 '4' Stopped by zero step from line search 
 
-More codes are found in \code{\link{ucminf}}
+More codes are found in \code{ucminf}
 }
 
 \item{message}{A character string giving any additional information
@@ -178,7 +178,7 @@ More codes are found in \code{\link{ucminf}}
 
 
 \item{o}{The object returned by \code{ucminf}, for further information
-on this see \code{ucminf}}
+on this see \code{\link[ucminf:ucminf]{ucminf}}.}
 
 }
 
@@ -192,8 +192,9 @@ Bogetoft and Otto; \emph{Benchmarking with DEA, SFA, and R}, Springer
 }
 
 
-\seealso{ See the method \code{ucminf} for the possible optimization
-   methods and further options to use in the option \code{control}.
+\seealso{ See the method \link[ucminf:ucminf]{ucminf} in the package \pkg{ucminf}
+   for the possible optimization methods and further options to use in the 
+   option \code{control}.
 
    The method \code{sfa} in the package \pkg{frontier} gives another
    way to estimate stochastic production functions.

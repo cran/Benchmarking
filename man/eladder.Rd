@@ -1,4 +1,4 @@
-% $Id: eladder.Rd 259 2023-09-19 08:34:20Z larso $
+% $Id: eladder.Rd 268 2025-01-10 21:21:42Z larso $
 \encoding{UTF-8}
 \name{eladder}
 \alias{eladder}
@@ -78,7 +78,7 @@ eladder.plot(elad, peer, TRIM = NULL,
 
   \item{ylab}{A title for the y axis}
       
-   \item{\dots}{Usual options for the method \code{plot}.}
+  \item{\dots}{Usual options for the method \code{plot}.}
 
 }
 
@@ -105,6 +105,8 @@ eladder.plot(elad, peer, TRIM = NULL,
 
 \item{peer}{The sequence of removed peers corresponding to the largest
     values of lambda as index in the \code{X} rows.}
+    
+\item{lastp}{The last peers before the unit gets efficiency of 1.00}
 
 } 
 
@@ -119,8 +121,10 @@ eladder.plot(elad, peer, TRIM = NULL,
 
 
 \references{ Dag Fjeld Edvardsen; \emph{Four Essays on the Measurement
-   of Productive Efficiency}; University of Gothenburg 2004;
-   \url{http://hdl.handle.net/2077/2923} 
+   of Productive Efficiency}; University of Gothenburg 2004.
+   \url{http://hdl.handle.net/2077/2923}
+   %Avalible on ResearchGate:
+   %\url{https://www.researchgate.net/publication/34724184_Four_essays_on_the_measurement_of_productive_efficiency}
  }
 
 
